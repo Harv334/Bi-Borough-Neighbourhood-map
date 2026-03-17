@@ -1,0 +1,355 @@
+{
+  "metadata": {
+    "generated": "2026-03-17",
+    "sources": {
+      "crime": "police.uk street crime API (3-month rolling, annualised \u00d74)",
+      "claimants": "DWP Stat-Xplore UC claimant count (monthly)",
+      "gp": "NHS Digital ODS + postcodes.io",
+      "health": "OHID Fingertips (MSOA or LA level)",
+      "population": "ONS Census 2021 usual residents via NOMIS"
+    }
+  },
+  "wards": {
+    "E05013792": {
+      "name": "Abbey Road",
+      "code": "E05013792",
+      "neighbourhood": "sm",
+      "neighbourhood_label": "St John's Wood & Maida Vale",
+      "indicators": {
+        "gp_practice_count": 3,
+        "crime_total_annual": 3060,
+        "crime_violent_annual": 632,
+        "crime_burglary_annual": 228,
+        "crime_asb_annual": 776,
+        "crime_robbery_annual": 84,
+        "crime_drugs_annual": 148,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013793": {
+      "name": "Bayswater",
+      "code": "E05013793",
+      "neighbourhood": "rh",
+      "neighbourhood_label": "Regent Heath",
+      "indicators": {
+        "gp_practice_count": 1,
+        "crime_total_annual": 6488,
+        "crime_violent_annual": 1112,
+        "crime_burglary_annual": 552,
+        "crime_asb_annual": 1740,
+        "crime_robbery_annual": 152,
+        "crime_drugs_annual": 188,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013794": {
+      "name": "Church Street",
+      "code": "E05013794",
+      "neighbourhood": "rh",
+      "neighbourhood_label": "Regent Heath",
+      "indicators": {
+        "gp_practice_count": 3,
+        "crime_total_annual": 8388,
+        "crime_violent_annual": 1600,
+        "crime_burglary_annual": 368,
+        "crime_asb_annual": 1968,
+        "crime_robbery_annual": 260,
+        "crime_drugs_annual": 380,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013795": {
+      "name": "Harrow Road",
+      "code": "E05013795",
+      "neighbourhood": "sm",
+      "neighbourhood_label": "St John's Wood & Maida Vale",
+      "indicators": {
+        "gp_practice_count": 2,
+        "crime_total_annual": 6760,
+        "crime_violent_annual": 1608,
+        "crime_burglary_annual": 384,
+        "crime_asb_annual": 1816,
+        "crime_robbery_annual": 180,
+        "crime_drugs_annual": 276,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013796": {
+      "name": "Hyde Park",
+      "code": "E05013796",
+      "neighbourhood": "rh",
+      "neighbourhood_label": "Regent Heath",
+      "indicators": {
+        "gp_practice_count": 11,
+        "crime_total_annual": 7668,
+        "crime_violent_annual": 1196,
+        "crime_burglary_annual": 276,
+        "crime_asb_annual": 1420,
+        "crime_robbery_annual": 296,
+        "crime_drugs_annual": 480,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013797": {
+      "name": "Knightsbridge & Belgravia",
+      "code": "E05013797",
+      "neighbourhood": "sw",
+      "neighbourhood_label": "South Westminster",
+      "indicators": {
+        "gp_practice_count": 2,
+        "crime_total_annual": 5688,
+        "crime_violent_annual": 800,
+        "crime_burglary_annual": 176,
+        "crime_asb_annual": 952,
+        "crime_robbery_annual": 172,
+        "crime_drugs_annual": 112,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013798": {
+      "name": "Lancaster Gate",
+      "code": "E05013798",
+      "neighbourhood": "rh",
+      "neighbourhood_label": "Regent Heath",
+      "indicators": {
+        "gp_practice_count": 2,
+        "crime_total_annual": 5300,
+        "crime_violent_annual": 940,
+        "crime_burglary_annual": 320,
+        "crime_asb_annual": 1080,
+        "crime_robbery_annual": 116,
+        "crime_drugs_annual": 196,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013799": {
+      "name": "Little Venice",
+      "code": "E05013799",
+      "neighbourhood": "sm",
+      "neighbourhood_label": "St John's Wood & Maida Vale",
+      "indicators": {
+        "gp_practice_count": 3,
+        "crime_total_annual": 4912,
+        "crime_violent_annual": 812,
+        "crime_burglary_annual": 212,
+        "crime_asb_annual": 1480,
+        "crime_robbery_annual": 120,
+        "crime_drugs_annual": 192,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013800": {
+      "name": "Maida Vale",
+      "code": "E05013800",
+      "neighbourhood": "sm",
+      "neighbourhood_label": "St John's Wood & Maida Vale",
+      "indicators": {
+        "gp_practice_count": 3,
+        "crime_total_annual": 5100,
+        "crime_violent_annual": 1028,
+        "crime_burglary_annual": 404,
+        "crime_asb_annual": 1284,
+        "crime_robbery_annual": 184,
+        "crime_drugs_annual": 204,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013801": {
+      "name": "Marylebone",
+      "code": "E05013801",
+      "neighbourhood": "we",
+      "neighbourhood_label": "West End & Marylebone",
+      "indicators": {
+        "gp_practice_count": 5,
+        "crime_total_annual": 13356,
+        "crime_violent_annual": 1144,
+        "crime_burglary_annual": 380,
+        "crime_asb_annual": 1284,
+        "crime_robbery_annual": 508,
+        "crime_drugs_annual": 448,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013802": {
+      "name": "Pimlico North",
+      "code": "E05013802",
+      "neighbourhood": "sw",
+      "neighbourhood_label": "South Westminster",
+      "indicators": {
+        "gp_practice_count": 5,
+        "crime_total_annual": 7948,
+        "crime_violent_annual": 1260,
+        "crime_burglary_annual": 264,
+        "crime_asb_annual": 1980,
+        "crime_robbery_annual": 248,
+        "crime_drugs_annual": 204,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013803": {
+      "name": "Pimlico South",
+      "code": "E05013803",
+      "neighbourhood": "sw",
+      "neighbourhood_label": "South Westminster",
+      "indicators": {
+        "crime_total_annual": 7700,
+        "crime_violent_annual": 1456,
+        "crime_burglary_annual": 304,
+        "crime_asb_annual": 2192,
+        "crime_robbery_annual": 228,
+        "crime_drugs_annual": 196,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013804": {
+      "name": "Queen's Park",
+      "code": "E05013804",
+      "neighbourhood": "rh",
+      "neighbourhood_label": "Regent Heath",
+      "indicators": {
+        "gp_practice_count": 3,
+        "crime_total_annual": 5532,
+        "crime_violent_annual": 1420,
+        "crime_burglary_annual": 272,
+        "crime_asb_annual": 1192,
+        "crime_robbery_annual": 164,
+        "crime_drugs_annual": 284,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013805": {
+      "name": "Regent's Park",
+      "code": "E05013805",
+      "neighbourhood": "sm",
+      "neighbourhood_label": "St John's Wood & Maida Vale",
+      "indicators": {
+        "gp_practice_count": 4,
+        "crime_total_annual": 3556,
+        "crime_violent_annual": 636,
+        "crime_burglary_annual": 132,
+        "crime_asb_annual": 736,
+        "crime_robbery_annual": 64,
+        "crime_drugs_annual": 160,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013806": {
+      "name": "St James's",
+      "code": "E05013806",
+      "neighbourhood": "sw",
+      "neighbourhood_label": "South Westminster",
+      "indicators": {
+        "gp_practice_count": 8,
+        "crime_total_annual": 25652,
+        "crime_violent_annual": 3456,
+        "crime_burglary_annual": 360,
+        "crime_asb_annual": 2192,
+        "crime_robbery_annual": 1020,
+        "crime_drugs_annual": 868,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013807": {
+      "name": "Vincent Square",
+      "code": "E05013807",
+      "neighbourhood": "sw",
+      "neighbourhood_label": "South Westminster",
+      "indicators": {
+        "gp_practice_count": 3,
+        "crime_total_annual": 8340,
+        "crime_violent_annual": 1484,
+        "crime_burglary_annual": 236,
+        "crime_asb_annual": 1968,
+        "crime_robbery_annual": 328,
+        "crime_drugs_annual": 188,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013808": {
+      "name": "West End",
+      "code": "E05013808",
+      "neighbourhood": "we",
+      "neighbourhood_label": "West End & Marylebone",
+      "indicators": {
+        "gp_practice_count": 9,
+        "crime_total_annual": 24276,
+        "crime_violent_annual": 1920,
+        "crime_burglary_annual": 544,
+        "crime_asb_annual": 1944,
+        "crime_robbery_annual": 832,
+        "crime_drugs_annual": 324,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    },
+    "E05013809": {
+      "name": "Westbourne",
+      "code": "E05013809",
+      "neighbourhood": "rh",
+      "neighbourhood_label": "Regent Heath",
+      "indicators": {
+        "gp_practice_count": 4,
+        "crime_total_annual": 6384,
+        "crime_violent_annual": 1128,
+        "crime_burglary_annual": 464,
+        "crime_asb_annual": 1972,
+        "crime_robbery_annual": 140,
+        "crime_drugs_annual": 180,
+        "crime_period": "2025-11 to 2026-01 (annualised \u00d74)",
+        "health_life_exp_male": 86.7,
+        "health_healthy_le_male": 62.39,
+        "health_premature_mortality": 9.03
+      }
+    }
+  }
+}

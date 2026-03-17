@@ -2,7 +2,7 @@
 
 Interactive ward-level map for neighbourhood funding allocation across 4 Westminster neighbourhoods and 18 wards.
 
-**Live map:** https://YOUR-USERNAME.github.io/westminster-neighbourhood-map/
+**Live map:** [https://YOUR-USERNAME.github.io/westminster-neighbourhood-map/](https://harv334.github.io/Bi-Borough-Neighbourhood-map/)
 
 ## What this shows
 

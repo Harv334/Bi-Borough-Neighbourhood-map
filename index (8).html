@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Westminster Neighbourhood Map</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a1a; }
+
+  /* ── Layout ── */
+  .app { display: flex; flex-direction: column; height: 100vh; }
+  .hdr { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .hdr-left { display: flex; align-items: center; gap: 12px; }
+  .hdr-logo { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+  .hdr-sub { font-size: 11px; color: #666; margin-top: 1px; }
+  .nbadges { display: flex; gap: 5px; flex-wrap: wrap; }
+  .nb { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; cursor: pointer; opacity: .45; border: 1.5px solid transparent; white-space: nowrap; transition: opacity .15s, transform .1s; }
+  .nb:hover { transform: translateY(-1px); }
+  .nb.on { opacity: 1; }
+  .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+  /* ── Sidebar ── */
+  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; background: #fff; }
+  .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
+  .sb-tab { flex: 1; padding: 9px 4px; font-size: 11px; font-weight: 500; color: #888; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s; }
+  .sb-tab:hover { color: #333; }
+  .sb-tab.active { color: #1a1a1a; border-bottom-color: #185FA5; }
+  .tab-pane { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+  .tab-pane.active { display: flex; }
+  .sb-sec { padding: 11px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
+  .sb-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 8px; }
+  .lrow { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: default; }
+  .ldot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .lname { font-size: 12px; color: #333; flex: 1; }
+  .lcount { font-size: 11px; color: #999; }
+  input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; accent-color: #185FA5; }
+  select { width: 100%; padding: 6px 9px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; color: #333; background: #fff; cursor: pointer; outline: none; }
+  select:focus { border-color: #185FA5; }
+  input[type=text] { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; color: #333; background: #fff; outline: none; }
+  input[type=text]:focus { border-color: #185FA5; box-shadow: 0 0 0 2px rgba(24,95,165,.1); }
+
+  /* ── VCSE list ── */
+  .vcse-count { font-size: 11px; color: #888; padding: 6px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; background: #fafaf8; }
+  .vcse-list { flex: 1; overflow-y: auto; min-height: 0; }
+  .vcse-item { padding: 8px 13px; border-bottom: 1px solid #f0f0ec; cursor: pointer; transition: background .1s; }
+  .vcse-item:hover { background: #f8f8f4; }
+  .vcse-name { font-size: 12px; font-weight: 500; color: #1a1a1a; line-height: 1.3; }
+  .vcse-addr { font-size: 10px; color: #999; margin-top: 2px; }
+  .vcse-more { padding: 8px 13px; font-size: 11px; color: #999; text-align: center; font-style: italic; }
+
+  /* ── Ward detail panel ── */
+  .ward-scroll { flex: 1; overflow-y: auto; padding: 11px 13px; min-height: 0; }
+  .ph { text-align: center; padding: 28px 12px; color: #999; font-size: 12px; line-height: 1.8; }
+  .ph-icon { font-size: 22px; margin-bottom: 8px; opacity: .4; }
+  .nbadge-sm { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-bottom: 9px; }
+  .wname { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: baseline; }
+  .wpop { font-size: 11px; font-weight: 400; color: #888; }
+  .cat-block { margin-bottom: 9px; }
+  .cat-hdr { display: flex; align-items: center; justify-content: space-between; padding: 6px 9px; background: #f5f5f0; border-radius: 6px; cursor: pointer; transition: background .1s; }
+  .cat-hdr:hover { background: #eeeeea; }
+  .cat-hdr-l { font-size: 11px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 7px; }
+  .cat-ico { width: 16px; text-align: center; font-size: 12px; }
+  .cat-arrow { font-size: 9px; color: #aaa; transition: transform .15s; }
+  .cat-arrow.open { transform: rotate(90deg); }
+  .cat-body { display: none; padding: 3px 0 0; }
+  .cat-body.open { display: block; }
+  .sr { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid #f0f0ec; font-size: 11px; gap: 8px; }
+  .sl { color: #666; flex: 1; line-height: 1.4; }
+  .sv { font-weight: 500; color: #1a1a1a; text-align: right; flex-shrink: 0; }
+  .sv.real { color: #1a5c2e; }
+  .sv.sample { color: #888; font-style: italic; }
+  .gpill { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; font-weight: 500; }
+  .gpill-ward { background: #e8f4e8; color: #1a5c2e; }
+  .gpill-msoa { background: #e3edf9; color: #0c447c; }
+  .gpill-la   { background: #fef3e2; color: #7a4a00; }
+  .data-note { margin-top: 10px; padding: 7px 10px; background: #f8f8f4; border-left: 3px solid #ddd; font-size: 10px; color: #888; line-height: 1.5; border-radius: 0 5px 5px 0; }
+  .data-note a { color: #185FA5; text-decoration: none; }
+
+  /* ── Overlay scale ── */
+  .scale-bar { display: none; margin-top: 8px; }
+  .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 3px; }
+  .scale-grad { display: flex; height: 6px; border-radius: 3px; overflow: hidden; }
+
+  /* ── Map ── */
+  .map-wrap { flex: 1; position: relative; min-height: 0; min-width: 0; }
+  #map { width: 100%; height: 100%; }
+  .loading-overlay { position: absolute; inset: 0; background: rgba(255,255,255,.92); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; z-index: 2000; }
+  .loading-overlay.hidden { display: none; }
+  .spin { width: 28px; height: 28px; border: 3px solid #eee; border-top-color: #185FA5; border-radius: 50%; animation: sp .8s linear infinite; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+  .loading-txt { font-size: 13px; color: #666; }
+  .loading-sub { font-size: 11px; color: #aaa; }
+
+  /* ── Status bar ── */
+  .sbar { background: #fff; border-top: 1px solid #e5e5e0; padding: 4px 14px; font-size: 10px; color: #aaa; display: flex; justify-content: space-between; flex-shrink: 0; }
+
+  /* ── Leaflet overrides ── */
+  .leaflet-popup-content-wrapper { border-radius: 8px !important; box-shadow: 0 2px 12px rgba(0,0,0,.12) !important; border: none !important; padding: 0 !important; overflow: hidden; }
+  .leaflet-popup-tip-container { display: none; }
+  .leaflet-popup-content { margin: 0 !important; min-width: 200px; max-width: 260px; }
+  .pop-hdr { padding: 9px 13px; font-size: 12px; font-weight: 600; color: #fff; }
+  .pop-body { padding: 8px 13px; font-size: 11px; background: #fff; color: #333; }
+  .pop-addr { color: #888; margin-bottom: 5px; line-height: 1.4; }
+  .pop-row { display: flex; gap: 8px; margin-bottom: 3px; }
+  .pop-key { color: #aaa; width: 54px; flex-shrink: 0; }
+
+  /* ── VCSE cluster colours ── */
+  .marker-cluster-small div,
+  .marker-cluster-medium div,
+  .marker-cluster-large div { background: rgba(133,79,11,.75) !important; color: #fff !important; font-weight: 600 !important; font-size: 12px !important; }
+  .marker-cluster-small,
+  .marker-cluster-medium,
+  .marker-cluster-large { background: rgba(133,79,11,.2) !important; }
+
+  /* ── Transparency slider ── */
+  .opacity-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .opacity-row label { font-size:11px; color:#888; flex-shrink:0; width:68px; }
+  input[type=range] { flex:1; accent-color:#185FA5; height:4px; cursor:pointer; }
+  .opacity-val { font-size:11px; color:#333; width:28px; text-align:right; flex-shrink:0; }
+
+  /* ── Neighbourhood focus mode ── */
+  .nbfocus-bar { display:flex; gap:4px; flex-wrap:wrap; padding:10px 13px 8px;
+                 border-bottom:1px solid #e5e5e0; flex-shrink:0; }
+  .nbfocus-btn { font-size:11px; font-weight:500; padding:4px 10px; border-radius:20px;
+                 cursor:pointer; border:1.5px solid transparent; white-space:nowrap;
+                 transition:all .15s; opacity:.5; }
+  .nbfocus-btn:hover { opacity:.85; transform:translateY(-1px); }
+  .nbfocus-btn.active { opacity:1; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .nbfocus-btn.all { background:#f0f0ec; color:#555; border-color:#ddd; opacity:1; }
+  .nbfocus-btn.all.active { background:#333; color:#fff; border-color:#333; }
+
+  /* ── GP layer toggle ── */
+  .layer-section { padding:10px 13px; border-bottom:1px solid #e5e5e0; flex-shrink:0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .sidebar { width: 220px; }
+    .nbadges { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <div>
+        <div class="hdr-logo">Westminster Neighbourhood Map</div>
+        <div class="hdr-sub">4 neighbourhoods · 18 wards · 247 VCSE organisations</div>
+      </div>
+    </div>
+    <div class="nbadges" id="nbadges"></div>
+  </div>
+
+  <div class="main">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="nbfocus-bar" id="nbfocus-bar">
+        <button class="nbfocus-btn all active" data-nbhd="all" onclick="setNbhdFocus('all')">All wards</button>
+      </div>
+      <div class="sb-tabs">
+        <div class="sb-tab active" data-tab="layers">Layers</div>
+        <div class="sb-tab" data-tab="vcse">VCSE</div>
+        <div class="sb-tab" data-tab="overlay">Overlay</div>
+        <div class="sb-tab" data-tab="ward">Ward</div>
+      </div>
+
+      <!-- Layers tab -->
+      <div class="tab-pane active" id="tab-layers">
+        <div class="sb-sec">
+          <div class="sb-lbl">Point layers</div>
+          <label class="lrow"><div class="ldot" style="background:#185FA5"></div><span class="lname">GP practices</span><input type="checkbox" id="tg" checked></label>
+          <label class="lrow"><div class="ldot" style="background:#A32D2D"></div><span class="lname">Hospitals &amp; clinics</span><input type="checkbox" id="th" checked></label>
+          <label class="lrow"><div class="ldot" style="background:#0F6E56"></div><span class="lname">Green spaces</span><input type="checkbox" id="tgr" checked></label>
+          <label class="lrow"><div class="ldot" style="background:#854F0B"></div><span class="lname">VCSE organisations <span class="lcount">247</span></span><input type="checkbox" id="tv" checked></label>
+        </div>
+        <div class="sb-sec" style="flex-shrink:0;border-bottom:1px solid #e5e5e0">
+          <div class="sb-lbl">Borough boundaries</div>
+          <label class="lrow"><div style="width:9px;height:9px;border:2px solid #1a1a1a;border-radius:2px;flex-shrink:0"></div><span class="lname">NW London boroughs</span><input type="checkbox" id="tb" checked></label>
+        </div>
+        <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto">
+          <div class="sb-lbl">Neighbourhood filter</div>
+          <div id="nfilters"></div>
+          <div class="data-note" style="margin-top:12px">
+            Click a badge above to zoom to a neighbourhood.<br>
+            Click any ward to explore its data in the Ward tab.
+          </div>
+        </div>
+        <div class="sb-sec" style="flex-shrink:0;border-top:1px solid #e5e5e0">
+          <div class="sb-lbl">Ward transparency</div>
+          <div class="opacity-row">
+            <label>Fill</label>
+            <input type="range" id="fill-opacity" min="0" max="100" value="40">
+            <span class="opacity-val" id="fill-opacity-val">40%</span>
+          </div>
+          <div class="opacity-row" style="margin-top:6px">
+            <label>Border</label>
+            <input type="range" id="border-weight" min="0" max="8" value="2" step="0.5">
+            <span class="opacity-val" id="border-weight-val">2</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VCSE tab -->
+      <div class="tab-pane" id="tab-vcse">
+        <div class="sb-sec" style="padding-bottom:8px">
+          <div class="sb-lbl">Filter by area</div>
+          <select id="vcse-area-filter" style="width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;color:#333;background:#fff;margin-bottom:8px">
+            <option value="london">All London (all organisations)</option>
+            <option value="all" selected>Westminster only</option>
+            <optgroup label="── Neighbourhoods ──">
+              <option value="nbhd-sw">South Westminster</option>
+              <option value="nbhd-we">West End &amp; Marylebone</option>
+              <option value="nbhd-rh">Regent Heath</option>
+              <option value="nbhd-sm">St John's Wood &amp; Maida Vale</option>
+            </optgroup>
+          </select>
+          <input type="text" id="vcse-search" placeholder="Search organisations...">
+        </div>
+        <div class="vcse-count" id="vcse-count">194 organisations</div>
+        <div class="vcse-list" id="vcse-list"></div>
+      </div>
+
+      <!-- Overlay tab -->
+      <div class="tab-pane" id="tab-overlay">
+        <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto">
+          <div class="sb-lbl">Choropleth overlay</div>
+          <select id="ov">
+            <option value="none">— none (neighbourhood colours) —</option>
+            <optgroup label="Health">
+              <option value="health_life_expectancy">Life expectancy</option>
+              <option value="health_healthy_life_expectancy">Healthy life expectancy</option>
+              <option value="health_depression_prevalence">Depression prevalence</option>
+              <option value="census_good_health_pct">Good/very good health % (Census)</option>
+              <option value="census_bad_health_pct">Bad/very bad health % (Census)</option>
+            </optgroup>
+            <optgroup label="Crime">
+              <option value="crime_rate_per_1000">Crime rate per 1,000</option>
+              <option value="crime_violent_annual">Violent crime (annual)</option>
+              <option value="crime_asb_annual">Anti-social behaviour</option>
+            </optgroup>
+            <optgroup label="Deprivation">
+              <option value="claimant_rate_pct">Claimant rate (%)</option>
+              <option value="census_housing_deprived_pct">Housing deprived % (Census)</option>
+              <option value="census_no_qual_pct">No qualifications % (Census)</option>
+              <option value="census_unemployed_pct">Unemployed % (Census)</option>
+            </optgroup>
+            <optgroup label="Housing (Census)">
+              <option value="census_social_rented_pct">Social rented %</option>
+              <option value="census_private_rented_pct">Private rented %</option>
+              <option value="census_owned_pct">Owner occupied %</option>
+            </optgroup>
+            <optgroup label="Population (Census)">
+              <option value="census_population">Resident population</option>
+              <option value="gp_registered_patients">GP registered patients</option>
+              <option value="census_under16_pct">Under 16 %</option>
+              <option value="census_over65_pct">Aged 65+ %</option>
+              <option value="census_non_white_pct">Non-White %</option>
+            </optgroup>
+            <optgroup label="Economy (Census)">
+              <option value="census_level4_qual_pct">Level 4+ qualifications %</option>
+              <option value="census_higher_managerial_pct">Higher managerial/professional %</option>
+              <option value="census_routine_semi_routine_pct">Routine/semi-routine %</option>
+            </optgroup>
+          </select>
+
+          <div class="scale-bar" id="scale">
+            <div class="scale-labels"><span id="sc-lo">Low</span><span id="sc-hi">High</span></div>
+            <div class="scale-grad" id="sc-grad">
+              <div style="flex:1;background:#0F6E56"></div>
+              <div style="flex:1;background:#3B9E5A"></div>
+              <div style="flex:1;background:#EF9F27"></div>
+              <div style="flex:1;background:#D85A30"></div>
+              <div style="flex:1;background:#A32D2D"></div>
+            </div>
+          </div>
+
+
+          <div id="data-vintage" style="margin-top:10px;font-size:10px;color:#aaa;line-height:1.5"></div>
+        </div>
+      </div>
+
+      <!-- Ward data tab -->
+      <div class="tab-pane" id="tab-ward">
+        <div class="ward-scroll" id="wpanel">
+          <div class="ph">
+            <div class="ph-icon">↖</div>
+            Click any ward on the map to explore its health, crime, deprivation and service data
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="map-wrap">
+      <div class="loading-overlay" id="ldr">
+        <div class="spin"></div>
+        <div class="loading-txt" id="ldr-txt">Loading ward data...</div>
+        <div class="loading-sub" id="ldr-sub">Fetching ward_data.json</div>
+      </div>
+      <div id="map"></div>
+    </div>
+
+  </div>
+
+  <div class="sbar">
+    <span id="src-lbl">Loading...</span>
+    <span id="data-date"></span>
+  </div>
+
+</div><!-- .app -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+const NEIGHBOURHOODS = {
+  sw: { label: "South Westminster",           short: "S Westminster", color: "#185FA5", bg: "#E6F1FB",
+        wards: ["Knightsbridge & Belgravia","Pimlico North","Pimlico South","St James's","Vincent Square"] },
+  we: { label: "West End & Marylebone",       short: "West End",      color: "#534AB7", bg: "#EEEDFE",
+        wards: ["West End","Marylebone"] },
+  rh: { label: "Regent Heath",               short: "Regent Heath",  color: "#0F6E56", bg: "#E1F5EE",
+        wards: ["Hyde Park","Church Street","Lancaster Gate","Bayswater","Westbourne","Queen's Park"] },
+  sm: { label: "St John's Wood & Maida Vale", short: "St J's Wood",   color: "#854F0B", bg: "#FAEEDA",
+        wards: ["Harrow Road","Maida Vale","Little Venice","Abbey Road","Regent's Park"] },
+};
+
+const OV_CFG = {
+  // Health
+  health_life_expectancy:         { lo:"Lower", hi:"Higher", wh:false, min:75,   max:85   },
+  health_healthy_life_expectancy: { lo:"Lower", hi:"Higher", wh:false, min:55,   max:72   },
+  health_depression_prevalence:   { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:30   },
+  census_good_health_pct:         { lo:"Lower", hi:"Higher", wh:false, min:50,   max:90   },
+  census_bad_health_pct:          { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:15   },
+  // Crime
+  crime_rate_per_1000:            { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:250  },
+  crime_violent_annual:           { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:5000 },
+  crime_asb_annual:               { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:3000 },
+  // Deprivation
+  claimant_rate_pct:              { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:25   },
+  census_housing_deprived_pct:    { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:35   },
+  census_no_qual_pct:             { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:30   },
+  census_unemployed_pct:          { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:15   },
+  // Housing
+  census_social_rented_pct:       { lo:"Less",  hi:"More",   wh:false, min:0,    max:70   },
+  census_private_rented_pct:      { lo:"Less",  hi:"More",   wh:false, min:0,    max:70   },
+  census_owned_pct:               { lo:"Less",  hi:"More",   wh:false, min:0,    max:70   },
+  // Population
+  census_population:              { lo:"Fewer", hi:"More",   wh:false, min:6000, max:16000},
+  gp_registered_patients:         { lo:"Fewer", hi:"More",   wh:false, min:5000, max:40000},
+  census_under16_pct:             { lo:"Lower", hi:"Higher", wh:false, min:5,    max:30   },
+  census_over65_pct:              { lo:"Lower", hi:"Higher", wh:false, min:3,    max:25   },
+  census_non_white_pct:           { lo:"Lower", hi:"Higher", wh:false, min:0,    max:70   },
+  // Economy
+  census_level4_qual_pct:         { lo:"Lower", hi:"Higher", wh:false, min:20,   max:90   },
+  census_higher_managerial_pct:   { lo:"Lower", hi:"Higher", wh:false, min:10,   max:80   },
+  census_routine_semi_routine_pct:{ lo:"Lower", hi:"Higher", wh:true,  min:0,    max:30   },
+};
+
+// Transparency state — controlled by sliders
+let fillOpacityMult = 1.0;   // multiplier on base fill opacity
+let borderWeightMult = 1.0;  // multiplier on base border weight
+
+const CATS = [
+  { key: "population",    label: "Population",    ico: "◎", fields: [
+    { k: "ons_population",       l: "ONS resident population", g: "ward" },
+    { k: "gp_registered_patients",l: "GP registered patients", g: "ward" },
+    { k: "gp_practice_count",    l: "GP practices in ward",    g: "ward" },
+  ]},
+  { key: "crime",         label: "Crime",         ico: "⚠", fields: [
+    { k: "crime_total_annual",    l: "Total crimes (annual)",       g: "ward" },
+    { k: "crime_rate_per_1000",   l: "Crime rate per 1,000 people", g: "ward" },
+    { k: "crime_violent_annual",  l: "Violent crime (annual)",      g: "ward" },
+    { k: "crime_burglary_annual", l: "Burglary (annual)",           g: "ward" },
+    { k: "crime_asb_annual",      l: "Anti-social behaviour",       g: "ward" },
+    { k: "crime_robbery_annual",  l: "Robbery (annual)",            g: "ward" },
+    { k: "crime_drugs_annual",    l: "Drug offences (annual)",      g: "ward" },
+  ]},
+  { key: "deprivation",   label: "Deprivation",   ico: "£", fields: [
+    { k: "claimant_count",        l: "UC claimant count",          g: "ward" },
+    { k: "claimant_rate_pct",     l: "Claimant rate (% of pop.)",  g: "ward" },
+  ]},
+  { key: "health",        label: "Health",        ico: "♥", fields: [
+    { k: "health_life_expectancy",        l: "Life expectancy (combined)", g: "msoa" },
+    { k: "health_life_exp_male",          l: "Life expectancy (male)",     g: "msoa" },
+    { k: "health_life_exp_female",        l: "Life expectancy (female)",   g: "msoa" },
+    { k: "health_healthy_life_expectancy",l: "Healthy life expectancy",    g: "msoa" },
+    { k: "health_depression_prevalence",  l: "Depression prevalence",      g: "msoa" },
+    { k: "health_hypertension_prevalence",l: "Hypertension prevalence",    g: "msoa" },
+    { k: "health_physically_active_pct",  l: "Physically active adults",   g: "msoa" },
+    { k: "health_premature_mortality",    l: "Premature mortality <75",    g: "msoa" },
+    { k: "health_diabetes_prevalence",    l: "Diabetes prevalence",        g: "msoa" },
+  ]},
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WARD GEOJSON (BSC boundaries from ONS May 2024)
+// ═══════════════════════════════════════════════════════════════════════════
+const GJ = {"type":"FeatureCollection","features":[
+  {"type":"Feature","properties":{"WD24NM":"Abbey Road","WD24CD":"E05013792"},"geometry":{"type":"Polygon","coordinates":[[[-0.175766,51.539617],[-0.173477,51.537646],[-0.176089,51.536014],[-0.168958,51.530122],[-0.171924,51.526424],[-0.176823,51.524626],[-0.181359,51.528388],[-0.188723,51.534531],[-0.178343,51.539808],[-0.175766,51.539617]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Bayswater","WD24CD":"E05013793"},"geometry":{"type":"Polygon","coordinates":[[[-0.184884,51.519534],[-0.183302,51.518405],[-0.189648,51.515229],[-0.18908,51.510124],[-0.192123,51.509878],[-0.195053,51.51504],[-0.199171,51.514541],[-0.199907,51.51684],[-0.19516,51.520539],[-0.184884,51.519534]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Church Street","WD24CD":"E05013794"},"geometry":{"type":"Polygon","coordinates":[[[-0.16432,51.520919],[-0.165341,51.520766],[-0.170165,51.519947],[-0.176823,51.524626],[-0.171924,51.526424],[-0.167333,51.528287],[-0.16432,51.520919]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Harrow Road","WD24CD":"E05013795"},"geometry":{"type":"Polygon","coordinates":[[[-0.19734,51.527893],[-0.197446,51.525245],[-0.190296,51.524922],[-0.189822,51.524697],[-0.201626,51.522742],[-0.207297,51.526235],[-0.201403,51.528555],[-0.203062,51.532895],[-0.203013,51.532896],[-0.19734,51.527893]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Hyde Park","WD24CD":"E05013796"},"geometry":{"type":"Polygon","coordinates":[[[-0.161605,51.514215],[-0.152521,51.503908],[-0.171232,51.506678],[-0.172278,51.512013],[-0.183302,51.518405],[-0.184884,51.519534],[-0.179967,51.520097],[-0.170165,51.519947],[-0.165341,51.520766],[-0.167446,51.518112],[-0.161605,51.514215]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Knightsbridge & Belgravia","WD24CD":"E05013797"},"geometry":{"type":"Polygon","coordinates":[[[-0.152521,51.503908],[-0.149777,51.503246],[-0.144817,51.496723],[-0.148307,51.490072],[-0.147481,51.485344],[-0.149979,51.485485],[-0.15033,51.485439],[-0.155779,51.49472],[-0.158458,51.502226],[-0.165419,51.498685],[-0.179524,51.497781],[-0.180312,51.501462],[-0.174678,51.50216],[-0.171232,51.506678],[-0.152521,51.503908]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Lancaster Gate","WD24CD":"E05013798"},"geometry":{"type":"Polygon","coordinates":[[[-0.171232,51.506678],[-0.174678,51.50216],[-0.180312,51.501462],[-0.184205,51.501789],[-0.18908,51.510124],[-0.189648,51.515229],[-0.183302,51.518405],[-0.172278,51.512013],[-0.171232,51.506678]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Little Venice","WD24CD":"E05013799"},"geometry":{"type":"Polygon","coordinates":[[[-0.176823,51.524626],[-0.170165,51.519947],[-0.179967,51.520097],[-0.189822,51.524697],[-0.190296,51.524922],[-0.181359,51.528388],[-0.176823,51.524626]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Maida Vale","WD24CD":"E05013800"},"geometry":{"type":"Polygon","coordinates":[[[-0.188723,51.534531],[-0.181359,51.528388],[-0.190296,51.524922],[-0.197446,51.525245],[-0.19734,51.527893],[-0.191468,51.536292],[-0.188723,51.534531]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Marylebone","WD24CD":"E05013801"},"geometry":{"type":"Polygon","coordinates":[[[-0.161605,51.514215],[-0.167446,51.518112],[-0.165341,51.520766],[-0.16432,51.520919],[-0.14791,51.523488],[-0.142852,51.517384],[-0.161605,51.514215]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Pimlico North","WD24CD":"E05013802"},"geometry":{"type":"Polygon","coordinates":[[[-0.142607,51.496579],[-0.131521,51.489601],[-0.141407,51.487754],[-0.148307,51.490072],[-0.144817,51.496723],[-0.142607,51.496579]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Pimlico South","WD24CD":"E05013803"},"geometry":{"type":"Polygon","coordinates":[[[-0.131521,51.489601],[-0.128466,51.488237],[-0.136531,51.485389],[-0.141727,51.485019],[-0.147481,51.485344],[-0.148307,51.490072],[-0.141407,51.487754],[-0.131521,51.489601]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Queen's Park","WD24CD":"E05013804"},"geometry":{"type":"Polygon","coordinates":[[[-0.207297,51.526235],[-0.215497,51.526719],[-0.216021,51.52792],[-0.215267,51.531361],[-0.203062,51.532895],[-0.201403,51.528555],[-0.207297,51.526235]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Regent's Park","WD24CD":"E05013805"},"geometry":{"type":"Polygon","coordinates":[[[-0.145206,51.523989],[-0.14791,51.523488],[-0.16432,51.520919],[-0.167333,51.528287],[-0.171924,51.526424],[-0.168958,51.530122],[-0.176089,51.536014],[-0.173477,51.537646],[-0.164899,51.535785],[-0.152702,51.53751],[-0.145206,51.523989]]]}},
+  {"type":"Feature","properties":{"WD24NM":"St James's","WD24CD":"E05013806"},"geometry":{"type":"Polygon","coordinates":[[[-0.111466,51.510758],[-0.111494,51.510757],[-0.121349,51.50741],[-0.122265,51.503895],[-0.124654,51.494719],[-0.142607,51.496579],[-0.144817,51.496723],[-0.149777,51.503246],[-0.128949,51.513415],[-0.111568,51.515335],[-0.111466,51.510758]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Vincent Square","WD24CD":"E05013807"},"geometry":{"type":"Polygon","coordinates":[[[-0.124654,51.494719],[-0.124657,51.494708],[-0.124857,51.494367],[-0.128449,51.488242],[-0.128466,51.488237],[-0.131521,51.489601],[-0.142607,51.496579],[-0.124654,51.494719]]]}},
+  {"type":"Feature","properties":{"WD24NM":"West End","WD24CD":"E05013808"},"geometry":{"type":"Polygon","coordinates":[[[-0.130327,51.51642],[-0.128949,51.513415],[-0.149777,51.503246],[-0.152521,51.503908],[-0.161605,51.514215],[-0.142852,51.517384],[-0.14791,51.523488],[-0.145206,51.523989],[-0.143545,51.523966],[-0.130327,51.51642]]]}},
+  {"type":"Feature","properties":{"WD24NM":"Westbourne","WD24CD":"E05013809"},"geometry":{"type":"Polygon","coordinates":[[[-0.179967,51.520097],[-0.184884,51.519534],[-0.19516,51.520539],[-0.199907,51.51684],[-0.203742,51.520624],[-0.201626,51.522742],[-0.189822,51.524697],[-0.179967,51.520097]]]}},
+]};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATIC POINT DATA (GPs, hospitals, green spaces — update as needed)
+// ═══════════════════════════════════════════════════════════════════════════
+const GPS = [
+  {n:"Pimlico Medical Centre",a:"Tachbrook St SW1V",lat:51.4918,lng:-0.1445},
+  {n:"Victoria Medical Centre",a:"Belgrave Rd SW1V",lat:51.4948,lng:-0.1438},
+  {n:"Marsham Street Practice",a:"Marsham St SW1P",lat:51.4968,lng:-0.1298},
+  {n:"Church Street Surgery",a:"Church St NW8",lat:51.5242,lng:-0.1682},
+  {n:"Lisson Grove Health Centre",a:"Lisson Grove NW8",lat:51.5264,lng:-0.1678},
+  {n:"Paddington Green Practice",a:"Paddington Green W2",lat:51.5195,lng:-0.1789},
+  {n:"St John's Wood Surgery",a:"St John's Wood NW8",lat:51.5341,lng:-0.1724},
+  {n:"The Portland Practice",a:"Great Portland St W1W",lat:51.5198,lng:-0.1441},
+];
+const HOSP = [
+  {n:"St Thomas' Hospital",a:"Westminster Bridge Rd SE1",lat:51.4985,lng:-0.1174,t:"NHS acute"},
+  {n:"Chelsea & Westminster Hospital",a:"Fulham Rd SW10",lat:51.4826,lng:-0.1819,t:"NHS acute"},
+  {n:"Westminster Urgent Care Centre",a:"Marsham St SW1P",lat:51.4972,lng:-0.1302,t:"Urgent care"},
+  {n:"St Mary's Hospital",a:"Praed St W2",lat:51.5148,lng:-0.1730,t:"NHS acute"},
+  {n:"The Wellington Hospital",a:"Wellington Pl NW8",lat:51.5368,lng:-0.1726,t:"Private"},
+];
+const GRN = [
+  {n:"St James's Park",a:"The Mall SW1A",lat:51.5025,lng:-0.1340,sz:"23 ha"},
+  {n:"Green Park",a:"Piccadilly W1J",lat:51.5034,lng:-0.1453,sz:"19 ha"},
+  {n:"Hyde Park",a:"Hyde Park W2",lat:51.5073,lng:-0.1657,sz:"142 ha"},
+  {n:"Regent's Park",a:"NW1",lat:51.5313,lng:-0.1569,sz:"166 ha"},
+  {n:"Kensington Gardens",a:"W2",lat:51.5058,lng:-0.1800,sz:"111 ha"},
+  {n:"Paddington Recreation Ground",a:"Maida Vale W9",lat:51.5271,lng:-0.1871,sz:"11 ha"},
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VCSE DATA (229 orgs from Westminster One Directory)
+// ═══════════════════════════════════════════════════════════════════════════
+const VCSE_RAW = [["The Portman Early Childhood Centre","12-18 Salisbury Street, London, NW8 8DE",51.52258,-0.16881,"Church Street (Westminster) #3","Community Walks"],["Mosaic Community Trust","61A Warwick Avenue, London, W9 2PR",51.52365,-0.18513,"Church Street #3","Arts Team"],["Triangle Studios","66 Church Street, London, NW8 8ET",51.52329,-0.1705,"Church Street (Westminster) 3","Arts Team"],["Cardinal Hume Centre","3-7 Arneway Street, Horseferry Road, London, SW1P 2BG",51.49649,-0.13375,"St James', South Westminster","Arts Team"],["Unfold","Fivefields, 8-10 Grosvenor Gardens, Victoria, London, SW1W 0DH",51.49755,-0.14757,"Across Westminster","Arts Team"],["Grand Junction","Rowington Close, London, W2 5TF",51.5223,-0.18908,"Westbourne #7","Arts Team"],["Paddington Development Trust","The Stowe Centre, 258 Harrow Road, London, W2 5ES",51.52021,-0.1903,"Westbourne #7","Arts Team"],["The Stowe Centre","The Stowe Centre, 258 Harrow Road, London, W2 5ES",51.52021,-0.1903,"Westbourne #7","Arts Team"],["Grand Union Healthcare Centre","209 Harrow Road, London, W2 5EH",51.51999,-0.19106,"Westbourne #7","Arts Team"],["Healthcare Central London","St Georges House, 82 Vincent Square, London, SW1P 2PF",51.49435,-0.13417,"Across Westminster","Arts Team"],["One Westminster Community Directory","37 Chapel Street, London, NW1 5DP",51.51968,-0.16698,"Across Westminster","Arts Team"],["Westbourne Community/Maternity Champions","Office 1, Beethoven Centre, Third Avenue, W10 4JL",51.5269,-0.20803,"Westbourne #7","Arts Team"],["Cockpit Theatre","Gateforth Street, NW8 8EH",51.52458,-0.16937,"Church Street (Westminster) #3","Arts Team"],["The Showroom","63 Penfold Street, London, NW8 8PQ",51.52346,-0.17276,"Church Street (Westminster) #3","Arts Team"],["The Abbey Centre","34 Great Smith Street, London, SW1P 3BU",51.49788,-0.12965,"St James', South Westminster","Arts Team"],["Listen To Act","37 Chapel Street, London, NW1 5DP",51.51968,-0.16698,"Now in Enfield","Arts Team"],["Creative Futures","The Beethoven Centre, Third Avenue, London, W10 4JL",51.5269,-0.20803,"Across Westminster","Arts Team"],["Marylebone Library","9-11 New Cavendish Street, W1G 9UQ",51.51885,-0.15072,"",""],["Paddington Library","Porchester Road, W2 5DU",51.51745,-0.1884,"",""],["Queen's Park Library","666 Harrow Road, W10 4NE",51.52705,-0.2108,"",""],["Floating Classroom","65 Alfred Road, W2 5EU",51.52101,-0.19604,"Westbourne #7","Arts Team"],["Queen's Park Bangladesh Association","1st Floor, WECH Community Centre, Athens Garden, Chantry Close, W9 3RS",51.52433,-0.19995,"Queen's Park #12","Arts Team"],["BME Health Forum","80A Church Street, NW8 8ET",51.52329,-0.1705,"Church Street (Westminster) 3","Arts Team"],["Penfold Community Hub","60 Penfold Street, London, NW8 8PJ",51.52372,-0.17234,"Church Street (Westminster) 3","Arts Team"],["North Westminster Foodbank","258 Harrow Road, W2 5ES",51.52021,-0.1903,"",""],["Westminster Chapel Foodbank","Buckingham Gate, SW1E 6BS",51.49851,-0.13666,"",""],["St Matthew’s Church","20 St Matthew Street, SW1P 2BU",51.49709,-0.13322,"",""],["Marylebone Project","1-5 Cosway Street, London, NW1 5NR",51.52107,-0.16546,"Church Street (Westminster) 3","Arts Team"],["MEWSO","124 Upper Street, N1 2TX",51.53871,-0.10248,"Church Street (Westminster) 3","Arts Team"],["Dream Arts","34 Grosvenor Gardens, SW1W 0DH",51.49694,-0.14661,"Westbourne #7","Arts Team"],["ETAT (Encouragement Through the Arts and talking)","Thamesbank Centre, Turpentine Lane, SW1V 4BD",51.48619,-0.14552,"Pimlico","Arts Team"],["Resonate Arts","The Stowe Centre, 258 Harrow Road, W2 5ES",51.52021,-0.1903,"Westbourne #7","Arts Team"],["Union Dance","8-10 Charing Cross Road, WC2H 0HG",51.51037,-0.12809,"St James', South Westminster","Arts Team"],["Paddington Arts","32 Woodfield Road, W9 2BE",51.52306,-0.20014,"Westbourne #7","Arts Team"],["Doorstep libraries","8-10 Grosvenor Gardens, SW1W 0DH",51.49713,-0.14624,"Knightsbridge & Belgravia","Arts Team"],["Queen's Park Community Council","Office 1, Beethoven Centre, Third Avenue, W10 4JL",51.5269,-0.20803,"Queen's Park #9","Arts Team"],["Learning Disability Network (LDN)","16A Croxley Road, W9 3HL",51.53006,-0.20027,"Harrow Road #21","Arts Team"],["The Women and Girls Project, Queen's Park","Beethoven Centre, W10 4JL",51.53108,-0.20876,"Queen's Park #9","Arts Team"],["Friends of Queen's Park Gardens","Queen's Park Community Council, Beethoven Centre, W10 4JL",51.5269,-0.20803,"Queen's Park #10","Arts Team"],["The Avenues Youth Project","3-7 Third Avenue, W10 4RS",51.52709,-0.20809,"Queen's Park #11","Arts Team"],["Salusbury World","103 Salusbury Road, NW6 6RG",51.53697,-0.20635,"Queen's Park #11","Arts Team"],["Westminster Bangladeshi Association","Pimlico Resource Centre, Walston House, Aylesford Street, SW1V 3RL",51.48872,-0.13401,"","Compassionate Communities (3rd)"],["Carers Network","Office 8, Beethoven Centre, W10 4JL",51.5269,-0.20803,"",""],["Kongolese Centre for Information & Advice","19 Samford St, Greater, NW8 8ER",51.52466,-0.16985,"",""],["LDN London (formerly The Westminster Society)","16A Croxley Road, W9 3HL",51.53006,-0.20027,"",""],["In - Deep","Unit 300, SW1V 1BZ",51.49273,-0.14075,"",""],["Age UK Westminster","174k Third Ave, W10 4JL",51.53092,-0.20906,"",""],["All Souls Clubhouse","141 Cleveland Street, W1T 6QG",51.52273,-0.14195,"",""],["Beauchamp Lodge Settlement","Unit 63, Great Western Studios,, W2 5EU",51.52101,-0.19604,"",""],["Caxton Youth Organisation","Basement Clubrooms,, SW1V 4JF",51.53153,-0.14185,"",""],["Chinese Community Centre","2 Leicester Court, WC2H 7DW",51.51142,-0.12925,"",""],["Chinese Information and Advice Centre","2 Gerrard Place, W1D 5PB",51.51225,-0.13048,"",""],["Re-engage","7 Bell Yard, WC2A 2JR",51.51426,-0.11176,"",""],["The Phoenix Garden","21 Stacey St, WC2H 8DG",51.5148,-0.12894,"",""],["Girlguiding Westminster Division","17-19 Buckingham Palace Road, SW1W 0PT",51.49881,-0.14319,"",""],["The Hellenic Centre","16 - 18 Paddington Street, W1U 5AS",51.52087,-0.1536,"",""],["Home-Start Westminster","St Pauls Church Centre, 3 Rossmore Rd, NW1 6NJ",51.52424,-0.16649,"",""],["Marylebone Bangladesh Society Ltd","19 Samford Street, NW8 8ER",51.52466,-0.16985,"",""],["Munro Health T/A Munro Health Ltd","383 Ladbroke Grove, Office 4, Canalside House, W10 5AA",51.5263,-0.21542,"",""],["North Paddington Youth Club","229 Lanark Road, W9 1EA",51.53048,-0.18537,"",""],["Notre Dame Refugee Centre","16 Leicester Square, WC2H 7BZ",51.51078,-0.13028,"",""],["Open Age","Exmoor St, St Charles Centre for Health and Wellbeing, W10 6DZ",51.52244,-0.21742,"",""],["Paddington Law Centre","421 Harrow Road, W10 4RE",51.5259,-0.20506,"",""],["Westbourne Park Family Centre","Porchester Rd, Westbourne Park Baptist Church, W2 5DX",51.51861,-0.18918,"",""],["The Passage","St Vincent’s Centre, Carlisle Pl, SW1P 1NL",51.49555,-0.14128,"",""],["Pursuing Independent Paths","4E Warwick Court, W9 3DY",51.51858,-0.11409,"",""],["Real Action","3 Mozart St, W10 4LA",51.52863,-0.2047,"",""],["Single Homeless Project (Westminster Mental Health Floating Support)","245 Gray's Inn Road, WC1X 8QY",51.52841,-0.11956,"",""],["St Andrew's Club","12 Old Pye St, SW1P 2DG",51.49756,-0.13141,"",""],["St. Vincent's Family Project","Methodist Central Hall, Storey's Gate, SW1H 9NH",51.50002,-0.13004,"",""],["Sudanese Supplementary School","37 Chapel Street, NW1 5DP",51.51968,-0.16698,"",""],["Strides Coaching Spaces","The Foundry, 17 Oval Way, London, SE11 5RR",51.48593,-0.11652,"across westminster",""],["West London Mission","134-136 Seymour Place, W1H 1NT",51.52075,-0.16394,"",""],["West Central London Mind","23 Monck St, London, SW1P 2AE",51.49586,-0.13076,"",""],["Westminster Boating Base","136 Grosvenor Rd, SW1V 3JY",51.48524,-0.13462,"",""],["Westminster Housing Co-operative Ltd","5 Woodfield Rd, W9 2BA",51.523,-0.19844,"",""],["Church Street Library","67-69 Church Street, NW8 8EU",51.52329,-0.1705,"",""],["Walterton and Elgin Community Homes (WECH)","416 Harrow Road, W9 2HX",51.52349,-0.19799,"",""],["Nova New Opportunities","2 Thorpe Close, W10 5XL",51.51834,-0.20848,"",""],["Pimlico Toy Library","133A Lupus Street, SW1V 3EN",51.48777,-0.14126,"",""],["Wigmore Hall","36 Wigmore Street, W1U 2BP",51.51689,-0.14833,"",""],["Kulan Somali Organisation","37 Chapel street, NW1 5DP",51.51968,-0.16698,"",""],["Westminster Adult Education Services","219 Lisson Grove, NW8 8LW",51.52665,-0.1724,"",""],["Kidscape","2 Grosvenor Gardens, SW1W 0DH",51.49773,-0.14813,"",""],["Groundwork London","18-21 Morley Street, SE1 7QZ",51.4995,-0.10904,"",""],["Zodiac Arts","The Trinity Methodist Church, W9 3EA",51.52947,-0.20138,"",""],["Streetwise Opera","10 Queen Street Place, EC4R 1AG",51.5102,-0.09302,"",""],["Central London Youth Development Trust","Cherwell House, Penfold Street, NW8 8PT",51.52329,-0.17087,"",""],["The Thorney Island Society","10 Old Pye Street, SW1P 2DG",51.49756,-0.13141,"",""],["Citizens Advice Westminster","21a Conduit Place, W2 1HS",51.51525,-0.17516,"",""],["Neighbourcare St Johns Wood & Maida Vale","25 ST EDMUND'S TERRACE, NW8 7PY",51.53582,-0.16379,"",""],["Dutch Pot Lunch and Social Club","Ada Court, 10-16 Maida Vale, W9 1TD",51.52738,-0.1795,"",""],["Depaul UK","34 Decima St, SE1 4QQ",51.49749,-0.08349,"",""],["Kurdish Association in Britain","77-79 charlotte street, W1T 4PW",51.51951,-0.13582,"",""],["Church Army - Marylebone Project","Bradbury House, 1-5 Cosway St, NW1 5NR",51.52107,-0.16546,"",""],["Octavia Foundation","Emily House, 202-208 Kensal Road, W10 5BN",51.52602,-0.20835,"",""],["Independent Age","18 Avonmore Road, W14 8RR",51.4949,-0.20734,"",""],["Duval Court Tenants Association","36 Bedfordbury, WC2N 4DQ",51.51027,-0.12566,"",""],["Future Men","34 Grosvenor Gardens, SW1W 0DH",51.49694,-0.14661,"",""],["Eritrean Cultural Support Group","112 Palace Garden Terrace, W8 4RT",51.50851,-0.1937,"",""],["Mala CHERGA Theatre Company","Lisson Grove, Armitage House, NW1 6SU",51.52142,-0.16536,"",""],["The Scout Association - 4th City of Westminster Scout Group","St Peter's, Eaton Square, School, SW1W 0NL",51.49601,-0.14642,"",""],["West End Community Trust","14 Old Compton St, W1D 4TH",51.51377,-0.13015,"",""],["Fitzrovia Community Centre","2 Foley St, Fitzrovia Community Centre, W1W 6DL",51.51932,-0.1401,"",""],["Go Live Theatre (formerly Mousetrap)","33 Shaftsbury Avenue, W1D 7EH",51.65285,-0.17739,"",""],["Third Sector Media","133 Shirland Road, W9 2EP",51.52679,-0.19384,"",""],["South West Fest","133A Lupus Street,, SW1V 3EN",51.48777,-0.14126,"",""],["Grand Union BID","7 Praed Street, W2 1NJ",51.51879,-0.16962,"",""],["Vincentian Care Plus","2 Grosvenor Gardens, SW1W 0DH",51.49773,-0.14813,"",""],["Henna Asian Women's Group","222c Belsize Road, NW6 4DJ",51.53872,-0.19007,"",""],["Iraqi Welfare Association","85 York Street, W1H 4QA",51.51967,-0.16368,"",""],["Puppet Theatre Barge/ Art of the Puppet","78 Middleton Road, E8 4BP",51.54052,-0.07209,"",""],["Breathe Easy Westminster","4 Sussex Street, SW1V4RS",51.48912,-0.1435,"",""],["Shop and Donate CIC","Vauxhall Peabody Estate, Admin Block A,, SW1V 1TA",51.4939,-0.1399,"",""],["Family Friends","73 St Charles Square, W10 6EJ",51.52025,-0.21694,"",""],["Eritrean Lowlanders League","1 Webb Close, W10 5QB",51.52436,-0.2245,"",""],["Mosaic LGBT Young Persons' Trust","201 Drummond St, NW1 3FE",51.52626,-0.13976,"",""],["The Screen Community","258 Harrow Road, W2 5ES",51.52021,-0.1903,"",""],["African Development Society","37 Chapel Street, NW1 5DP",51.51968,-0.16698,"",""],["Skills and Training Network","483 Green Lanes, N13 4BS",51.58882,-0.10167,"",""],["Fitzrovia Youth in Action","66-68 Warren St, W1T 5NZ",51.52413,-0.13955,"",""],["Mayfair Community Choir","25 S Audley St, W1K 2PB",51.50935,-0.15114,"",""],["MyTime Active","4th Floor, Victoria Charity Centre, SW1V 1RB",51.49237,-0.14177,"",""],["Millbank Creative Works","36A Ruskin House, SW1P 4HU",51.46645,-0.08932,"",""],["Marylebone Cricket Club","28A St John's Wood Rd, Lord's Cricket Ground, NW8 7JY",51.5298,-0.17204,"",""],["Al-hasaniya - Moroccan Women's Centre","Bays 4-5 Trellick Tower, W10 5PA",51.52362,-0.20541,"",""],["Supportmatch Homeshare Service","348 Finchley Road, NW3 7AJ",51.55918,-0.1967,"",""],["For Baby's Sake - Stefanou Foundation","88 Bravington Road, Queen's Park Children's, W9 3AL",51.5293,-0.2047,"",""],["Clear Village Charitable Trust","Block A, Peabody Vauxhall Estate, Vauxhall Bridge Rd, SW1V 1TA",51.4939,-0.1399,"",""],["Central London Samaritans","13 Salisbury Place, W1H 1FJ",51.52076,-0.16038,"",""],["Tell It Parents Network","472 Harrow Road, W9 3RU",51.52403,-0.20044,"",""],["West London Buddhist Centre","45a Porchester Road, W2 5DP",51.51772,-0.18891,"",""],["Bishop Creighton House","374-380 Lillie Rd, SW6 7PH",51.48332,-0.21659,"",""],["North Paddington Foodbank","57 Goldney Road, W9 2AR",51.52476,-0.19672,"",""],["Friends of Hyde Park and Kensington Gardens","The Old Police House, Hyde Park, W2 2UH",51.50743,-0.16571,"",""],["Solace Women’s Aid","Unit 5-7 Blenheim Court, N7 9NY",51.54508,-0.12243,"",""],["Diversity Role Models","55 Dean St, London, W1D 6AF",51.51242,-0.13219,"",""],["African Global Media and Community Development","Flat 100 Glastonbury, Abbots Manor, SW1V 4NS",51.49048,-0.14689,"",""],["Odhams Walk Residents Management Ltd - OWRM","62 Odhams Walk, WC2H 9SD",51.51398,-0.12461,"",""],["Making the Leap","Harriet Tubman House, Hazel Road, NW10 5PP",51.53052,-0.22709,"",""],["Fitzrovia Chapel","2 Pearson Square, W1T 3BF",51.51902,-0.13856,"",""],["The Pimlico Foundation","St James the Less, Moreton Street, SW1V 2PS",51.49059,-0.13526,"",""],["You Press","32 Woodfield Road, W9 2BE",51.52306,-0.20014,"",""],["Sudanese Youth Club","258 Harrow Rd, The Stowe Youth Centre, W2 5ES",51.52021,-0.1903,"",""],["Third Age Counselling","Warwick Wy, Glastonbury House, SW1V 4NT",51.49048,-0.14689,"",""],["Abdul Mageed Educational Trust","73 C Sutherland Street, SW1V 4JY",51.4887,-0.14574,"",""],["Mall Galleries","17 Carlton House Terrace, SW1Y 5BD",51.5068,-0.13026,"",""],["Greenhouse sports","35 COSWAY STREET, NW1 5NS",51.52162,-0.16647,"",""],["Support and Advice on Sexual Health Services (SASH)","32a Wardour Street, W1D 6QR",51.51143,-0.13214,"",""],["Lisson Green Tenants and Residents Association (TARA)","24 Lilestone Street, NW8 8SR",51.52566,-0.16635,"",""],["Continental Landscapes Ltd","St John's Wood Church Ground Gardens, NW8 7PF",51.53058,-0.16752,"",""],["Grace Eyre Foundation","336 Brixton Road, SW9 7AA",51.46815,-0.11294,"",""],["Outside Edge Theatre Company","61 Munster Road, SW6 5RE",51.47503,-0.20825,"",""],["The Listening Place","3 Meade Mews, SW1P 4EG",51.48973,-0.13093,"",""],["Change Communication","17 Old Ford Rd, E2 9PJ",51.52996,-0.05358,"",""],["Afghanistan and Central Asian Association","Unit 9 Griffin Centre, TW14 0HS",51.45857,-0.408,"",""],["Advantages of Age Ltd","11A Priory Road, NW6 4NN",51.5398,-0.19036,"",""],["MCC Foundation","Lord's Cricket Ground, St John's Wood Rd, NW8 8QN",51.5298,-0.17204,"",""],["2-3 Degrees","103 Charing Cross Rd, WC2H 0DT",51.51445,-0.1297,"",""],["The Miranda Brawn Diversity Leadership Foundation","Suite 81, 95 Mortimer Street, W1W 7GB",51.51743,-0.14208,"",""],["The Courtauld Institute of Art","Vernon Square, Penton Rise,, WC1X 9EW",51.53016,-0.11484,"",""],["Young Westminster Foundation","2nd Floor, 3 Rupert st, W1D 6DX",51.5109,-0.13261,"",""],["JAGS Foundation","26 George Street, CR0 1PB",51.37371,-0.09903,"",""],["Pregnant in West London","27a Colville Road, W11 2BT",51.51485,-0.20199,"",""],["Listening Books","12 Lant Street, SE1 1QH",51.50132,-0.09733,"",""],["Flat Justice Community Interest Company","85 Great Portland Street, W1W 7LT",51.51848,-0.14238,"",""],["Grand Junction at St Mary Magdalene's","Rowington Close, W2 5TF",51.5223,-0.18908,"",""],["Dragon Eggs Digital CIC","85 Great Portland Street, W1W 7LT",51.51848,-0.14238,"",""],["Community Champions Programme, Public Health, WCC","64 Victoria Street, 12th Floor, Westmintster City Hall, SW1E 6QP",51.49766,-0.1375,"",""],["Riverside Street Buddies","28 Greencoat Place, SW1P 1DX",51.49445,-0.13726,"",""],["Recycle School Uniform CIC","28 Linslade house, NW8 8TL",51.52621,-0.16554,"",""],["Kosovar Albanian Youth Against Violence","11 Sandbourne, W11 1DS",51.40699,-0.19568,"",""],["Muscular Dystrophy UK","61a Great Suffolk Street, SE1 0BU",51.50114,-0.09915,"",""],["CARD-HR","2 Danesfield, SE5 0AW",51.37562,-0.40593,"",""],["Thamesbank Community Hall","Turpentine Ln, Thamesbank Centre, SW1V 4BD",51.48619,-0.14552,"",""],["Bards on Boats","Suite 185, 8 Duncan St, N1 8BW",51.5335,-0.10452,"",""],["Westminster Wheels","41-45 Church St, NW8 8ES",51.52372,-0.16965,"",""],["Basch Helps CIC","71-75 Shelton St, WC2H 9JQ",51.51481,-0.12351,"",""],["Neighbourhood Doulas","55 Hazelwood Tower, W10 5DU",51.52433,-0.20673,"",""],["WEPT (Women Empowerment Project & Training)","17 Sheringham House, NW1 5NY",51.52093,-0.16697,"",""],["Sport4Health","St Gabriel's Parish House, Glasgow Terrace, SW1 3VA",51.48687,-0.14287,"",""],["Mary Smith Pantry","131 Lupus St,, SW1V 3EN",51.48777,-0.14126,"",""],["Rumshop Cultural Club","36a Blomfield Villas, W2 6NQ",51.5207,-0.18515,"",""],["The Cartoon Museum","63 Wells Street, W1A 3AE",51.51758,-0.13858,"",""],["For Women CIC","210 Old Brompton Road, SW5 0BS",51.48993,-0.18836,"",""],["The Egyptian Association in Great Britian","37 Chapel St,, NW1 5DP",51.51968,-0.16698,"",""],["St James's Church","197 Piccadilly, W1J 9LL",51.50863,-0.13796,"",""],["Balance","2 Beatrice Place, W8 5LP",51.44765,-0.21952,"",""],["The Swedish Church","6 Harcourt Street, W1H 4AG",51.52001,-0.16441,"",""],["Metro Blind Sport","3 Queen Square, London, WC1N 3AR",51.52136,-0.1227,"",""],["Adult Literacy Trust","2D Carlisle Placele Place Londonace London, SW1P 1NP",51.49556,-0.14128,"",""],["Healthwatch Westminster","The Stowe Centre, W2 5ES",51.52021,-0.1903,"",""],["The Kids Network","37 Hackney Road, E2 7NX",51.52793,-0.07658,"",""],["Z2k (registered as Zacchaeus 2000 Trust)","Fourth Floor, 80 Petty France, SW1H 9EX",51.49938,-0.13569,"",""],["Turning Point Drug and Alcohol Wellbeing Service (DAWS)","32a Wardour Street, W1D 6QR",51.51143,-0.13214,"",""],["Little Village","144 Tooting High Street, SW17 0RT",51.42526,-0.1709,"",""],["Miracles the Charity","85 Great Portland Street, W1W 7LT",51.51848,-0.14238,"",""],["The Photographers' Gallery","16 Ramillies Street, W1F 7LW",51.51496,-0.13904,"",""],["Only A Pavement Away","1 Vincent Square, SW1P 2PN",51.49278,-0.13391,"",""],["BuddyHub","127 Farringdon Rd, EC1R 3DA",51.52287,-0.10772,"",""],["University of Westminster Student's Union","35 Marylebone Rd,, NW1 5LS",51.52194,-0.15502,"",""],["Single Homeless Project","245 Gray’s Inn Road, WC1X 8QY",51.52841,-0.11956,"",""],["Learning Disability Network London (formerly The Westminster Society)","16a Croxley Road, W9 3HL",51.53006,-0.20027,"",""],["Skills Active Forward - SAF-UK","42c Aldridge Road Villas, W111BW",51.51928,-0.20035,"",""],["SSAFA, the Armed Forces charity","4 St Dunstan's Hill, EC3R 8AD",51.50948,-0.08277,"",""],["Pipeline Projects Community Arts","48 Albemarle Street, W1S4BP",51.50809,-0.14119,"",""],["The Access Project","7 - 14 Great Dover Street, SE1 4YR",51.49986,-0.09291,"",""],["All Souls Serve The City","2 All Souls Place, W1B 3DA",51.5183,-0.14286,"",""],["Ubuntu Pledge","196 Freston Road, W10 6TT",51.51254,-0.219,"",""],["Ubuntu Pledge","300 Old Brompton Rd, SW59JF",51.48851,-0.1934,"",""],["Adebo Space","36 kilravock street, W10 44hx",51.52942,-0.20911,"",""],["Harrow Road Soup Kitchen","36 Barfett Street, W10 4NP",51.52775,-0.20601,"",""],["Sudanese Nubian Association","Office 2 Canalside House, W10 5AA",51.5263,-0.21542,"",""],["Middlesex and NW London Army Cadet Force","Yeomanry House,, WC1N 1NP",51.52551,-0.12421,"",""],["Pimlico Musical Foundation","Churchill Gardens, St Gabriel's Church Hall, SW1V 3AA",51.48714,-0.14294,"",""],["Hope for better Future","The Stowe Centre, 258 Harrow Rd, Paddington Development Trust, W2 5ES",51.52021,-0.1903,"",""],["THE FLOURISH GROUP CIC","23 Third Ave, Happy Hub, W10 4RS",51.52778,-0.20785,"",""],["The Hot Choc Mob Homeless Volunteer Group","The Strand, WC2N 5HY",51.51422,-0.11322,"",""],["Eastern Sudan Community Association (ESCA)","374 Edgware Road, W2 1EB",51.5217,-0.17204,"",""],["St. Mungos","3 Thomas More Square, E1W1YW",51.50809,-0.06746,"",""],["Revert & Returners","85 great Portland street, W1W 7LT",51.51848,-0.14238,"",""],["Heritage of London Trust","Fivefields, 10 Grosvenor Gardens, SW1W 0DH",51.49736,-0.14779,"",""],["Wondering Minds","1 Spencer Pl,, SW1P 1AU",51.49637,-0.13607,"",""],["Handel Hendrix House","25 Brook Street, W1K 4HB",51.51296,-0.1459,"",""],["GoodGym","33 Holborn, EC1N 2HU",51.51733,-0.10849,"",""],["Number Champions","6 Totnes Walk, N2 0AD",51.58585,-0.1715,"",""],["Step Change Studios","2 Mandeville Place, W1U 2BF",51.51616,-0.15085,"",""],["LEGS","1 Vicarage Lane, E15 4HF",51.54272,0.00949,"",""],["Anti-Tribalism Movement","5A Uxbridge Road, Shepherd's Bush, W12 8LJ",51.5053,-0.22544,"",""],["WeSwim","17 Belle Vue Rd, E17 4DQ",51.59502,0.00051,"",""],["House of Talents","300 Harrow Road, W2 5HG",51.52194,-0.19288,"",""],["Breadwinners","International House, SW9 7QE",51.46406,-0.11299,"",""],["TimeGivers","1 Rylett Crescent, W12 9RP",51.49979,-0.24425,"",""],["St Giles & St George Education","60 St Giles High Street, WC2H 8LG",51.5156,-0.12853,"",""],["Westminster City Council Night Stars","Westminster City Hall, SW1E 6QP",51.49761,-0.13734,"",""],["Urbanwise.London","Canalside Activity Centre, Canal Close, Ladbroke Grove , W10 5AY",51.5264,-0.21614,"",""],["Shifaá Healing Hearts Counselling","6 Nutbourne Street, W10 4HN",51.53089,-0.21011,"",""],["Community Classroom CIC","51 Fermoy Road, W9 3NJ",51.52434,-0.20377,"",""],["Elimu Mas Academy","11, Woodfield Road, W9 2BA",51.52275,-0.19955,"",""],["Neurocraft Hub CIC","Westminster",51.50044,-0.12654,"",""],["London National Park City","80 Mortimer Street, W1W 7FE",51.51749,-0.14224,"",""],["Middlesex in The Community","Middlesex Cricket, Lord’s Cricket Ground, London, NW8 8QN, NW8 8QN",51.5298,-0.17204,"",""],["London Clarion Cycle Club","24 Brunel Road, SE16 6HZ",51.50214,-0.04928,"",""],["Shaman PR","337 Edgware  road, W2 1BT",51.52321,-0.17467,"",""],["TARIQA BURHANIYA DISUQIYA SHADHULIYA","258 Harrow Road, W2 5ES",51.52021,-0.1903,"",""],["Up To Earth CIC","258 Harrow Road, W2 5ES",51.52021,-0.1903,"",""],["Our Second Home","6 Canterbury Crescent, Brixton, SW9 7QD",51.46406,-0.11299,"",""]];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+function norm(n) { return (n||'').toLowerCase().replace(/\u2019/g,"'").trim(); }
+function nbhdOf(wn) {
+  for (const [k,n] of Object.entries(NEIGHBOURHOODS))
+    if (n.wards.includes(wn)) return k;
+  return null;
+}
+function ramp(t, inv) {
+  if (inv) t = 1 - t;
+  t = Math.min(Math.max(t, 0), 1);
+  let r, g, b;
+  if (t < 0.5) { const f=t*2; r=Math.round(15+(239-15)*f); g=Math.round(110+(159-110)*f); b=Math.round(86+(39-86)*f); }
+  else { const f=(t-.5)*2; r=Math.round(239+(163-239)*f); g=Math.round(159+(45-159)*f); b=39; }
+  return `rgb(${r},${g},${b})`;
+}
+function fmtNum(v, decimals=0) {
+  if (v === null || v === undefined || v === '') return '—';
+  const n = parseFloat(v);
+  if (isNaN(n)) return '—';
+  return decimals > 0 ? n.toFixed(decimals) : Math.round(n).toLocaleString();
+}
+function mkicon(color, label) {
+  return L.divIcon({ html: `<div style="background:${color};width:28px;height:28px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)">${label}</div>`, iconSize:[28,28], iconAnchor:[14,14], className:'' });
+}
+function mkVCSEIcon() {
+  return L.divIcon({ html: `<div style="background:#854F0B;width:10px;height:10px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.3)"></div>`, iconSize:[10,10], iconAnchor:[5,5], className:'' });
+}
+function mkpop(color, title, addr, rows) {
+  return `<div class="pop-hdr" style="background:${color}">${title}</div><div class="pop-body"><div class="pop-addr">${addr||'Address not listed'}</div>${Object.entries(rows).map(([k,v])=>`<div class="pop-row"><span class="pop-key">${k}</span><span>${v}</span></div>`).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAP SETUP
+// ═══════════════════════════════════════════════════════════════════════════
+const map = L.map('map', { center:[51.512,-0.158], zoom:13, zoomControl:true });
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom: 19
+}).addTo(map);
+
+// Static layers
+const gpL = L.layerGroup(GPS.map(d => {
+  const popup = mkpop('#185FA5', d.n, d.a, d.patients ? {'Patients': d.patients.toLocaleString()} : {});
+  return L.marker([d.lat,d.lng],{icon:mkicon('#185FA5','G')}).bindPopup(popup);
+}));
+
+// Enrich GP markers from ward_data.json once loaded
+function enrichGPFromWardData(wardData) {
+  if (!wardData) return;
+  // Build a list of all practices from ward data
+  const allPractices = [];
+  for (const [code, ward] of Object.entries(wardData)) {
+    const plist = ward.indicators?.gp_practices || [];
+    plist.forEach(p => {
+      if (p.patients > 0) allPractices.push(p);
+    });
+  }
+  if (allPractices.length === 0) return;
+  console.log(`Loaded ${allPractices.length} GP practices from ward_data.json`);
+}
+const hL  = L.layerGroup(HOSP.map(d => L.marker([d.lat,d.lng],{icon:mkicon('#A32D2D','H')}).bindPopup(mkpop('#A32D2D',d.n,d.a,{Type:d.t}))));
+const grL = L.layerGroup(GRN.map(d  => L.marker([d.lat,d.lng],{icon:mkicon('#0F6E56','P')}).bindPopup(mkpop('#0F6E56',d.n,d.a,{Size:d.sz}))));
+gpL.addTo(map); hL.addTo(map); grL.addTo(map);
+
+// ── Borough boundary layer ───────────────────────────────────────────────────
+const boroughL = L.geoJSON(BOROUGH_GJ, {
+  style: {
+    color: '#1a1a1a',
+    weight: 2.5,
+    fillOpacity: 0,
+    opacity: 0.85,
+    dashArray: null,
+  },
+  onEachFeature: (feat, lyr) => {
+    lyr.bindTooltip(feat.properties.name, {
+      sticky: true,
+      opacity: 0.9,
+      className: '',
+    });
+  }
+});
+boroughL.addTo(map);
+// Keep borough lines on top of ward fill
+boroughL.bringToFront();
+
+// VCSE cluster layer
+const vcseCluster = L.markerClusterGroup({
+  maxClusterRadius: 40,
+  showCoverageOnHover: false,
+  zoomToBoundsOnClick: true,
+  iconCreateFunction: cluster => {
+    const c = cluster.getChildCount();
+    const sz = c > 50 ? 36 : c > 20 ? 30 : 26;
+    return L.divIcon({ html:`<div style="background:rgba(133,79,11,.75);width:${sz}px;height:${sz}px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)">${c}</div>`, iconSize:[sz,sz], iconAnchor:[sz/2,sz/2], className:'' });
+  }
+});
+
+const vcseData = [];
+VCSE_RAW.forEach(([name, addr, lat, lng]) => {
+  const marker = L.marker([lat,lng], {icon:mkVCSEIcon()});
+  marker.bindPopup(`<div class="pop-hdr" style="background:#854F0B">${name}</div><div class="pop-body"><div class="pop-addr">${addr||'—'}</div></div>`);
+  vcseCluster.addLayer(marker);
+  vcseData.push({ name, addr, lat, lng, marker });
+});
+vcseCluster.addTo(map);
+
+// ── VCSE filtering ────────────────────────────────────────────────────────
+// Ward codes per neighbourhood (for spatial filtering)
+const NBHD_WARDS = {
+  'sw': ['Knightsbridge & Belgravia','Pimlico North','Pimlico South',"St James's",'Vincent Square'],
+  'we': ['West End','Marylebone'],
+  'rh': ['Hyde Park','Church Street','Lancaster Gate','Bayswater','Westbourne',"Queen's Park"],
+  'sm': ['Harrow Road','Maida Vale','Little Venice','Abbey Road',"Regent's Park"],
+};
+
+// Check if a lat/lng point falls inside a Leaflet polygon layer
+function pointInWardLayer(lat, lng, wardName) {
+  if (!wLyr) return false;
+  const pt = L.latLng(lat, lng);
+  let inside = false;
+  wLyr.eachLayer(l => {
+    if (l.feature.properties.WD24NM === wardName) {
+      try {
+        const poly = l.toGeoJSON().geometry;
+        if (leafletPip ? leafletPip.pointInLayer(pt, l) : roughPointInBounds(pt, l)) {
+          inside = true;
+        }
+      } catch(e) {}
+    }
+  });
+  return inside;
+}
+
+// Fast bounds-based containment check (good enough for our ward sizes)
+function roughPointInBounds(latlng, layer) {
+  try {
+    return layer.getBounds().contains(latlng);
+  } catch(e) { return false; }
+}
+
+// Get the neighbourhood key for a given lat/lng using ward bounds
+function nbhdOfLatLng(lat, lng) {
+  if (!wLyr) return null;
+  const pt = L.latLng(lat, lng);
+  let result = null;
+  wLyr.eachLayer(l => {
+    if (result) return;
+    try {
+      if (l.getBounds().contains(pt)) {
+        const wn = l.feature.properties.WD24NM;
+        const nk = nbhdOf(wn);
+        if (nk) result = nk;
+      }
+    } catch(e) {}
+  });
+  return result;
+}
+
+let currentVCSEAreaFilter = 'all';
+
+function applyVCSEFilter() {
+  const areaFilter = currentVCSEAreaFilter;
+  const textFilter = (document.getElementById('vcse-search')?.value || '').toLowerCase().trim();
+
+  // Determine visibility for each org
+  vcseData.forEach(o => {
+    let areaMatch;
+    if (areaFilter === 'london') {
+      // Show everything regardless of location
+      areaMatch = true;
+    } else if (areaFilter === 'all') {
+      // Westminster only — must fall within one of the 18 ward bounds
+      areaMatch = nbhdOfLatLng(o.lat, o.lng) !== null;
+    } else {
+      // Specific neighbourhood
+      const nbhdKey = areaFilter.replace('nbhd-', '');
+      areaMatch = nbhdOfLatLng(o.lat, o.lng) === nbhdKey;
+    }
+    const textMatch = !textFilter ||
+      o.name.toLowerCase().includes(textFilter) ||
+      (o.addr||'').toLowerCase().includes(textFilter);
+
+    const visible = areaMatch && textMatch;
+    if (visible) {
+      if (!vcseCluster.hasLayer(o.marker)) vcseCluster.addLayer(o.marker);
+    } else {
+      if (vcseCluster.hasLayer(o.marker)) vcseCluster.removeLayer(o.marker);
+    }
+  });
+
+  // Rebuild sidebar list with same logic
+  const visible = vcseData.filter(o => {
+    let areaMatch;
+    if (areaFilter === 'london') {
+      areaMatch = true;
+    } else if (areaFilter === 'all') {
+      areaMatch = nbhdOfLatLng(o.lat, o.lng) !== null;
+    } else {
+      areaMatch = nbhdOfLatLng(o.lat, o.lng) === areaFilter.replace('nbhd-', '');
+    }
+    return areaMatch && (!textFilter || o.name.toLowerCase().includes(textFilter) || (o.addr||'').toLowerCase().includes(textFilter));
+  });
+
+  const countEl = document.getElementById('vcse-count');
+  if (countEl) countEl.textContent = `${visible.length} organisation${visible.length!==1?'s':''}`;
+
+  const list = document.getElementById('vcse-list');
+  if (!list) return;
+  list.innerHTML = '';
+  visible.slice(0, 150).forEach(o => {
+    const div = document.createElement('div');
+    div.className = 'vcse-item';
+    div.innerHTML = `<div class="vcse-name">${o.name}</div><div class="vcse-addr">${o.addr||'—'}</div>`;
+    div.onclick = () => { map.setView([o.lat, o.lng], 16); o.marker.openPopup(); };
+    list.appendChild(div);
+  });
+  if (visible.length > 150) {
+    const more = document.createElement('div');
+    more.className = 'vcse-more';
+    more.textContent = `+${visible.length - 150} more — refine search`;
+    list.appendChild(more);
+  }
+}
+
+// Wire up filters — run after ward layer is built
+function initVCSEFilters() {
+  applyVCSEFilter();
+
+  document.getElementById('vcse-search').addEventListener('input', applyVCSEFilter);
+
+  document.getElementById('vcse-area-filter').addEventListener('change', e => {
+    currentVCSEAreaFilter = e.target.value;
+    // If selecting a neighbourhood, also trigger focus mode
+    if (e.target.value.startsWith('nbhd-')) {
+      setNbhdFocus(e.target.value.replace('nbhd-', ''));
+    } else {
+      setNbhdFocus('all');
+    }
+    applyVCSEFilter();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WARD LAYER (built after ward_data.json loads)
+// ═══════════════════════════════════════════════════════════════════════════
+let wLyr = null, selW = null, curOv = 'none';
+let WARD_DATA = {};
+let focusedNbhd = 'all';   // neighbourhood focus: 'all' or key like 'sw'
+
+function setNbhdFocus(key) {
+  focusedNbhd = key;
+
+  // Update focus buttons
+  document.querySelectorAll('.nbfocus-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.nbhd === key);
+  });
+
+  // Update header badges opacity
+  document.querySelectorAll('#nbadges .nb').forEach(b => {
+    const bk = b.dataset.key;
+    b.classList.toggle('on', key === 'all' || bk === key);
+  });
+
+  // Redraw all ward styles
+  if (wLyr) wLyr.eachLayer(l =>
+    l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM)))
+  );
+
+  // Sync VCSE area filter dropdown
+  const areaSelect = document.getElementById('vcse-area-filter');
+  if (areaSelect) {
+    // 'all' = neighbourhood focus off → Westminster filter
+    // 'nbhd-X' = neighbourhood focused → neighbourhood filter
+    areaSelect.value = key === 'all' ? 'all' : 'nbhd-' + key;
+    currentVCSEAreaFilter = areaSelect.value;
+    applyVCSEFilter();
+  }
+
+  // Zoom to focused neighbourhood if not 'all'
+  if (key !== 'all' && wLyr) {
+    const layers = wLyr.getLayers().filter(l => nbhdOf(l.feature.properties.WD24NM) === key);
+    if (layers.length) {
+      const bounds = L.featureGroup(layers).getBounds();
+      if (bounds.isValid()) map.fitBounds(bounds, { padding:[40,40], maxZoom:15 });
+    }
+  } else if (key === 'all' && wLyr) {
+    map.fitBounds(wLyr.getBounds(), { padding:[28,28] });
+    // Keep borough outlines on top
+    if (boroughL) setTimeout(() => boroughL.bringToFront(), 200);
+  }
+}
+
+function gs(wn) { return wn === selW ? 'selected' : 'default'; }
+
+function ovColor(wn, ovKey) {
+  const cfg = OV_CFG[ovKey]; if (!cfg) return '#aaa';
+  const w = WARD_DATA[wn]; if (!w) return '#aaa';
+  const val = w.indicators?.[ovKey]; if (val == null || val === '') return '#ccc';
+  return ramp((parseFloat(val) - cfg.min) / (cfg.max - cfg.min), !cfg.wh);
+}
+
+function wstyle(wn, ov, state) {
+  const nk = nbhdOf(wn), nb = nk ? NEIGHBOURHOODS[nk] : null;
+
+  // Neighbourhood focus dimming — fade wards not in the focused neighbourhood
+  const dimmed = focusedNbhd && focusedNbhd !== 'all' && nbhdOf(wn) !== focusedNbhd;
+  const stroke = nb ? nb.color : '#475569';
+
+  if (ov === 'none') {
+    const baseFo = {default:0.05, hover:0.15, selected:0.26}[state] || 0.05;
+    const baseW  = {default:2.2,  hover:2.8,  selected:3.2}[state]  || 2.2;
+    const fo = dimmed ? 0.02 : Math.min(0.95, baseFo * fillOpacityMult);
+    const w  = dimmed ? 1.0  : baseW * borderWeightMult;
+    const op = dimmed ? 0.3  : 0.9;
+    return { color:stroke, weight:w, fillColor:stroke, fillOpacity:fo, opacity:op };
+  }
+  const fill = ovColor(wn, ov);
+  const baseFo = {default:0.4, hover:0.58, selected:0.7}[state] || 0.4;
+  const baseW  = {default:1.5, hover:2,    selected:2.5}[state] || 1.5;
+  const fo = dimmed ? 0.05 : Math.min(0.95, baseFo * fillOpacityMult);
+  const w  = dimmed ? 1.0  : baseW * borderWeightMult;
+  const op = dimmed ? 0.3  : 0.85;
+  return { color:dimmed?'#aaa':'#333', weight:w, fillColor:fill, fillOpacity:fo, opacity:op };
+}
+
+function pillClass(g) {
+  return g==='ward' ? 'gpill gpill-ward' : g==='msoa' ? 'gpill gpill-msoa' : 'gpill gpill-la';
+}
+
+function showWard(wn) {
+  const n = norm(wn);
+  // Find by name match
+  const wdata = Object.values(WARD_DATA).find(w => norm(w.name) === n) ||
+                Object.values(WARD_DATA).find(w => w.name === wn);
+  const p = document.getElementById('wpanel');
+
+  if (!wdata) {
+    p.innerHTML = `<div class="ph"><div class="ph-icon">⚠</div>${wn}<br><small>No indicator data loaded yet</small></div>`;
+    return;
+  }
+
+  const nk = wdata.neighbourhood, nb = nk ? NEIGHBOURHOODS[nk] : null;
+
+  // Switch to ward tab
+  document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='ward'));
+  document.querySelectorAll('.tab-pane').forEach(t => t.classList.toggle('active', t.id==='tab-ward'));
+
+  const inds = wdata.indicators || {};
+  const hasReal = Object.values(inds).some(v => v !== null && v !== '' && v !== undefined);
+
+  const cats = CATS.map(cat => {
+    const rows = cat.fields.map(f => {
+      const val = inds[f.k];
+      if (val === null || val === undefined || val === '') return '';
+      const isNum = !isNaN(parseFloat(val));
+      const display = isNum ? parseFloat(val).toLocaleString(undefined, {maximumFractionDigits:1}) : val;
+      const cls = hasReal ? 'sv real' : 'sv sample';
+      return `<div class="sr"><span class="sl">${f.l}<span class="${pillClass(f.g)}">${f.g}</span></span><span class="${cls}">${display}</span></div>`;
+    }).filter(Boolean).join('');
+    if (!rows) return '';
+    return `<div class="cat-block">
+      <div class="cat-hdr" onclick="toggleCat(this)">
+        <span class="cat-hdr-l"><span class="cat-ico">${cat.ico}</span>${cat.label}</span>
+        <span class="cat-arrow open">▶</span>
+      </div>
+      <div class="cat-body open">${rows}</div>
+    </div>`;
+  }).join('');
+
+  const pop = inds.ons_population ? `~${parseInt(inds.ons_population).toLocaleString()}` : (wdata.pop || '');
+
+  p.innerHTML = `
+    ${nb ? `<div style="margin-bottom:8px"><span class="nbadge-sm" style="background:${nb.bg};color:${nb.color}">${nb.label}</span></div>` : ''}
+    <div class="wname">${wdata.name} <span class="wpop">${pop}</span></div>
+    ${cats || '<div class="data-note">No indicator data — run fetch_all_data.py and re-upload ward_data.json</div>'}
+    <div class="data-note">
+      <span class="gpill gpill-ward">ward</span> = ward level &nbsp;
+      <span class="gpill gpill-msoa">msoa</span> = MSOA (approximate) &nbsp;
+      <span class="gpill gpill-la">la</span> = borough level<br>
+      Crime data: police.uk · Claimants: DWP · Health: OHID Fingertips
+    </div>`;
+}
+
+window.toggleCat = function(hdr) {
+  hdr.querySelector('.cat-arrow').classList.toggle('open');
+  hdr.nextElementSibling.classList.toggle('open');
+};
+
+function buildWardLayer() {
+  wLyr = L.geoJSON(GJ, {
+    style: f => wstyle(f.properties.WD24NM, curOv, gs(f.properties.WD24NM)),
+    onEachFeature: (feat, lyr) => {
+      const wn = feat.properties.WD24NM;
+      lyr.on('click', () => {
+        if (wLyr) wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+        selW = wn;
+        lyr.setStyle(wstyle(wn, curOv, 'selected'));
+        lyr.bringToFront();
+        showWard(wn);
+      });
+      lyr.on('mouseover', e => {
+        if (wn !== selW) lyr.setStyle(wstyle(wn, curOv, 'hover'));
+        const nk = nbhdOf(wn), nb = nk ? NEIGHBOURHOODS[nk] : null;
+        lyr.bindTooltip(`<b style="font-size:12px">${wn}</b>${nb ? `<br><span style="font-size:10px;color:${nb.color}">${nb.label}</span>` : ''}`, { sticky:true, opacity:.94 }).openTooltip(e.latlng);
+      });
+      lyr.on('mouseout', () => { if (wn !== selW) lyr.setStyle(wstyle(wn, curOv, 'default')); });
+    }
+  });
+  wLyr.addTo(map);
+  map.fitBounds(wLyr.getBounds(), { padding:[28,28] });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NEIGHBOURHOOD BADGES & FILTERS
+// ═══════════════════════════════════════════════════════════════════════════
+const nbBadgesEl   = document.getElementById('nbadges');
+const nfiltersEl   = document.getElementById('nfilters');
+const nbFocusBar   = document.getElementById('nbfocus-bar');
+
+Object.entries(NEIGHBOURHOODS).forEach(([k, nb]) => {
+  // Header badge — now triggers focus mode
+  const b = document.createElement('div');
+  b.className = 'nb on';
+  b.dataset.key = k;
+  b.textContent = nb.short;
+  b.style.cssText = `background:${nb.bg};color:${nb.color};border-color:${nb.color}`;
+  b.onclick = () => setNbhdFocus(focusedNbhd === k ? 'all' : k);
+  nbBadgesEl.appendChild(b);
+
+  // Focus bar button
+  const fb = document.createElement('button');
+  fb.className = 'nbfocus-btn';
+  fb.dataset.nbhd = k;
+  fb.textContent = nb.short;
+  fb.style.cssText = `background:${nb.bg};color:${nb.color};border-color:${nb.color}`;
+  fb.onclick = () => setNbhdFocus(focusedNbhd === k ? 'all' : k);
+  nbFocusBar.appendChild(fb);
+
+  // Sidebar filter
+  const r = document.createElement('label');
+  r.className = 'lrow';
+  r.innerHTML = `<div style="width:11px;height:11px;border-radius:3px;border:2px solid ${nb.color};background:${nb.bg};flex-shrink:0"></div><span class="lname" style="font-size:12px">${nb.label}</span><input type="checkbox" checked style="accent-color:${nb.color}">`;
+  r.querySelector('input').addEventListener('change', e => {
+    if (!wLyr) return;
+    const on = e.target.checked;
+    b.classList.toggle('on', on);
+    wLyr.eachLayer(l => {
+      if (nbhdOf(l.feature.properties.WD24NM) === k)
+        l.setStyle(on ? wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM)) : { opacity:0, fillOpacity:0 });
+    });
+  });
+  nfiltersEl.appendChild(r);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LAYER TOGGLES & OVERLAY
+// ═══════════════════════════════════════════════════════════════════════════
+document.getElementById('tb').addEventListener('change',  e => {
+  if (e.target.checked) { boroughL.addTo(map); boroughL.bringToFront(); }
+  else { map.removeLayer(boroughL); }
+});
+document.getElementById('tg').addEventListener('change',  e => e.target.checked ? gpL.addTo(map) : map.removeLayer(gpL));
+document.getElementById('th').addEventListener('change',  e => e.target.checked ? hL.addTo(map)  : map.removeLayer(hL));
+document.getElementById('tgr').addEventListener('change', e => e.target.checked ? grL.addTo(map) : map.removeLayer(grL));
+document.getElementById('tv').addEventListener('change',  e => e.target.checked ? vcseCluster.addTo(map) : map.removeLayer(vcseCluster));
+
+document.getElementById('ov').addEventListener('change', e => {
+  curOv = e.target.value;
+  const cfg = OV_CFG[curOv];
+  const sc  = document.getElementById('scale');
+  sc.style.display = curOv !== 'none' ? 'block' : 'none';
+  if (cfg) {
+    document.getElementById('sc-lo').textContent = cfg.lo;
+    document.getElementById('sc-hi').textContent = cfg.hi;
+    document.getElementById('sc-grad').style.flexDirection = cfg.wh ? 'row' : 'row-reverse';
+  }
+  if (wLyr) wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+  // Switch to overlay tab
+  document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='overlay'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='tab-overlay'));
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SIDEBAR TABS
+// ═══════════════════════════════════════════════════════════════════════════
+document.querySelectorAll('.sb-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.sb-tab').forEach(x => x.classList.toggle('active', x===t));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='tab-'+t.dataset.tab));
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAP LEGEND
+// ═══════════════════════════════════════════════════════════════════════════
+const leg = L.control({ position: 'bottomright' });
+leg.onAdd = () => {
+  const d = L.DomUtil.create('div');
+  d.style.cssText = 'background:#fff;padding:8px 11px;border-radius:8px;border:1px solid #e5e5e0;font-size:11px;color:#333;box-shadow:0 1px 6px rgba(0,0,0,.08)';
+  d.innerHTML =
+    `<div style="font-size:10px;font-weight:600;color:#999;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Neighbourhoods</div>` +
+    Object.values(NEIGHBOURHOODS).map(n => `<div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:11px;height:11px;border-radius:3px;border:2px solid ${n.color};background:${n.bg};flex-shrink:0"></div>${n.short}</div>`).join('') +
+    `<div style="border-top:1px solid #eee;margin:5px 0 4px"></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#185FA5;flex-shrink:0"></div>GP practice</div>
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#A32D2D;flex-shrink:0"></div>Hospital</div>
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#0F6E56;flex-shrink:0"></div>Green space</div>
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#854F0B;flex-shrink:0"></div>VCSE org (247)</div>
+    <div style="border-top:1px solid #eee;margin:5px 0 4px"></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:11px;height:11px;border:2px solid #1a1a1a;border-radius:2px;flex-shrink:0"></div>Borough boundary</div>\`;
+  return d;
+};
+leg.addTo(map);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA LOADING — fetches ward_data.json from the same folder
+// ═══════════════════════════════════════════════════════════════════════════
+async function loadData() {
+  const ldr    = document.getElementById('ldr');
+  const ldrTxt = document.getElementById('ldr-txt');
+  const ldrSub = document.getElementById('ldr-sub');
+
+  try {
+    ldrTxt.textContent = 'Loading ward data...';
+    ldrSub.textContent = 'Fetching ward_data.json';
+
+    const response = await fetch('ward_data.json');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const json = await response.json();
+    const wards = json.wards || {};
+
+    // Index by ward name (normalised) for fast lookup
+    WARD_DATA = {};
+    for (const [code, ward] of Object.entries(wards)) {
+      WARD_DATA[ward.name] = ward;
+    }
+
+    const meta     = json.metadata || {};
+    const dateStr  = meta.generated || '';
+    const sourceStr = Object.values(meta.sources || {}).join(' · ');
+
+    // Count real data points
+    let realPoints = 0;
+    for (const ward of Object.values(wards)) {
+      for (const v of Object.values(ward.indicators || {})) {
+        if (v !== null && v !== '' && v !== undefined && typeof v !== 'string') realPoints++;
+      }
+    }
+
+    document.getElementById('src-lbl').textContent =
+      `Data: police.uk (crime) · NHS Digital ODS (GP) · OHID Fingertips (health) · ONS Census 2021 · Westminster One Directory (VCSE)`;
+    document.getElementById('data-date').textContent =
+      `${realPoints} real data points across 18 wards${dateStr ? ' · Generated ' + dateStr : ''}`;
+
+    // Update overlay vintage note
+    document.getElementById('data-vintage').innerHTML =
+      `Crime: Nov 2025 – Jan 2026 (annualised)<br>Claimants: ${meta.claimant_period||'most recent month'}<br>Health: OHID Fingertips (MSOA level)`;
+
+    ldrTxt.textContent = 'Building map...';
+    ldrSub.textContent = `${Object.keys(wards).length} wards loaded`;
+
+    buildWardLayer();
+    enrichGPFromWardData(wards);
+    // Now ward layer exists — init VCSE filters
+    setTimeout(initVCSEFilters, 100);
+    ldr.classList.add('hidden');
+
+  } catch (err) {
+    // ward_data.json missing or not yet generated — show map with sample data
+    console.warn('ward_data.json not found or invalid:', err.message);
+    document.getElementById('src-lbl').textContent =
+      'ward_data.json not found — map running with boundaries only. Run fetch_all_data.py to populate data.';
+    document.getElementById('ldr-txt').textContent = 'Loading boundaries...';
+    document.getElementById('ldr-sub').textContent = 'ward_data.json not found — click wards to see structure';
+    buildWardLayer();
+    setTimeout(initVCSEFilters, 100);
+    ldr.classList.add('hidden');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+setTimeout(() => map.invalidateSize(), 200);
+loadData();
+</script>
+</body>
+</html>

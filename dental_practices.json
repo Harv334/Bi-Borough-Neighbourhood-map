@@ -1,0 +1,1801 @@
+[
+  {
+    "name": "Marylebone House Dental Practice",
+    "postcode": "NW1 5PN",
+    "lat": 51.522142,
+    "lng": -0.159153,
+    "imd_decile": 8
+  },
+  {
+    "name": "Optimal Dental Health",
+    "postcode": "NW1 6AE",
+    "lat": 51.522541,
+    "lng": -0.158229,
+    "imd_decile": 8
+  },
+  {
+    "name": "NW Smiles",
+    "postcode": "NW1 6AH",
+    "lat": 51.522951,
+    "lng": -0.159726,
+    "imd_decile": 8
+  },
+  {
+    "name": "The Ivory Dental Studio",
+    "postcode": "NW1 6DX",
+    "lat": 51.523985,
+    "lng": -0.160881,
+    "imd_decile": 6
+  },
+  {
+    "name": "The Root Canal Specialist",
+    "postcode": "NW1 6XN",
+    "lat": 51.524227,
+    "lng": -0.159098,
+    "imd_decile": 8
+  },
+  {
+    "name": "Abbey Road Dental Practice Limited",
+    "postcode": "NW8 0AE",
+    "lat": 51.537534,
+    "lng": -0.184373,
+    "imd_decile": 7
+  },
+  {
+    "name": "St John's Wood Orthodontic Clinic",
+    "postcode": "NW8 6ER",
+    "lat": 51.536876,
+    "lng": -0.175545,
+    "imd_decile": 9
+  },
+  {
+    "name": "Aura Dental",
+    "postcode": "NW8 7BT",
+    "lat": 51.534121,
+    "lng": -0.168403,
+    "imd_decile": 7
+  },
+  {
+    "name": "55A Dental",
+    "postcode": "NW8 7NL",
+    "lat": 51.533598,
+    "lng": -0.171206,
+    "imd_decile": 7
+  },
+  {
+    "name": "Smilemore Dental Care",
+    "postcode": "NW8 7NL",
+    "lat": 51.533598,
+    "lng": -0.171206,
+    "imd_decile": 7
+  },
+  {
+    "name": "Twoth St John's Wood",
+    "postcode": "NW8 7SH",
+    "lat": 51.532898,
+    "lng": -0.169591,
+    "imd_decile": 7
+  },
+  {
+    "name": "Revive Clinic Dental & Facial Aesthetics",
+    "postcode": "NW8 8EU",
+    "lat": 51.523216,
+    "lng": -0.170368,
+    "imd_decile": 1
+  },
+  {
+    "name": "The Church Street Dental Practice",
+    "postcode": "NW8 8EU",
+    "lat": 51.523216,
+    "lng": -0.170368,
+    "imd_decile": 1
+  },
+  {
+    "name": "Buckingham Gate Orthodontics",
+    "postcode": "SW1E 6LB",
+    "lat": 51.499607,
+    "lng": -0.140381,
+    "imd_decile": 8
+  },
+  {
+    "name": "UK Smile",
+    "postcode": "SW1E 6PE",
+    "lat": 51.49929,
+    "lng": -0.137973,
+    "imd_decile": 8
+  },
+  {
+    "name": "The Dentist Gallery",
+    "postcode": "SW1P 1BT",
+    "lat": 51.495605,
+    "lng": -0.135862,
+    "imd_decile": 3
+  },
+  {
+    "name": "Westminster House Dental Practice",
+    "postcode": "SW1P 2AH",
+    "lat": 51.494722,
+    "lng": -0.127297,
+    "imd_decile": 4
+  },
+  {
+    "name": "Angel Dental Implant Centre 2",
+    "postcode": "SW1P 2BQ",
+    "lat": 51.496291,
+    "lng": -0.130935,
+    "imd_decile": 7
+  },
+  {
+    "name": "EGO Dental Clinic",
+    "postcode": "SW1P 2HY",
+    "lat": 51.496828,
+    "lng": -0.133607,
+    "imd_decile": 1
+  },
+  {
+    "name": "Victoria Orthodontic Clinic",
+    "postcode": "SW1P 2PF",
+    "lat": 51.494281,
+    "lng": -0.134014,
+    "imd_decile": 7
+  },
+  {
+    "name": "Leyland-Dent Limited",
+    "postcode": "SW1P 3LT",
+    "lat": 51.496781,
+    "lng": -0.128941,
+    "imd_decile": 7
+  },
+  {
+    "name": "Pimlico Dental Care",
+    "postcode": "SW1P 4AP",
+    "lat": 51.490252,
+    "lng": -0.13232,
+    "imd_decile": 4
+  },
+  {
+    "name": "Millbank Dental Care",
+    "postcode": "SW1P 4PR",
+    "lat": 51.49002,
+    "lng": -0.130774,
+    "imd_decile": 6
+  },
+  {
+    "name": "Victoria Dental Centre",
+    "postcode": "SW1V 1AA",
+    "lat": 51.495401,
+    "lng": -0.141705,
+    "imd_decile": 6
+  },
+  {
+    "name": "Wilton Dental Care",
+    "postcode": "SW1V 1DE",
+    "lat": 51.493227,
+    "lng": -0.140741,
+    "imd_decile": 5
+  },
+  {
+    "name": "Hermes London Dental Clinic",
+    "postcode": "SW1V 1ER",
+    "lat": 51.492963,
+    "lng": -0.138807,
+    "imd_decile": 5
+  },
+  {
+    "name": "London Dental Studio",
+    "postcode": "SW1V 1QT",
+    "lat": 51.49255,
+    "lng": -0.139444,
+    "imd_decile": 5
+  },
+  {
+    "name": "The London Dental Studio",
+    "postcode": "SW1V 1QT",
+    "lat": 51.49255,
+    "lng": -0.139444,
+    "imd_decile": 5
+  },
+  {
+    "name": "McKennell Dental Practice",
+    "postcode": "SW1V 2LY",
+    "lat": 51.491511,
+    "lng": -0.138564,
+    "imd_decile": 5
+  },
+  {
+    "name": "Smileone Pimlico",
+    "postcode": "SW1V 3HD",
+    "lat": 51.487192,
+    "lng": -0.144617,
+    "imd_decile": 3
+  },
+  {
+    "name": "Boston Orthodontics",
+    "postcode": "SW1W 0DH",
+    "lat": 51.497224,
+    "lng": -0.14722,
+    "imd_decile": 8
+  },
+  {
+    "name": "The Beresford Clinic",
+    "postcode": "SW1W 0EJ",
+    "lat": 51.498007,
+    "lng": -0.144437,
+    "imd_decile": 9
+  },
+  {
+    "name": "Made in London Dental",
+    "postcode": "SW1W 0QP",
+    "lat": 51.497818,
+    "lng": -0.144444,
+    "imd_decile": 9
+  },
+  {
+    "name": "Belgravia Dental Care",
+    "postcode": "SW1W 9LN",
+    "lat": 51.494426,
+    "lng": -0.147175,
+    "imd_decile": 4
+  },
+  {
+    "name": "Elizabeth Street Dentist",
+    "postcode": "SW1W 9PG",
+    "lat": 51.494179,
+    "lng": -0.152026,
+    "imd_decile": 8
+  },
+  {
+    "name": "Serene - Dental and Facial Aesthetics",
+    "postcode": "SW1X 7JN",
+    "lat": 51.502497,
+    "lng": -0.157136,
+    "imd_decile": 8
+  },
+  {
+    "name": "The Knightsbridge Clinic",
+    "postcode": "SW1X 7LY",
+    "lat": 51.50231,
+    "lng": -0.154406,
+    "imd_decile": 8
+  },
+  {
+    "name": "Bryer Wallace Belgravia",
+    "postcode": "SW1X 8JL",
+    "lat": 51.498962,
+    "lng": -0.156529,
+    "imd_decile": 8
+  },
+  {
+    "name": "Dental Surgery",
+    "postcode": "SW1X 8JU",
+    "lat": 51.499153,
+    "lng": -0.156637,
+    "imd_decile": 8
+  },
+  {
+    "name": "Pall Mall Dental Clinic",
+    "postcode": "SW1Y 5LU",
+    "lat": 51.507043,
+    "lng": -0.133521,
+    "imd_decile": 8
+  },
+  {
+    "name": "Imperial College Dental Surgery",
+    "postcode": "SW7 1NA",
+    "lat": 51.500258,
+    "lng": -0.172657,
+    "imd_decile": 8
+  },
+  {
+    "name": "Dr Ishtaq Mohammed - Queens Park Health Centre",
+    "postcode": "W10 4LD",
+    "lat": 51.530581,
+    "lng": -0.207617,
+    "imd_decile": 2
+  },
+  {
+    "name": "Keep Smiling UK",
+    "postcode": "W11 2RN",
+    "lat": 51.514949,
+    "lng": -0.197436,
+    "imd_decile": 8
+  },
+  {
+    "name": "Freiberger Dental Practice - Ambika House",
+    "postcode": "W1B 1PR",
+    "lat": 51.518624,
+    "lng": -0.144766,
+    "imd_decile": 5
+  },
+  {
+    "name": "Baudelaire Clinic",
+    "postcode": "W1B 1QN",
+    "lat": 51.521313,
+    "lng": -0.145925,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr Alan Sidi - Portland Place",
+    "postcode": "W1B 1QN",
+    "lat": 51.521313,
+    "lng": -0.145925,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr David Wright - 57 Portland Place",
+    "postcode": "W1B 1QN",
+    "lat": 51.521313,
+    "lng": -0.145925,
+    "imd_decile": 9
+  },
+  {
+    "name": "Implant Perio Clinic",
+    "postcode": "W1B 1QN",
+    "lat": 51.521313,
+    "lng": -0.145925,
+    "imd_decile": 9
+  },
+  {
+    "name": "Julia Brewin - Portland Place",
+    "postcode": "W1B 1QN",
+    "lat": 51.521313,
+    "lng": -0.145925,
+    "imd_decile": 9
+  },
+  {
+    "name": "Redhead Orthodontics Portland Place",
+    "postcode": "W1B 1QN",
+    "lat": 51.521313,
+    "lng": -0.145925,
+    "imd_decile": 9
+  },
+  {
+    "name": "Soho Dental",
+    "postcode": "W1D 3HZ",
+    "lat": 51.514525,
+    "lng": -0.131889,
+    "imd_decile": 4
+  },
+  {
+    "name": "Soho Dental Care",
+    "postcode": "W1D 3HZ",
+    "lat": 51.514525,
+    "lng": -0.131889,
+    "imd_decile": 4
+  },
+  {
+    "name": "1 Kings Dental",
+    "postcode": "W1D 3JP",
+    "lat": 51.514397,
+    "lng": -0.132269,
+    "imd_decile": 4
+  },
+  {
+    "name": "Private Dental Practice",
+    "postcode": "W1D 5DY",
+    "lat": 51.512794,
+    "lng": -0.130461,
+    "imd_decile": 4
+  },
+  {
+    "name": "Piccadilly Dental",
+    "postcode": "W1D 6NA",
+    "lat": 51.511882,
+    "lng": -0.13194,
+    "imd_decile": 3
+  },
+  {
+    "name": "Carnaby Street Dental Practice",
+    "postcode": "W1F 7DL",
+    "lat": 51.513688,
+    "lng": -0.139187,
+    "imd_decile": 4
+  },
+  {
+    "name": "Poland Street Dental Care",
+    "postcode": "W1F 7LY",
+    "lat": 51.515338,
+    "lng": -0.137751,
+    "imd_decile": 4
+  },
+  {
+    "name": "Smilepod - Soho",
+    "postcode": "W1F 7NN",
+    "lat": 51.513947,
+    "lng": -0.136799,
+    "imd_decile": 4
+  },
+  {
+    "name": "Bupa Dental Care Soho",
+    "postcode": "W1F 8TE",
+    "lat": 51.514472,
+    "lng": -0.135898,
+    "imd_decile": 4
+  },
+  {
+    "name": "Dr. Omid Sobhani",
+    "postcode": "W1G 6AL",
+    "lat": 51.521215,
+    "lng": -0.14825,
+    "imd_decile": 9
+  },
+  {
+    "name": "Shakib & Neale Ltd T/A Harley Street Maxillofacial Clinic",
+    "postcode": "W1G 6AL",
+    "lat": 51.521215,
+    "lng": -0.14825,
+    "imd_decile": 9
+  },
+  {
+    "name": "99 Harley Street",
+    "postcode": "W1G 6AQ",
+    "lat": 51.520907,
+    "lng": -0.148118,
+    "imd_decile": 9
+  },
+  {
+    "name": "Cunnington Endodontics - Harley Street",
+    "postcode": "W1G 6AQ",
+    "lat": 51.520907,
+    "lng": -0.148118,
+    "imd_decile": 9
+  },
+  {
+    "name": "This is IT Dental",
+    "postcode": "W1G 6AQ",
+    "lat": 51.520907,
+    "lng": -0.148118,
+    "imd_decile": 9
+  },
+  {
+    "name": "Pro Dental Clinic",
+    "postcode": "W1G 6AS",
+    "lat": 51.52174,
+    "lng": -0.148474,
+    "imd_decile": 9
+  },
+  {
+    "name": "Brilliant Dental Limited",
+    "postcode": "W1G 6AT",
+    "lat": 51.521697,
+    "lng": -0.148634,
+    "imd_decile": 9
+  },
+  {
+    "name": "Smile Architect",
+    "postcode": "W1G 6AW",
+    "lat": 51.521351,
+    "lng": -0.148345,
+    "imd_decile": 9
+  },
+  {
+    "name": "Harley Centre for Cosmetic & Implant Dentistry",
+    "postcode": "W1G 6AX",
+    "lat": 51.521867,
+    "lng": -0.14857,
+    "imd_decile": 9
+  },
+  {
+    "name": "Harley Street Centre for Endodontics",
+    "postcode": "W1G 6AX",
+    "lat": 51.521867,
+    "lng": -0.14857,
+    "imd_decile": 9
+  },
+  {
+    "name": "Harley Street Dental Clinic Limited",
+    "postcode": "W1G 6BG",
+    "lat": 51.52252,
+    "lng": -0.148889,
+    "imd_decile": 9
+  },
+  {
+    "name": "Devonshire Dental Centre",
+    "postcode": "W1G 6HH",
+    "lat": 51.521592,
+    "lng": -0.149388,
+    "imd_decile": 9
+  },
+  {
+    "name": "Diamond Whites",
+    "postcode": "W1G 6HJ",
+    "lat": 51.521657,
+    "lng": -0.149515,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr Philip Stemmer",
+    "postcode": "W1G 6HJ",
+    "lat": 51.521657,
+    "lng": -0.149515,
+    "imd_decile": 9
+  },
+  {
+    "name": "Art Dentistry",
+    "postcode": "W1G 6HP",
+    "lat": 51.522083,
+    "lng": -0.149685,
+    "imd_decile": 9
+  },
+  {
+    "name": "Clive Stockwell Dental",
+    "postcode": "W1G 6HP",
+    "lat": 51.522083,
+    "lng": -0.149685,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dale of Harley Street Limited",
+    "postcode": "W1G 6HP",
+    "lat": 51.522083,
+    "lng": -0.149685,
+    "imd_decile": 9
+  },
+  {
+    "name": "NG Smiles",
+    "postcode": "W1G 6HP",
+    "lat": 51.522083,
+    "lng": -0.149685,
+    "imd_decile": 9
+  },
+  {
+    "name": "25 Devonshire Place, Dental Practice",
+    "postcode": "W1G 6JD",
+    "lat": 51.52259,
+    "lng": -0.150515,
+    "imd_decile": 9
+  },
+  {
+    "name": "Sonria Dental Clinic Limited",
+    "postcode": "W1G 6JD",
+    "lat": 51.52259,
+    "lng": -0.150515,
+    "imd_decile": 9
+  },
+  {
+    "name": "The Marylebone Implant Centre",
+    "postcode": "W1G 6JG",
+    "lat": 51.522382,
+    "lng": -0.150437,
+    "imd_decile": 9
+  },
+  {
+    "name": "Smiles by Jasmine",
+    "postcode": "W1G 6JP",
+    "lat": 51.521869,
+    "lng": -0.150386,
+    "imd_decile": 9
+  },
+  {
+    "name": "Swedish Smile Clinic",
+    "postcode": "W1G 6JP",
+    "lat": 51.521869,
+    "lng": -0.150386,
+    "imd_decile": 9
+  },
+  {
+    "name": "Bespoke Smile Marylebone",
+    "postcode": "W1G 6LD",
+    "lat": 51.520553,
+    "lng": -0.149041,
+    "imd_decile": 9
+  },
+  {
+    "name": "Crosbie Care Limited",
+    "postcode": "W1G 6LD",
+    "lat": 51.520553,
+    "lng": -0.149041,
+    "imd_decile": 9
+  },
+  {
+    "name": "Wimpole Street Dental Care",
+    "postcode": "W1G 6LJ",
+    "lat": 51.521066,
+    "lng": -0.149078,
+    "imd_decile": 9
+  },
+  {
+    "name": "H W Preiskel",
+    "postcode": "W1G 6NF",
+    "lat": 51.520454,
+    "lng": -0.149607,
+    "imd_decile": 9
+  },
+  {
+    "name": "E-line Orthodontics",
+    "postcode": "W1G 6PB",
+    "lat": 51.521426,
+    "lng": -0.150274,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr. Gaynor Langley - Devonshire Street",
+    "postcode": "W1G 6QB",
+    "lat": 51.521391,
+    "lng": -0.149137,
+    "imd_decile": 9
+  },
+  {
+    "name": "Blanche Smile Studio",
+    "postcode": "W1G 7BY",
+    "lat": 51.520555,
+    "lng": -0.146936,
+    "imd_decile": 9
+  },
+  {
+    "name": "Elite Orthodontics Limited",
+    "postcode": "W1G 7BY",
+    "lat": 51.520555,
+    "lng": -0.146936,
+    "imd_decile": 9
+  },
+  {
+    "name": "Weymouth Street Paediatric Dental Care",
+    "postcode": "W1G 7BY",
+    "lat": 51.520555,
+    "lng": -0.146936,
+    "imd_decile": 9
+  },
+  {
+    "name": "Weymouth Street Dental Practice",
+    "postcode": "W1G 7BZ",
+    "lat": 51.520893,
+    "lng": -0.146677,
+    "imd_decile": 9
+  },
+  {
+    "name": "Bloom and Gonsai Dental",
+    "postcode": "W1G 7DB",
+    "lat": 51.520605,
+    "lng": -0.146675,
+    "imd_decile": 9
+  },
+  {
+    "name": "RS Dental Ltd",
+    "postcode": "W1G 7DB",
+    "lat": 51.520605,
+    "lng": -0.146675,
+    "imd_decile": 9
+  },
+  {
+    "name": "The London Centre for Prosthodontics Limited",
+    "postcode": "W1G 7DB",
+    "lat": 51.520605,
+    "lng": -0.146675,
+    "imd_decile": 9
+  },
+  {
+    "name": "Marylebone Smile Clinic",
+    "postcode": "W1G 7HD",
+    "lat": 51.519676,
+    "lng": -0.147044,
+    "imd_decile": 9
+  },
+  {
+    "name": "Cime Dentistry Limited",
+    "postcode": "W1G 7HG",
+    "lat": 51.519866,
+    "lng": -0.147123,
+    "imd_decile": 9
+  },
+  {
+    "name": "Gentle Dental Care",
+    "postcode": "W1G 7HG",
+    "lat": 51.519866,
+    "lng": -0.147123,
+    "imd_decile": 9
+  },
+  {
+    "name": "Michael Carling Harley Street",
+    "postcode": "W1G 7HG",
+    "lat": 51.519866,
+    "lng": -0.147123,
+    "imd_decile": 9
+  },
+  {
+    "name": "76 Harley Street Limited",
+    "postcode": "W1G 7HH",
+    "lat": 51.52001,
+    "lng": -0.14716,
+    "imd_decile": 9
+  },
+  {
+    "name": "The One to One Dental Clinic",
+    "postcode": "W1G 7HL",
+    "lat": 51.520165,
+    "lng": -0.147255,
+    "imd_decile": 9
+  },
+  {
+    "name": "Be Dental Clinic",
+    "postcode": "W1G 7HN",
+    "lat": 51.520246,
+    "lng": -0.14728,
+    "imd_decile": 9
+  },
+  {
+    "name": "Central Dental Care - London",
+    "postcode": "W1G 7HN",
+    "lat": 51.520246,
+    "lng": -0.14728,
+    "imd_decile": 9
+  },
+  {
+    "name": "Heffernan Dental Specialists",
+    "postcode": "W1G 7HP",
+    "lat": 51.520391,
+    "lng": -0.147347,
+    "imd_decile": 9
+  },
+  {
+    "name": "Ortho London",
+    "postcode": "W1G 7HP",
+    "lat": 51.520391,
+    "lng": -0.147347,
+    "imd_decile": 9
+  },
+  {
+    "name": "Harley Street",
+    "postcode": "W1G 7HS",
+    "lat": 51.520736,
+    "lng": -0.147534,
+    "imd_decile": 9
+  },
+  {
+    "name": "Specialist Dental Services Ltd",
+    "postcode": "W1G 7HX",
+    "lat": 51.520917,
+    "lng": -0.147599,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr Larmoyer's Practice",
+    "postcode": "W1G 7JA",
+    "lat": 51.521143,
+    "lng": -0.14772,
+    "imd_decile": 9
+  },
+  {
+    "name": "Mr Mark Atkinson - Harley Street",
+    "postcode": "W1G 7JD",
+    "lat": 51.521315,
+    "lng": -0.147785,
+    "imd_decile": 9
+  },
+  {
+    "name": "Norton Implants",
+    "postcode": "W1G 7JD",
+    "lat": 51.521315,
+    "lng": -0.147785,
+    "imd_decile": 9
+  },
+  {
+    "name": "Banning Dental Group-Harley Street",
+    "postcode": "W1G 7JT",
+    "lat": 51.522276,
+    "lng": -0.148236,
+    "imd_decile": 9
+  },
+  {
+    "name": "Digital Smile Studio",
+    "postcode": "W1G 7JT",
+    "lat": 51.522276,
+    "lng": -0.148236,
+    "imd_decile": 9
+  },
+  {
+    "name": "Family Dental Practice",
+    "postcode": "W1G 7JT",
+    "lat": 51.522276,
+    "lng": -0.148236,
+    "imd_decile": 9
+  },
+  {
+    "name": "The Harley Street Smile Clinic",
+    "postcode": "W1G 7JT",
+    "lat": 51.522276,
+    "lng": -0.148236,
+    "imd_decile": 9
+  },
+  {
+    "name": "Harley Street Oral Reconstruction Centre",
+    "postcode": "W1G 7LH",
+    "lat": 51.523126,
+    "lng": -0.148562,
+    "imd_decile": 9
+  },
+  {
+    "name": "Sturridge Capp & Barrett",
+    "postcode": "W1G 7LH",
+    "lat": 51.523126,
+    "lng": -0.148562,
+    "imd_decile": 9
+  },
+  {
+    "name": "London Holistic Dental Centre",
+    "postcode": "W1G 8AB",
+    "lat": 51.520028,
+    "lng": -0.14886,
+    "imd_decile": 9
+  },
+  {
+    "name": "LUCEO Dental",
+    "postcode": "W1G 8AH",
+    "lat": 51.518739,
+    "lng": -0.148682,
+    "imd_decile": 9
+  },
+  {
+    "name": "Sensu",
+    "postcode": "W1G 8AS",
+    "lat": 51.518097,
+    "lng": -0.148405,
+    "imd_decile": 9
+  },
+  {
+    "name": "Ko Dental Practice",
+    "postcode": "W1G 8AW",
+    "lat": 51.518332,
+    "lng": -0.148497,
+    "imd_decile": 8
+  },
+  {
+    "name": "The Welbeck Clinic",
+    "postcode": "W1G 8ED",
+    "lat": 51.517878,
+    "lng": -0.149337,
+    "imd_decile": 8
+  },
+  {
+    "name": "19 Wimpole Street Dental",
+    "postcode": "W1G 8GE",
+    "lat": 51.518316,
+    "lng": -0.148036,
+    "imd_decile": 9
+  },
+  {
+    "name": "Cantwell Healthcare - Wimpole Street",
+    "postcode": "W1G 8GE",
+    "lat": 51.518316,
+    "lng": -0.148036,
+    "imd_decile": 9
+  },
+  {
+    "name": "London Periodontics and Implant Dentistry",
+    "postcode": "W1G 8GE",
+    "lat": 51.518316,
+    "lng": -0.148036,
+    "imd_decile": 9
+  },
+  {
+    "name": "Mr Martin Gough - Wimpole Street",
+    "postcode": "W1G 8GE",
+    "lat": 51.518316,
+    "lng": -0.148036,
+    "imd_decile": 9
+  },
+  {
+    "name": "Origin Orthodontics",
+    "postcode": "W1G 8GE",
+    "lat": 51.518316,
+    "lng": -0.148036,
+    "imd_decile": 9
+  },
+  {
+    "name": "Marylebone Dental Care",
+    "postcode": "W1G 8GF",
+    "lat": 51.518388,
+    "lng": -0.148062,
+    "imd_decile": 9
+  },
+  {
+    "name": "Wimpole Dental Office",
+    "postcode": "W1G 8GF",
+    "lat": 51.518388,
+    "lng": -0.148062,
+    "imd_decile": 9
+  },
+  {
+    "name": "Only One Clinic",
+    "postcode": "W1G 8GG",
+    "lat": 51.51846,
+    "lng": -0.148088,
+    "imd_decile": 9
+  },
+  {
+    "name": "The Restorative Dental Practice",
+    "postcode": "W1G 8GG",
+    "lat": 51.51846,
+    "lng": -0.148088,
+    "imd_decile": 9
+  },
+  {
+    "name": "C & M Dental Care",
+    "postcode": "W1G 8GQ",
+    "lat": 51.518515,
+    "lng": -0.148115,
+    "imd_decile": 9
+  },
+  {
+    "name": "The Dental Surgeons",
+    "postcode": "W1G 8GQ",
+    "lat": 51.518515,
+    "lng": -0.148115,
+    "imd_decile": 9
+  },
+  {
+    "name": "W1 Dental",
+    "postcode": "W1G 8GQ",
+    "lat": 51.518515,
+    "lng": -0.148115,
+    "imd_decile": 9
+  },
+  {
+    "name": "LCIAD Limited",
+    "postcode": "W1G 8GW",
+    "lat": 51.518896,
+    "lng": -0.14833,
+    "imd_decile": 9
+  },
+  {
+    "name": "Plowman and Partners",
+    "postcode": "W1G 8HL",
+    "lat": 51.517931,
+    "lng": -0.148729,
+    "imd_decile": 9
+  },
+  {
+    "name": "Wimpole Street Dental Clinic",
+    "postcode": "W1G 8HZ",
+    "lat": 51.518053,
+    "lng": -0.147903,
+    "imd_decile": 9
+  },
+  {
+    "name": "28 Harley Place",
+    "postcode": "W1G 8LZ",
+    "lat": 51.518581,
+    "lng": -0.147737,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr Mehran Sanei - Harley Street",
+    "postcode": "W1G 8QL",
+    "lat": 51.519747,
+    "lng": -0.147574,
+    "imd_decile": 9
+  },
+  {
+    "name": "RW Perio",
+    "postcode": "W1G 8QL",
+    "lat": 51.519747,
+    "lng": -0.147574,
+    "imd_decile": 9
+  },
+  {
+    "name": "Awais Qureshi",
+    "postcode": "W1G 8QN",
+    "lat": 51.51982,
+    "lng": -0.1476,
+    "imd_decile": 9
+  },
+  {
+    "name": "Future Drilling Ltd",
+    "postcode": "W1G 8QN",
+    "lat": 51.51982,
+    "lng": -0.1476,
+    "imd_decile": 9
+  },
+  {
+    "name": "M Z INC Limited",
+    "postcode": "W1G 8QN",
+    "lat": 51.51982,
+    "lng": -0.1476,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dental Practice",
+    "postcode": "W1G 8QQ",
+    "lat": 51.518777,
+    "lng": -0.147081,
+    "imd_decile": 9
+  },
+  {
+    "name": "The LOOC",
+    "postcode": "W1G 8SA",
+    "lat": 51.520155,
+    "lng": -0.149504,
+    "imd_decile": 9
+  },
+  {
+    "name": "Wimpole Consulting Suites",
+    "postcode": "W1G 8SA",
+    "lat": 51.520155,
+    "lng": -0.149504,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dawood and Tanner Dental Practice",
+    "postcode": "W1G 8SB",
+    "lat": 51.520058,
+    "lng": -0.14958,
+    "imd_decile": 9
+  },
+  {
+    "name": "30a Wimpole Street",
+    "postcode": "W1G 8YA",
+    "lat": 51.519222,
+    "lng": -0.148489,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr Teodor Murgelas",
+    "postcode": "W1G 8YH",
+    "lat": 51.51952,
+    "lng": -0.149112,
+    "imd_decile": 9
+  },
+  {
+    "name": "Wimpole Street Endodontics",
+    "postcode": "W1G 8YH",
+    "lat": 51.51952,
+    "lng": -0.149112,
+    "imd_decile": 9
+  },
+  {
+    "name": "Wimpole Street Smile Clinic",
+    "postcode": "W1G 8YH",
+    "lat": 51.51952,
+    "lng": -0.149112,
+    "imd_decile": 9
+  },
+  {
+    "name": "55 Wimpole Street",
+    "postcode": "W1G 8YL",
+    "lat": 51.519366,
+    "lng": -0.149046,
+    "imd_decile": 9
+  },
+  {
+    "name": "James Baker Dental Practice",
+    "postcode": "W1G 8YL",
+    "lat": 51.519366,
+    "lng": -0.149046,
+    "imd_decile": 9
+  },
+  {
+    "name": "Stephen Dental Practice",
+    "postcode": "W1G 9HN",
+    "lat": 51.518163,
+    "lng": -0.145188,
+    "imd_decile": 5
+  },
+  {
+    "name": "Christopher Parte - Queen Anne Street",
+    "postcode": "W1G 9HX",
+    "lat": 51.517857,
+    "lng": -0.147478,
+    "imd_decile": 9
+  },
+  {
+    "name": "N Bloom & Associates - Queen Anne Street",
+    "postcode": "W1G 9HX",
+    "lat": 51.517857,
+    "lng": -0.147478,
+    "imd_decile": 9
+  },
+  {
+    "name": "Bass Orthodontics",
+    "postcode": "W1G 9LQ",
+    "lat": 51.518725,
+    "lng": -0.145512,
+    "imd_decile": 5
+  },
+  {
+    "name": "Perio London",
+    "postcode": "W1G 9LQ",
+    "lat": 51.518725,
+    "lng": -0.145512,
+    "imd_decile": 5
+  },
+  {
+    "name": "Bandlish and Auplish Dental Surgery",
+    "postcode": "W1G 9PH",
+    "lat": 51.518026,
+    "lng": -0.146189,
+    "imd_decile": 5
+  },
+  {
+    "name": "Mr Asif Chatoo - Harmont House",
+    "postcode": "W1G 9PH",
+    "lat": 51.518026,
+    "lng": -0.146189,
+    "imd_decile": 5
+  },
+  {
+    "name": "Basil Mizrahi Prosthodontics Limited",
+    "postcode": "W1G 9PJ",
+    "lat": 51.518026,
+    "lng": -0.146189,
+    "imd_decile": 5
+  },
+  {
+    "name": "Dental Studio 22",
+    "postcode": "W1G 9PL",
+    "lat": 51.517067,
+    "lng": -0.145838,
+    "imd_decile": 5
+  },
+  {
+    "name": "Ndu Clinic",
+    "postcode": "W1G 9PL",
+    "lat": 51.517067,
+    "lng": -0.145838,
+    "imd_decile": 5
+  },
+  {
+    "name": "40 Harley Street",
+    "postcode": "W1G 9PP",
+    "lat": 51.518669,
+    "lng": -0.146494,
+    "imd_decile": 5
+  },
+  {
+    "name": "Harley Street Dental Limited",
+    "postcode": "W1G 9PP",
+    "lat": 51.518669,
+    "lng": -0.146494,
+    "imd_decile": 5
+  },
+  {
+    "name": "London Orthodontics - Dr Simon Manara",
+    "postcode": "W1G 9PP",
+    "lat": 51.518669,
+    "lng": -0.146494,
+    "imd_decile": 5
+  },
+  {
+    "name": "Priv\u00e9 Clinics",
+    "postcode": "W1G 9PP",
+    "lat": 51.518669,
+    "lng": -0.146494,
+    "imd_decile": 5
+  },
+  {
+    "name": "Serenata UK Ltd",
+    "postcode": "W1G 9PP",
+    "lat": 51.518669,
+    "lng": -0.146494,
+    "imd_decile": 5
+  },
+  {
+    "name": "Brazilian Smile",
+    "postcode": "W1G 9PR",
+    "lat": 51.518724,
+    "lng": -0.146535,
+    "imd_decile": 5
+  },
+  {
+    "name": "Dr Filippos Mavroskoufis - Harley Street",
+    "postcode": "W1G 9PS",
+    "lat": 51.518815,
+    "lng": -0.146632,
+    "imd_decile": 5
+  },
+  {
+    "name": "Dr Shabir Pandor - Second Floor Surgery",
+    "postcode": "W1G 9PS",
+    "lat": 51.518815,
+    "lng": -0.146632,
+    "imd_decile": 5
+  },
+  {
+    "name": "A3 Dental",
+    "postcode": "W1G 9PT",
+    "lat": 51.518851,
+    "lng": -0.14666,
+    "imd_decile": 5
+  },
+  {
+    "name": "Harley Street Dental Centre",
+    "postcode": "W1G 9PT",
+    "lat": 51.518851,
+    "lng": -0.14666,
+    "imd_decile": 5
+  },
+  {
+    "name": "The Harley Street Implant Centre",
+    "postcode": "W1G 9PT",
+    "lat": 51.518851,
+    "lng": -0.14666,
+    "imd_decile": 5
+  },
+  {
+    "name": "Harley Street Dental Studio",
+    "postcode": "W1G 9PY",
+    "lat": 51.519042,
+    "lng": -0.146753,
+    "imd_decile": 5
+  },
+  {
+    "name": "Dentexcel - Dr Keith Cohen",
+    "postcode": "W1G 9QN",
+    "lat": 51.517592,
+    "lng": -0.14661,
+    "imd_decile": 9
+  },
+  {
+    "name": "31 Harley Street",
+    "postcode": "W1G 9QS",
+    "lat": 51.517845,
+    "lng": -0.146686,
+    "imd_decile": 9
+  },
+  {
+    "name": "Rod McNeil & Associates",
+    "postcode": "W1G 9QS",
+    "lat": 51.517845,
+    "lng": -0.146686,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr  Ashok Sethi - Harley Street",
+    "postcode": "W1G 9QT",
+    "lat": 51.517908,
+    "lng": -0.146712,
+    "imd_decile": 9
+  },
+  {
+    "name": "Ace Dental",
+    "postcode": "W1G 9ST",
+    "lat": 51.517411,
+    "lng": -0.147713,
+    "imd_decile": 9
+  },
+  {
+    "name": "Dr Barkhordar's Dental Implant Clinic",
+    "postcode": "W1G 9ST",
+    "lat": 51.517411,
+    "lng": -0.147713,
+    "imd_decile": 9
+  },
+  {
+    "name": "Lister House Dental Clinic",
+    "postcode": "W1G 9ST",
+    "lat": 51.517411,
+    "lng": -0.147713,
+    "imd_decile": 9
+  },
+  {
+    "name": "Lister House Endodontic and Restorative Dental Centre",
+    "postcode": "W1G 9ST",
+    "lat": 51.517411,
+    "lng": -0.147713,
+    "imd_decile": 9
+  },
+  {
+    "name": "Lister House Iced Limited",
+    "postcode": "W1G 9ST",
+    "lat": 51.517411,
+    "lng": -0.147713,
+    "imd_decile": 9
+  },
+  {
+    "name": "cksuperdent Limited",
+    "postcode": "W1G 9XZ",
+    "lat": 51.516997,
+    "lng": -0.14881,
+    "imd_decile": 8
+  },
+  {
+    "name": "Smart Dental and Aesthetic",
+    "postcode": "W1H 1QH",
+    "lat": 51.519693,
+    "lng": -0.162971,
+    "imd_decile": 5
+  },
+  {
+    "name": "Happy Kids Dental Practice Ltd",
+    "postcode": "W1H 2EH",
+    "lat": 51.518598,
+    "lng": -0.162568,
+    "imd_decile": 5
+  },
+  {
+    "name": "Crescent Dental Clinic",
+    "postcode": "W1H 4JL",
+    "lat": 51.519183,
+    "lng": -0.163712,
+    "imd_decile": 5
+  },
+  {
+    "name": "Joanna Gallop Limited at Upper Berkeley Dental Care",
+    "postcode": "W1H 7QB",
+    "lat": 51.515835,
+    "lng": -0.15899,
+    "imd_decile": 7
+  },
+  {
+    "name": "Peter Kertesz Dental Surgery",
+    "postcode": "W1K 4HE",
+    "lat": 51.51296,
+    "lng": -0.14602,
+    "imd_decile": 4
+  },
+  {
+    "name": "Dr Gillian Millman",
+    "postcode": "W1K 5QG",
+    "lat": 51.513295,
+    "lng": -0.147289,
+    "imd_decile": 4
+  },
+  {
+    "name": "Teeth@W1",
+    "postcode": "W1K 5QG",
+    "lat": 51.513295,
+    "lng": -0.147289,
+    "imd_decile": 4
+  },
+  {
+    "name": "Bond Dental London (MAYFAIR)",
+    "postcode": "W1K 5QL",
+    "lat": 51.513407,
+    "lng": -0.147558,
+    "imd_decile": 4
+  },
+  {
+    "name": "Nigel Meyer & Associates Dental Surgeons",
+    "postcode": "W1K 5QL",
+    "lat": 51.513407,
+    "lng": -0.147558,
+    "imd_decile": 4
+  },
+  {
+    "name": "The Health Society",
+    "postcode": "W1K 6LL",
+    "lat": 51.512148,
+    "lng": -0.154368,
+    "imd_decile": 6
+  },
+  {
+    "name": "71 Park Street",
+    "postcode": "W1K 7HN",
+    "lat": 51.511513,
+    "lng": -0.155187,
+    "imd_decile": 6
+  },
+  {
+    "name": "Holford Partners Curaden Dental Clinic",
+    "postcode": "W1S 1RS",
+    "lat": 51.513884,
+    "lng": -0.145896,
+    "imd_decile": 4
+  },
+  {
+    "name": "Dr Doris Clinic",
+    "postcode": "W1S 4JN",
+    "lat": 51.508184,
+    "lng": -0.141429,
+    "imd_decile": 7
+  },
+  {
+    "name": "Dr Joe Oliver - Oliver Aesthetics",
+    "postcode": "W1S 4PP",
+    "lat": 51.508918,
+    "lng": -0.140636,
+    "imd_decile": 7
+  },
+  {
+    "name": "James Street Dental Practice",
+    "postcode": "W1U 1EQ",
+    "lat": 51.514736,
+    "lng": -0.150271,
+    "imd_decile": 8
+  },
+  {
+    "name": "Denturly London Central",
+    "postcode": "W1U 1QY",
+    "lat": 51.515298,
+    "lng": -0.153981,
+    "imd_decile": 8
+  },
+  {
+    "name": "Until Oral LTD",
+    "postcode": "W1U 1QY",
+    "lat": 51.515298,
+    "lng": -0.153981,
+    "imd_decile": 8
+  },
+  {
+    "name": "Premium Dental Hygiene Services, Marylebone",
+    "postcode": "W1U 2AU",
+    "lat": 51.51641,
+    "lng": -0.149223,
+    "imd_decile": 8
+  },
+  {
+    "name": "Pro Dental Clinic - Spanish Place",
+    "postcode": "W1U 3HX",
+    "lat": 51.517476,
+    "lng": -0.15238,
+    "imd_decile": 8
+  },
+  {
+    "name": "Thayer Street Dental Centre",
+    "postcode": "W1U 3JP",
+    "lat": 51.51749,
+    "lng": -0.151587,
+    "imd_decile": 8
+  },
+  {
+    "name": "Bupa Dental Care Marylebone",
+    "postcode": "W1U 4HB",
+    "lat": 51.520571,
+    "lng": -0.15593,
+    "imd_decile": 7
+  },
+  {
+    "name": "Smiles and Smiles Limited",
+    "postcode": "W1U 4JD",
+    "lat": 51.520625,
+    "lng": -0.152512,
+    "imd_decile": 7
+  },
+  {
+    "name": "The Whiter Smile Limited",
+    "postcode": "W1U 6FY",
+    "lat": 51.520716,
+    "lng": -0.156587,
+    "imd_decile": 7
+  },
+  {
+    "name": "Dawood and Tanner Montagu Mansions",
+    "postcode": "W1U 6LD",
+    "lat": 51.519764,
+    "lng": -0.157231,
+    "imd_decile": 7
+  },
+  {
+    "name": "Dr Nazan Adali Orthodontics",
+    "postcode": "W1U 6LD",
+    "lat": 51.519764,
+    "lng": -0.157231,
+    "imd_decile": 7
+  },
+  {
+    "name": "Bond Dental",
+    "postcode": "W1U 8HW",
+    "lat": 51.518788,
+    "lng": -0.15802,
+    "imd_decile": 7
+  },
+  {
+    "name": "The London Smile Clinic",
+    "postcode": "W1W 5DW",
+    "lat": 51.521084,
+    "lng": -0.142259,
+    "imd_decile": 5
+  },
+  {
+    "name": "Image Dental Clinic",
+    "postcode": "W1W 6DR",
+    "lat": 51.519484,
+    "lng": -0.140018,
+    "imd_decile": 4
+  },
+  {
+    "name": "K Dental Studios",
+    "postcode": "W1W 6PJ",
+    "lat": 51.519555,
+    "lng": -0.142235,
+    "imd_decile": 5
+  },
+  {
+    "name": "Vitaleurope UK Limited",
+    "postcode": "W1W 7DZ",
+    "lat": 51.51857,
+    "lng": -0.140804,
+    "imd_decile": 5
+  },
+  {
+    "name": "the a.b.c smile",
+    "postcode": "W1W 7SF",
+    "lat": 51.517624,
+    "lng": -0.14067,
+    "imd_decile": 5
+  },
+  {
+    "name": "Bupa Health and Dental Centre - West End",
+    "postcode": "W1W 8HR",
+    "lat": 51.517786,
+    "lng": -0.139568,
+    "imd_decile": 5
+  },
+  {
+    "name": "Maison Smile",
+    "postcode": "W2 1DW",
+    "lat": 51.519075,
+    "lng": -0.168315,
+    "imd_decile": 5
+  },
+  {
+    "name": "Mydentist - Edgware Road - Westminster",
+    "postcode": "W2 1ED",
+    "lat": 51.522394,
+    "lng": -0.172996,
+    "imd_decile": 1
+  },
+  {
+    "name": "Inspire Dental Health",
+    "postcode": "W2 1EJ",
+    "lat": 51.524393,
+    "lng": -0.176059,
+    "imd_decile": 1
+  },
+  {
+    "name": "Marble Arch Dental Centre",
+    "postcode": "W2 1ES",
+    "lat": 51.518674,
+    "lng": -0.16859,
+    "imd_decile": 2
+  },
+  {
+    "name": "Dentist @ W2",
+    "postcode": "W2 1QN",
+    "lat": 51.516447,
+    "lng": -0.171663,
+    "imd_decile": 2
+  },
+  {
+    "name": "Cambridge Court Dental Centre",
+    "postcode": "W2 1UL",
+    "lat": 51.517847,
+    "lng": -0.16858,
+    "imd_decile": 4
+  },
+  {
+    "name": "Stanhope Place Dental Practice",
+    "postcode": "W2 2HH",
+    "lat": 51.513557,
+    "lng": -0.1628,
+    "imd_decile": 7
+  },
+  {
+    "name": "Whites Dental - Marble Arch",
+    "postcode": "W2 2QG",
+    "lat": 51.515749,
+    "lng": -0.164975,
+    "imd_decile": 2
+  },
+  {
+    "name": "The Paddington Dental Practice",
+    "postcode": "W2 3BP",
+    "lat": 51.514824,
+    "lng": -0.176571,
+    "imd_decile": 4
+  },
+  {
+    "name": "Kai Dental",
+    "postcode": "W2 3JH",
+    "lat": 51.510474,
+    "lng": -0.186602,
+    "imd_decile": 4
+  },
+  {
+    "name": "Hyde Park Dental Clinic",
+    "postcode": "W2 3PH",
+    "lat": 51.511706,
+    "lng": -0.176753,
+    "imd_decile": 6
+  },
+  {
+    "name": "Freshdental London",
+    "postcode": "W2 3QA",
+    "lat": 51.513734,
+    "lng": -0.179324,
+    "imd_decile": 6
+  },
+  {
+    "name": "Queensway Dental Practice",
+    "postcode": "W2 3RL",
+    "lat": 51.512562,
+    "lng": -0.187312,
+    "imd_decile": 5
+  },
+  {
+    "name": "Garden Square Dental Practice",
+    "postcode": "W2 4BA",
+    "lat": 51.515077,
+    "lng": -0.190599,
+    "imd_decile": 5
+  },
+  {
+    "name": "Porchester Dental Practice",
+    "postcode": "W2 4DB",
+    "lat": 51.513649,
+    "lng": -0.188393,
+    "imd_decile": 5
+  },
+  {
+    "name": "Number18 Dental",
+    "postcode": "W2 4NH",
+    "lat": 51.514949,
+    "lng": -0.191598,
+    "imd_decile": 5
+  },
+  {
+    "name": "Notting Hill Dental Clinic",
+    "postcode": "W2 5AH",
+    "lat": 51.515429,
+    "lng": -0.194203,
+    "imd_decile": 8
+  },
+  {
+    "name": "Savana Urban Spa",
+    "postcode": "W2 5AH",
+    "lat": 51.515429,
+    "lng": -0.194203,
+    "imd_decile": 8
+  },
+  {
+    "name": "Re:Nu Dental & Medispa",
+    "postcode": "W2 5BD",
+    "lat": 51.515749,
+    "lng": -0.195083,
+    "imd_decile": 8
+  },
+  {
+    "name": "Archangel Clinic Limited",
+    "postcode": "W2 5RA",
+    "lat": 51.515875,
+    "lng": -0.188722,
+    "imd_decile": 5
+  },
+  {
+    "name": "Bayswater Dental Surgery",
+    "postcode": "W2 5SH",
+    "lat": 51.515545,
+    "lng": -0.191791,
+    "imd_decile": 7
+  },
+  {
+    "name": "Bayswater Dental Clinic",
+    "postcode": "W2 6JE",
+    "lat": 51.514475,
+    "lng": -0.187149,
+    "imd_decile": 5
+  },
+  {
+    "name": "Abi Dental Care",
+    "postcode": "W9 1BZ",
+    "lat": 51.525401,
+    "lng": -0.178397,
+    "imd_decile": 8
+  },
+  {
+    "name": "Elgin Dental Care",
+    "postcode": "W9 1JR",
+    "lat": 51.529464,
+    "lng": -0.186453,
+    "imd_decile": 4
+  },
+  {
+    "name": "Dental Design Studio Maida Vale",
+    "postcode": "W9 1QJ",
+    "lat": 51.534724,
+    "lng": -0.189329,
+    "imd_decile": 3
+  },
+  {
+    "name": "Maida Smiles Clinic",
+    "postcode": "W9 1RU",
+    "lat": 51.527927,
+    "lng": -0.181828,
+    "imd_decile": 7
+  },
+  {
+    "name": "Yourdental Wellness",
+    "postcode": "W9 1SS",
+    "lat": 51.525845,
+    "lng": -0.179187,
+    "imd_decile": 8
+  },
+  {
+    "name": "Shirland Dental Practice",
+    "postcode": "W9 2BT",
+    "lat": 51.527135,
+    "lng": -0.195786,
+    "imd_decile": 2
+  },
+  {
+    "name": "Pearl Dental Practice",
+    "postcode": "W9 3EF",
+    "lat": 51.532794,
+    "lng": -0.205338,
+    "imd_decile": 2
+  },
+  {
+    "name": "W9 Dental Health",
+    "postcode": "W9 3JE",
+    "lat": 51.527744,
+    "lng": -0.197939,
+    "imd_decile": 3
+  },
+  {
+    "name": "WestCity Dental",
+    "postcode": "W9 3NA",
+    "lat": 51.524608,
+    "lng": -0.202806,
+    "imd_decile": 2
+  },
+  {
+    "name": "Maida Vale Dental Practice",
+    "postcode": "W9 3PN",
+    "lat": 51.525287,
+    "lng": -0.200775,
+    "imd_decile": 2
+  },
+  {
+    "name": "Harrow Road Dental Practice",
+    "postcode": "W9 3RA",
+    "lat": 51.52392,
+    "lng": -0.201334,
+    "imd_decile": 3
+  },
+  {
+    "name": "Bupa Health and Dental Centre - Chancery Lane",
+    "postcode": "WC2A 1PP",
+    "lat": 51.514471,
+    "lng": -0.111613,
+    "imd_decile": 4
+  },
+  {
+    "name": "Bell Yard Dental Surgery",
+    "postcode": "WC2A 2JR",
+    "lat": 51.514455,
+    "lng": -0.111772,
+    "imd_decile": 4
+  },
+  {
+    "name": "Sardinia House Dental Practice",
+    "postcode": "WC2A 3LZ",
+    "lat": 51.514948,
+    "lng": -0.117819,
+    "imd_decile": 4
+  },
+  {
+    "name": "18a Charing Cross Dental Surgery",
+    "postcode": "WC2H 0HR",
+    "lat": 51.510527,
+    "lng": -0.128162,
+    "imd_decile": 3
+  },
+  {
+    "name": "Leicester Square Dental Clinic",
+    "postcode": "WC2H 7BA",
+    "lat": 51.51176,
+    "lng": -0.129913,
+    "imd_decile": 3
+  },
+  {
+    "name": "The Covent Garden Dental Practice",
+    "postcode": "WC2H 9SD",
+    "lat": 51.513705,
+    "lng": -0.124443,
+    "imd_decile": 4
+  },
+  {
+    "name": "Covent Garden Dental Clinic",
+    "postcode": "WC2N 4HS",
+    "lat": 51.5097,
+    "lng": -0.125933,
+    "imd_decile": 3
+  },
+  {
+    "name": "Your Dental Practice",
+    "postcode": "WC2R 3JF",
+    "lat": 51.512872,
+    "lng": -0.112861,
+    "imd_decile": 4
+  }
+]

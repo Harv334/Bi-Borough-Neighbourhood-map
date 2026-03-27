@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated": "2026-03-26",
-    "last_updated": "2026-03-26 23:05",
+    "generated": "2026-03-27",
+    "last_updated": "2026-03-27 08:02",
     "sources": {
       "census": "Census 2021 (NOMIS) \u2014 LSOA aggregated to ward",
       "imd": "IoD 2025 (MHCLG) \u2014 LSOA aggregated to ward",
@@ -37,7 +37,8 @@
         "imd_worst_decile": 3,
         "imd_best_decile": 9,
         "imd_lsoa_count": 7,
-        "imd_pct_deprived_30": 14.3
+        "imd_pct_deprived_30": 14.3,
+        "dental_practice_count": 2
       }
     },
     "E05013793": {
@@ -64,7 +65,8 @@
         "imd_worst_decile": 4,
         "imd_best_decile": 8,
         "imd_lsoa_count": 7,
-        "imd_pct_deprived_30": 0.0
+        "imd_pct_deprived_30": 0.0,
+        "dental_practice_count": 8
       }
     },
     "E05013794": {
@@ -91,7 +93,8 @@
         "imd_worst_decile": 1,
         "imd_best_decile": 3,
         "imd_lsoa_count": 7,
-        "imd_pct_deprived_30": 100.0
+        "imd_pct_deprived_30": 100.0,
+        "dental_practice_count": 4
       }
     },
     "E05013795": {
@@ -118,7 +121,8 @@
         "imd_worst_decile": 2,
         "imd_best_decile": 4,
         "imd_lsoa_count": 6,
-        "imd_pct_deprived_30": 83.3
+        "imd_pct_deprived_30": 83.3,
+        "dental_practice_count": 3
       }
     },
     "E05013796": {
@@ -145,7 +149,8 @@
         "imd_worst_decile": 2,
         "imd_best_decile": 8,
         "imd_lsoa_count": 6,
-        "imd_pct_deprived_30": 33.3
+        "imd_pct_deprived_30": 33.3,
+        "dental_practice_count": 6
       }
     },
     "E05013797": {
@@ -172,7 +177,8 @@
         "imd_worst_decile": 2,
         "imd_best_decile": 8,
         "imd_lsoa_count": 8,
-        "imd_pct_deprived_30": 25.0
+        "imd_pct_deprived_30": 25.0,
+        "dental_practice_count": 8
       }
     },
     "E05013798": {
@@ -199,7 +205,8 @@
         "imd_worst_decile": 2,
         "imd_best_decile": 7,
         "imd_lsoa_count": 8,
-        "imd_pct_deprived_30": 12.5
+        "imd_pct_deprived_30": 12.5,
+        "dental_practice_count": 7
       }
     },
     "E05013799": {
@@ -226,7 +233,8 @@
         "imd_worst_decile": 1,
         "imd_best_decile": 8,
         "imd_lsoa_count": 5,
-        "imd_pct_deprived_30": 20.0
+        "imd_pct_deprived_30": 20.0,
+        "dental_practice_count": 3
       }
     },
     "E05013800": {
@@ -253,7 +261,8 @@
         "imd_worst_decile": 2,
         "imd_best_decile": 9,
         "imd_lsoa_count": 7,
-        "imd_pct_deprived_30": 42.9
+        "imd_pct_deprived_30": 42.9,
+        "dental_practice_count": 3
       }
     },
     "E05013801": {
@@ -280,7 +289,8 @@
         "imd_worst_decile": 5,
         "imd_best_decile": 9,
         "imd_lsoa_count": 10,
-        "imd_pct_deprived_30": 0.0
+        "imd_pct_deprived_30": 0.0,
+        "dental_practice_count": 145
       }
     },
     "E05013802": {
@@ -307,7 +317,8 @@
         "imd_worst_decile": 2,
         "imd_best_decile": 6,
         "imd_lsoa_count": 7,
-        "imd_pct_deprived_30": 42.9
+        "imd_pct_deprived_30": 42.9,
+        "dental_practice_count": 5
       }
     },
     "E05013803": {
@@ -334,7 +345,8 @@
         "imd_worst_decile": 1,
         "imd_best_decile": 8,
         "imd_lsoa_count": 6,
-        "imd_pct_deprived_30": 50.0
+        "imd_pct_deprived_30": 50.0,
+        "dental_practice_count": 1
       }
     },
     "E05013804": {
@@ -361,7 +373,8 @@
         "imd_worst_decile": 1,
         "imd_best_decile": 3,
         "imd_lsoa_count": 6,
-        "imd_pct_deprived_30": 100.0
+        "imd_pct_deprived_30": 100.0,
+        "dental_practice_count": 2
       }
     },
     "E05013805": {
@@ -388,7 +401,8 @@
         "imd_worst_decile": 3,
         "imd_best_decile": 9,
         "imd_lsoa_count": 8,
-        "imd_pct_deprived_30": 12.5
+        "imd_pct_deprived_30": 12.5,
+        "dental_practice_count": 9
       }
     },
     "E05013806": {
@@ -415,7 +429,8 @@
         "imd_worst_decile": 1,
         "imd_best_decile": 9,
         "imd_lsoa_count": 6,
-        "imd_pct_deprived_30": 33.3
+        "imd_pct_deprived_30": 33.3,
+        "dental_practice_count": 17
       }
     },
     "E05013807": {
@@ -442,7 +457,8 @@
         "imd_worst_decile": 2,
         "imd_best_decile": 8,
         "imd_lsoa_count": 7,
-        "imd_pct_deprived_30": 28.6
+        "imd_pct_deprived_30": 28.6,
+        "dental_practice_count": 6
       }
     },
     "E05013808": {
@@ -469,7 +485,8 @@
         "imd_worst_decile": 4,
         "imd_best_decile": 7,
         "imd_lsoa_count": 6,
-        "imd_pct_deprived_30": 0.0
+        "imd_pct_deprived_30": 0.0,
+        "dental_practice_count": 27
       }
     },
     "E05013809": {
@@ -496,7 +513,8 @@
         "imd_worst_decile": 1,
         "imd_best_decile": 4,
         "imd_lsoa_count": 6,
-        "imd_pct_deprived_30": 83.3
+        "imd_pct_deprived_30": 83.3,
+        "dental_practice_count": 1
       }
     }
   }

@@ -1,0 +1,39 @@
+name: Pipeline (CI)
+
+# Sanity-check on every push: the package installs, the CLI loads, and
+# `pipeline status` prints a table without crashing. Doesn't run any fetchers
+# (they hit external APIs).
+
+on:
+  push:
+    paths:
+      - "pipeline/**"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "pipeline/**"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install pipeline
+        working-directory: pipeline
+        run: |
+          pip install --upgrade pip
+          pip install -e .
+
+      - name: pipeline status
+        run: pipeline status
+
+      - name: pipeline status (json)
+        run: pipeline status --format json > /dev/null

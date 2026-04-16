@@ -1,0 +1,51 @@
+name: Pipeline (quarterly)
+
+# Runs every fetcher whose cadence is "quarterly":
+#   greenspace, tfl_stations, epc_domestic
+# Plus a refresh of boundaries (cheap and rarely changes).
+
+on:
+  schedule:
+    - cron: "0 4 8 1,4,7,10 *"   # 8th of Jan/Apr/Jul/Oct, 04:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pipeline-quarterly
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install pipeline (with raster extras)
+        working-directory: pipeline
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[raster]"
+
+      - name: Refresh boundaries (cheap)
+        run: pipeline run --source boundaries
+
+      - name: Run quarterly fetchers
+        env:
+          OS_DATA_HUB_TOKEN: ${{ secrets.OS_DATA_HUB_TOKEN }}
+          EPC_AUTH_TOKEN: ${{ secrets.EPC_AUTH_TOKEN }}
+        run: pipeline run --cadence quarterly
+
+      - name: Commit refreshed data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(data): quarterly refresh ${{ github.run_id }}"
+          file_pattern: "data/** index.html"

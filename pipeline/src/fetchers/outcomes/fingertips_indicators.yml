@@ -1,0 +1,79 @@
+# Curated list of OHID Fingertips indicators to pull every month.
+# Indicator IDs come from https://fingertips.phe.org.uk/api/indicator_metadata/all
+# Each entry pulls all areas for the indicator at LA (LAD25CD) granularity.
+
+indicators:
+  # ─── Mortality & life expectancy ────────────────────────────────
+  - id: 90366
+    short_name: life_expectancy_male
+    description: Life expectancy at birth (Male)
+  - id: 90367
+    short_name: life_expectancy_female
+    description: Life expectancy at birth (Female)
+  - id: 92901
+    short_name: healthy_life_expectancy_male
+    description: Healthy life expectancy at birth (Male)
+  - id: 92902
+    short_name: healthy_life_expectancy_female
+    description: Healthy life expectancy at birth (Female)
+
+  # ─── Cardiovascular & metabolic ─────────────────────────────────
+  - id: 219
+    short_name: smoking_prevalence_adults
+    description: Smoking prevalence in adults (18+)
+  - id: 90640
+    short_name: obesity_adults
+    description: Percentage of adults (aged 18+) classified as overweight or obese
+  - id: 90323
+    short_name: obesity_year6
+    description: Year 6: Prevalence of obesity (including severe obesity)
+  - id: 92588
+    short_name: physical_activity_adults
+    description: Percentage of physically active adults
+  - id: 241
+    short_name: hypertension_qof
+    description: Hypertension: QOF prevalence (all ages)
+
+  # ─── Mental health ──────────────────────────────────────────────
+  - id: 848
+    short_name: depression_qof
+    description: Depression: QOF recorded prevalence (18+)
+  - id: 41001
+    short_name: suicide_rate
+    description: Suicide rate (Persons, age standardised)
+  - id: 90813
+    short_name: severe_mental_illness_qof
+    description: Severe mental illness: QOF recorded prevalence
+
+  # ─── Children & young people ────────────────────────────────────
+  - id: 30307
+    short_name: child_poverty_low_income_under16
+    description: Children in absolute low income families (under 16s)
+  - id: 91142
+    short_name: hospital_admission_self_harm_10_24
+    description: Hospital admissions as a result of self-harm (10-24 yrs)
+  - id: 30315
+    short_name: a_e_attendance_under_5
+    description: A&E attendances (0-4 years)
+
+  # ─── Vaccination & screening ────────────────────────────────────
+  - id: 30309
+    short_name: mmr_2_doses_age5
+    description: Population vaccination coverage: MMR for two doses (5 years old)
+  - id: 91361
+    short_name: flu_vaccination_65plus
+    description: Flu vaccination coverage (aged 65+)
+  - id: 22001
+    short_name: cervical_screening_coverage
+    description: Cervical screening coverage - aged 25 to 49
+
+  # ─── Inequalities & wider determinants ──────────────────────────
+  - id: 93701
+    short_name: fuel_poverty_lihc
+    description: Fuel poverty (low income, low energy efficiency methodology)
+  - id: 90366  # NOTE: also covers male LE — keep here as a deprivation cross-check
+    short_name: life_expectancy_male_dup
+    description: (duplicate, deduplicate at load time)
+  - id: 90282
+    short_name: gp_patient_satisfaction
+    description: GP patient survey - satisfaction with overall experience of GP practice

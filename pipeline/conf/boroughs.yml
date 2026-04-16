@@ -1,0 +1,36 @@
+# NW London boroughs covered by the map.
+# LAD25CD codes used as the canonical join key against ONSPD/NHS data.
+# Display name = what shows on the map UI.
+# Postcode prefixes used to short-circuit ONSPD scans.
+
+boroughs:
+  - name: Brent
+    lad25cd: E09000005
+    postcode_prefixes: [HA, NW, W]
+  - name: Camden
+    lad25cd: E09000007
+    postcode_prefixes: [N, NW, WC, W]
+  - name: Ealing
+    lad25cd: E09000009
+    postcode_prefixes: [W, UB, TW, NW]
+  - name: Hammersmith & Fulham
+    lad25cd: E09000013
+    postcode_prefixes: [W, SW]
+  - name: Harrow
+    lad25cd: E09000015
+    postcode_prefixes: [HA, NW]
+  - name: Hillingdon
+    lad25cd: E09000017
+    postcode_prefixes: [UB, HA, TW]
+  - name: Hounslow
+    lad25cd: E09000018
+    postcode_prefixes: [TW, W, UB]
+  - name: Kensington & Chelsea
+    lad25cd: E09000020
+    postcode_prefixes: [W, SW]
+  - name: City of Westminster
+    lad25cd: E09000033
+    postcode_prefixes: [W, NW, WC, SW]
+
+# Union of all postcode prefixes — used when scanning UK-wide datasets.
+postcode_prefixes_all: [HA, NW, N, W, WC, SW, UB, TW]

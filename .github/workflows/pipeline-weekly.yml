@@ -1,0 +1,43 @@
+name: Pipeline (weekly)
+
+# Runs every fetcher whose cadence is "weekly" — currently FSA food hygiene.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pipeline-weekly
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install pipeline
+        working-directory: pipeline
+        run: |
+          pip install --upgrade pip
+          pip install -e .
+
+      - name: Run weekly fetchers
+        run: pipeline run --cadence weekly
+
+      - name: Commit refreshed data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(data): weekly refresh ${{ github.run_id }}"
+          file_pattern: "data/** index.html"

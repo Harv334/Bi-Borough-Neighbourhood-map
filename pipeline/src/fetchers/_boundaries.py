@@ -116,8 +116,19 @@ def _paginate_arcgis(url: str, params: dict) -> list[dict]:
         p["resultOffset"] = offset
         p["resultRecordCount"] = 2000
         r = requests.get(url, params=p, timeout=120)
-        r.raise_for_status()
+        if not r.ok:
+            # Surface ArcGIS's actual error body instead of a blind 400
+            print(f"ArcGIS error {r.status_code} on {url}")
+            print(f"  params: {p}")
+            print(f"  body:   {r.text[:2000]}")
+            r.raise_for_status()
         data = r.json()
+        # ArcGIS sometimes returns 200 with an error envelope
+        if isinstance(data, dict) and data.get("error"):
+            print(f"ArcGIS 200-with-error on {url}")
+            print(f"  params: {p}")
+            print(f"  error:  {data['error']}")
+            raise RuntimeError(f"ArcGIS error: {data['error']}")
         feats = data.get("features", [])
         if not feats:
             break

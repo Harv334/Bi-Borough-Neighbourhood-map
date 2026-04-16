@@ -59,9 +59,16 @@ class BoundariesFetcher(BaseFetcher):
 
     def fetch_raw(self) -> dict[str, dict]:
         lads = [code for _, code in load_boroughs(str(self.repo_root))]
-        # NW London bounding box (xmin, ymin, xmax, ymax) in WGS84
-        # Covers Hillingdon west to Camden east, Hounslow south to Harrow north.
-        NW_LONDON_BBOX = "-0.55,51.38,-0.08,51.70"
+        # LSOA 2021 layer has no LAD code field — filter via LSOA21NM prefix instead.
+        # LSOA names on ONS layers are "<Borough Name> NNNA", e.g. "Brent 001A".
+        lsoa_name_prefixes = [
+            "Brent", "Camden", "Ealing",
+            "Hammersmith and Fulham", "Harrow", "Hillingdon",
+            "Hounslow", "Kensington and Chelsea", "Westminster",
+        ]
+        lsoa_where = " OR ".join(
+            f"LSOA21NM LIKE '{p}%'" for p in lsoa_name_prefixes
+        )
 
         out: dict[str, dict] = {}
         for kind, url in LAYERS.items():
@@ -75,12 +82,8 @@ class BoundariesFetcher(BaseFetcher):
                 if kind in ("boroughs", "wards"):
                     # LAD25CD is present on both May 2025 layers
                     params["where"] = _where(lads, "LAD25CD")
-                else:  # lsoa — LSOA 2021 layer has no LAD field; use bbox spatial filter
-                    params["where"] = "1=1"
-                    params["geometry"] = NW_LONDON_BBOX
-                    params["geometryType"] = "esriGeometryEnvelope"
-                    params["inSR"] = "4326"
-                    params["spatialRel"] = "esriSpatialRelIntersects"
+                else:  # lsoa
+                    params["where"] = lsoa_where
                 # ArcGIS REST has a default 2,000 feature page size — paginate
                 features = _paginate_arcgis(url, params)
                 cache.write_text(json.dumps({"type": "FeatureCollection", "features": features}))

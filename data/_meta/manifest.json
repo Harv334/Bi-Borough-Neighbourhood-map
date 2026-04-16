@@ -1,4 +1,17 @@
 {
-  "last_run": null,
-  "sources": {}
+  "last_run": "2026-04-16T21:37:07.172736+00:00",
+  "sources": {
+    "boundaries": {
+      "duration_s": 0.1,
+      "fetched_at": "2026-04-16T21:37:07.110795+00:00",
+      "notes": "",
+      "output_path": "data/geo/boundaries.parquet",
+      "rows_written": 3,
+      "schema": {
+        "kind": "str",
+        "n_features": "int64",
+        "out_path": "str"
+      }
+    }
+  }
 }

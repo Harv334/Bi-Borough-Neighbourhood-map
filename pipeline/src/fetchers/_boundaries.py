@@ -34,7 +34,7 @@ ARCGIS_BASE = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/service
 # republishes a new vintage, update the layer name (e.g. WD24 -> WD25).
 LAYERS = {
     "lsoa": (
-        f"{ARCGIS_BASE}/Lower_layer_Super_Output_Areas_Dec_2021_Boundaries_Generalised_Clipped_EW_BGC_V3"
+        f"{ARCGIS_BASE}/Lower_layer_Super_Output_Areas_Dec_2021_Boundaries_Generalised_Clipped_EW_BGC_V5"
         "/FeatureServer/0/query"
     ),
     "wards": (

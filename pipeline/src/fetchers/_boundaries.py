@@ -70,8 +70,20 @@ class BoundariesFetcher(BaseFetcher):
             f"LSOA21NM LIKE '{p}%'" for p in lsoa_name_prefixes
         )
 
+        # Prefer committed boundary files (vendored in data/boundaries/). Dropping
+        # pre-filtered GeoJSONs there bypasses ArcGIS entirely — useful because
+        # ONS has repeatedly shuffled layer names/vintages on the Geo Portal.
+        # To force a refresh from ArcGIS, delete the files in data/boundaries/
+        # *and* the matching cache files under .cache/boundaries/.
+        boundaries_dir = Path(self.repo_root) / "data" / "boundaries"
+
         out: dict[str, dict] = {}
         for kind, url in LAYERS.items():
+            vendored = boundaries_dir / f"{kind}.geojson"
+            if vendored.exists():
+                out[kind] = json.loads(vendored.read_text())
+                continue
+
             cache = self.cache_dir / f"{kind}.geojson"
             if not cache.exists():
                 params = {

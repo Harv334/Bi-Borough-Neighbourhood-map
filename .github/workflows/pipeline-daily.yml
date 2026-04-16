@@ -34,7 +34,7 @@ jobs:
           cache: "pip"
 
       - name: Install pipeline
-        working-directory: pipeline
+        # (removed — pyproject.toml is at repo root)
         run: |
           pip install --upgrade pip
           pip install -e .

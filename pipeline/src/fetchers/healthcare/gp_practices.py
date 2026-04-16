@@ -51,7 +51,16 @@ class GpPracticesFetcher(BaseFetcher):
         """Download the latest EPRACCUR zip and return a DataFrame of all UK practices."""
         cache = self.cache_dir / "epraccur.zip"
         if not cache.exists():
-            r = requests.get(EPRACCUR_URL, timeout=60)
+            # NHS Digital's CDN 403s the default python-requests UA.
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/124.0.0.0 Safari/537.36"
+                ),
+                "Accept": "application/zip,application/octet-stream,*/*",
+            }
+            r = requests.get(EPRACCUR_URL, timeout=60, headers=headers)
             r.raise_for_status()
             cache.write_bytes(r.content)
 

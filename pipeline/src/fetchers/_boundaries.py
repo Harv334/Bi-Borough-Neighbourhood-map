@@ -59,6 +59,9 @@ class BoundariesFetcher(BaseFetcher):
 
     def fetch_raw(self) -> dict[str, dict]:
         lads = [code for _, code in load_boroughs(str(self.repo_root))]
+        # NW London bounding box (xmin, ymin, xmax, ymax) in WGS84
+        # Covers Hillingdon west to Camden east, Hounslow south to Harrow north.
+        NW_LONDON_BBOX = "-0.55,51.38,-0.08,51.70"
 
         out: dict[str, dict] = {}
         for kind, url in LAYERS.items():
@@ -69,13 +72,15 @@ class BoundariesFetcher(BaseFetcher):
                     "f": "geojson",
                     "outSR": "4326",
                 }
-                if kind == "boroughs":
+                if kind in ("boroughs", "wards"):
+                    # LAD25CD is present on both May 2025 layers
                     params["where"] = _where(lads, "LAD25CD")
-                elif kind == "wards":
-                    params["where"] = _where(lads, "LAD25CD")
-                else:  # lsoa — needs intersect via spatial filter; fallback to LAD-name filter
-                    # ONS LSOA layer carries LAD22CD; for LSOA21 it's stable
-                    params["where"] = _where(lads, "LAD22CD")
+                else:  # lsoa — LSOA 2021 layer has no LAD field; use bbox spatial filter
+                    params["where"] = "1=1"
+                    params["geometry"] = NW_LONDON_BBOX
+                    params["geometryType"] = "esriGeometryEnvelope"
+                    params["inSR"] = "4326"
+                    params["spatialRel"] = "esriSpatialRelIntersects"
                 # ArcGIS REST has a default 2,000 feature page size — paginate
                 features = _paginate_arcgis(url, params)
                 cache.write_text(json.dumps({"type": "FeatureCollection", "features": features}))

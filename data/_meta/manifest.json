@@ -1,16 +1,20 @@
 {
-  "last_run": "2026-04-16T21:37:07.172736+00:00",
+  "last_run": "2026-04-17T08:28:12.816999+00:00",
   "sources": {
-    "boundaries": {
-      "duration_s": 0.1,
-      "fetched_at": "2026-04-16T21:37:07.110795+00:00",
+    "imd2025": {
+      "duration_s": 0.3,
+      "fetched_at": "2026-04-17T08:28:12.470819+00:00",
       "notes": "",
-      "output_path": "data/geo/boundaries.parquet",
-      "rows_written": 3,
+      "output_path": "data/demographics/imd2025.parquet",
+      "rows_written": 33755,
       "schema": {
-        "kind": "str",
-        "n_features": "int64",
-        "out_path": "str"
+        "LSOA21CD": "object",
+        "crime_score": "float64",
+        "health_score": "float64",
+        "imd_decile": "int64",
+        "imd_rank": "int64",
+        "imd_score": "float64",
+        "income_score": "float64"
       }
     }
   }

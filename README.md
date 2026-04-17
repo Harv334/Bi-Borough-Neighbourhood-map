@@ -1,93 +1,84 @@
-# NW London Population Health — Bi-Borough Neighbourhood Map
+# NW London Population Health - Bi-Borough Neighbourhood Map
 
-Interactive map + auto-updating data pipeline for the 9 NW London local
-authorities (Brent, Camden, Ealing, Hammersmith & Fulham, Harrow,
-Hillingdon, Hounslow, Kensington & Chelsea, Westminster).
+Interactive Leaflet map + a single-file Python script that refreshes it.
+Covers the 9 NW London local authorities: Brent, Camden, Ealing,
+Hammersmith & Fulham, Harrow, Hillingdon, Hounslow, Kensington & Chelsea,
+City of Westminster.
 
-**Live map:** https://harv334.github.io/Bi-Borough-Neighbourhood-map/
+Live map: https://harv334.github.io/Bi-Borough-Neighbourhood-map/
 
 ## What's in this repo
 
-| Path                  | What it is                                                  |
-|-----------------------|-------------------------------------------------------------|
-| `index.html`          | The map (single-file Leaflet, deployed to GitHub Pages)     |
-| `data/`               | Refreshed Parquet files for every dataset (committed)       |
-| `data/boundaries/`    | LSOA + ward + LAD GeoJSONs                                   |
-| `data/_meta/`         | Manifest + Power BI index + map JSON                         |
-| `pipeline/`           | The Python pipeline (`pipeline run`, `pipeline export`, ...) |
-| `.github/workflows/`  | Cron jobs that keep `data/` and `index.html` fresh           |
-| `docs/HANDOVER.md`    | Single source of truth for whoever maintains this next       |
-| `docs/POWERBI.md`     | How to use the data in Power BI                              |
-| `docs/ADDING_A_FETCHER.md` | How to add a new data source                            |
+| Path                | What it is |
+|---------------------|----------------------------------------------------|
+| `index.html`        | The map itself - single-file Leaflet, deployed to GitHub Pages |
+| `fetch_all_data.py` | One script. Downloads everything, builds the JSON the map reads, re-splices `index.html`. |
+| `ward_data.json`    | Ward-level indicators (188 wards) - consumed by the map at load |
+| `lsoa_data.json`    | LSOA-level IMD scores + census columns (33,755 LSOAs) |
+| `pharmacies.json`   | Pharmacy point data (~540 rows) |
+| `data/`             | Intermediate Parquet files - one per source. Committed so you can open them in Power BI or pandas without rerunning fetches. |
+| `data/boundaries/`  | LSOA + ward + LAD GeoJSONs |
+| `.cache/`           | Raw downloads (gitignored). Drop manual files here - see below. |
 
-## Data sources
+## Quick start (one-time setup)
 
-19 sources across 8 categories — a full inventory is in
-`pipeline/conf/sources.yml` and reproduced here for browsing:
-
-**Healthcare supply** — GP practices (NHS EPRACCUR), hospital sites
-(NHS ETS), pharmacies (NHS BSA), dentists (NHS BSA), care homes (CQC).
-
-**Outcomes** — OHID Fingertips (life expectancy, smoking, obesity, MH
-prevalence, child immunisations, A&E rate, suicide rate, fuel poverty,
-GP patient satisfaction), OpenPrescribing (chronic disease drug
-volumes per ICB).
-
-**Demographics** — Census 2021 (Nomis bulk: TS001, TS017, TS021, TS037,
-TS038, TS066), MHCLG IoD 2025 (deprivation scores per LSOA).
-
-**Environment** — OS Open Greenspace, DEFRA AURN air quality monitors,
-LAEI modelled NO₂/PM2.5 (stub).
-
-**Transport** — TfL PTAL grid (LSOA mean), TfL StopPoint API
-(Tube/Overground/Elizabeth/DLR/National Rail).
-
-**Crime** — data.police.uk (street-level crimes per borough per month).
-
-**Food** — FSA Food Hygiene Ratings per local authority.
-
-**Housing** — EPC domestic certificates, DESNZ sub-regional fuel
-poverty.
-
-## Run it
-
-```sh
-cd pipeline
-pip install -e .
-
-# All sources due this cadence
-pipeline run --cadence monthly
-
-# A single source
-pipeline run --source gp_practices
-
-# What's in the data/ directory and when was it last refreshed?
-pipeline status
+```bash
+pip install pandas pyarrow requests pyproj shapely
 ```
 
-## Running on schedule
+Then drop these files into `.cache/`. All are free, public downloads.
 
-GitHub Actions runs every cadence on its own schedule —
-see `.github/workflows/`. No manual intervention needed.
+| File | Where to drop it | Source |
+|------|------------------|--------|
+| **ONSPD zip** (required, ~250 MB) | `.cache/onspd/ONSPD_*_UK.zip` | https://geoportal.statistics.gov.uk - search "ONS Postcode Directory", download the latest quarterly "full" zip |
+| **IMD 2025 File 7 CSV** (required, ~10 MB) | `.cache/imd2025/*.csv` | https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025 - File 7 (all ranks/scores/deciles) |
+| **EPRACCUR** (required, ~700 KB) | `.cache/gp_practices/epraccur.zip` | https://digital.nhs.uk/services/organisation-data-service/export-data-files/csv-downloads/gp-and-gp-practice-related-data |
+| **edispensary CSV** (required, ~3.5 MB) | `.cache/pharmacies/edispensary.csv` | Latest monthly from https://www.nhsbsa.nhs.uk |
+| Hospital CSV (optional) | `.cache/hospitals/Hospital.csv` | https://www.nhs.uk/about-us/nhs-website-datasets/ |
 
-Required GitHub Secrets:
-- `OS_DATA_HUB_TOKEN` — for OS Open Greenspace
-- `EPC_AUTH_TOKEN` — for EPC certificates
+OHID Fingertips (health outcomes) and police.uk (crime) are API-backed -
+the script hits them directly the first time and caches the responses.
 
-## Use the data elsewhere
+## Running
 
-Power BI: `data/_meta/powerbi_index.csv` lists every dataset with
-its raw GitHub URL — paste any URL into Power BI's "Get Data → Web".
-See `docs/POWERBI.md`.
+```bash
+# Run everything: fetches, transforms, writes ward/lsoa/pharmacy JSON.
+python fetch_all_data.py
 
-Pandas / DuckDB: every parquet at
-`https://raw.githubusercontent.com/Harv334/Bi-Borough-Neighbourhood-map/main/data/<category>/<id>.parquet`
+# Run a single source, then re-export:
+python fetch_all_data.py --only imd
 
-## Add a new data source
+# Skip a slow source:
+python fetch_all_data.py --skip crime
 
-See `docs/ADDING_A_FETCHER.md` — needs ~50 lines of Python and one
-yaml entry.
+# Skip all fetching; just rebuild the JSON from cached Parquets:
+python fetch_all_data.py --export-only
+```
 
-## Maintainer handover
+After running, refresh `index.html` in your browser (or push and let
+GitHub Pages redeploy).
 
-See `docs/HANDOVER.md` for everything a new maintainer needs to know.
+## When a source breaks
+
+The script keeps going on per-source failures - a broken URL won't wipe
+out your other outputs. The failing source's Parquet is left alone, so
+the previous run's data survives.
+
+To update one source:
+1. Re-download the file from the URL in the table above
+2. Overwrite it in `.cache/<source>/`
+3. Run `python fetch_all_data.py --only <source>`
+
+## Handing this over
+
+For someone who just wants to refresh the map:
+
+1. Clone the repo.
+2. `pip install pandas pyarrow requests pyproj shapely`
+3. Download the four required files listed in the table above and drop
+   them into their respective `.cache/` subfolders.
+4. `python fetch_all_data.py`
+5. `git commit -am "data refresh YYYY-MM" && git push`
+
+That's it. The script has a long docstring at the top restating every
+download URL in case this README ever goes stale.

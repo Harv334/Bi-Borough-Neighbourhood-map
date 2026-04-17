@@ -197,7 +197,8 @@
         </div>
         <div class="sb-sec" style="flex-shrink:0;border-bottom:1px solid #e5e5e0">
           <div class="sb-lbl">Borough boundaries</div>
-          <label class="lrow"><div style="width:9px;height:9px;border:2px solid #1a1a1a;border-radius:2px;flex-shrink:0"></div><span class="lname">NW London boroughs</span><input type="checkbox" id="tb" checked></label>
+          <label class="lrow"><div style="width:9px;height:9px;border:2px solid #1a1a1a;border-radius:2px;flex-shrink:0"></div><span class="lname">NW London boroughs</span><input type="checkbox" id="tb"></label>
+          <label class="lrow"><div style="width:9px;height:9px;background:linear-gradient(90deg,#8ecae6,#ffb703,#fb8500,#c05299);border-radius:2px;flex-shrink:0"></div><span class="lname">Neighbourhood colours</span><input type="checkbox" id="tnc"></label>
           <label class="lrow"><div style="width:9px;height:9px;border:1.5px solid #999;border-radius:2px;flex-shrink:0"></div><span class="lname">NW London wards <span class="lcount">170</span></span><input type="checkbox" id="tnw"></label>
           <label class="lrow"><div style="width:9px;height:9px;border:1.5px dashed #e67e22;border-radius:2px;flex-shrink:0"></div><span class="lname">LSOA boundaries (IMD) <span class="lcount">123</span></span><input type="checkbox" id="tlsoa"></label>
           <div id="lsoa-filter-row" style="display:none;margin:4px 0 0 18px">
@@ -272,33 +273,16 @@
           <div class="sb-lbl">Choropleth overlay</div>
           <select id="ov">
             <option value="none">— none (neighbourhood colours) —</option>
-            <optgroup label="Health outcomes">
-              <option value="ft_life_expectancy_male">Life expectancy (male)</option>
-              <option value="ft_healthy_life_expectancy_male">Healthy life expectancy (male)</option>
+            <optgroup label="Health (Census 2021, ward-level)">
               <option value="census_good_health_pct">Good/very good health %</option>
               <option value="census_bad_health_pct">Bad/very bad health %</option>
               <option value="census_disability_any_pct">Disability (any) %</option>
               <option value="census_disability_lot_pct">Disability (limited a lot) %</option>
               <option value="census_provides_unpaid_care_pct">Provides unpaid care %</option>
             </optgroup>
-            <optgroup label="Behaviours &amp; services">
-              <option value="ft_smoking_prevalence_adults">Adult smoking %</option>
-              <option value="ft_obesity_year6">Year 6 obesity %</option>
-              <option value="ft_hypertension_qof">Hypertension (QOF)</option>
-              <option value="ft_depression_qof">Depression (QOF)</option>
-              <option value="ft_severe_mental_illness_qof">Severe mental illness (QOF)</option>
-              <option value="ft_suicide_rate">Suicide rate</option>
-              <option value="ft_a_e_attendance_under_5">A&amp;E attendance (0-4)</option>
-              <option value="ft_mmr_2_doses_age5">MMR 2 doses by age 5</option>
-              <option value="ft_flu_vaccination_65plus">Flu vaccination (65+)</option>
-              <option value="ft_cervical_screening_25_49">Cervical screening (25-49)</option>
-              <option value="ft_gp_patient_satisfaction">GP patient satisfaction</option>
-            </optgroup>
             <optgroup label="Crime &amp; deprivation">
               <option value="crime_total">Total crimes (12 months)</option>
               <option value="core20_lsoa_count">Core20 LSOAs in ward</option>
-              <option value="ft_child_poverty_low_income">Child poverty (low income)</option>
-              <option value="ft_fuel_poverty_lihc">Fuel poverty (LIHC)</option>
               <option value="census_unemployed_pct">Unemployed %</option>
               <option value="census_no_qual_pct">No qualifications %</option>
               <option value="census_no_car_pct">No car/van %</option>
@@ -337,11 +321,11 @@
           <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#333;font-weight:500">
               <input type="checkbox" id="core20-toggle" style="cursor:pointer">
-              <span>Highlight Core20 wards</span>
+              <span>Highlight Core20 LSOAs</span>
             </label>
             <div style="font-size:10px;color:#888;margin-top:4px;line-height:1.45">
-              NHS Core20PLUS5: ward has at least 1 LSOA in IMD deciles 1-2.
-              Highlighted wards show a magenta outline.
+              NHS Core20PLUS5: LSOAs in IMD deciles 1-2 (most deprived 20% nationally).
+              Highlighted LSOAs are filled magenta.
             </div>
             <div id="core20-count" style="font-size:10px;color:#666;margin-top:3px"></div>
           </div>
@@ -398,34 +382,21 @@ const NEIGHBOURHOODS = {
 };
 
 const OV_CFG = {
-  // Health outcomes
-  ft_life_expectancy_male:         { lo:"Lower", hi:"Higher", wh:false, min:75,   max:86   },
-  ft_healthy_life_expectancy_male: { lo:"Lower", hi:"Higher", wh:false, min:55,   max:70   },
+  // Health (ward-level Census 2021)
   census_good_health_pct:          { lo:"Lower", hi:"Higher", wh:false, min:75,   max:95   },
   census_bad_health_pct:           { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:8    },
   census_disability_any_pct:       { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
   census_disability_lot_pct:       { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:10   },
   census_provides_unpaid_care_pct: { lo:"Lower", hi:"Higher", wh:true,  min:2,    max:10   },
-  // Behaviours & services
-  ft_smoking_prevalence_adults:    { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:20   },
-  ft_obesity_year6:                { lo:"Lower", hi:"Higher", wh:true,  min:15,   max:35   },
-  ft_hypertension_qof:             { lo:"Lower", hi:"Higher", wh:true,  min:3,    max:15   },
-  ft_depression_qof:               { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:15   },
-  ft_severe_mental_illness_qof:    { lo:"Lower", hi:"Higher", wh:true,  min:60,   max:200  },
-  ft_suicide_rate:                 { lo:"Lower", hi:"Higher", wh:true,  min:4,    max:15   },
-  ft_a_e_attendance_under_5:       { lo:"Lower", hi:"Higher", wh:true,  min:15,   max:50   },
-  ft_mmr_2_doses_age5:             { lo:"Lower", hi:"Higher", wh:false, min:60,   max:95   },
-  ft_flu_vaccination_65plus:       { lo:"Lower", hi:"Higher", wh:false, min:5,    max:25   },
-  ft_cervical_screening_25_49:     { lo:"Lower", hi:"Higher", wh:false, min:45,   max:75   },
-  ft_gp_patient_satisfaction:      { lo:"Lower", hi:"Higher", wh:false, min:15,   max:50   },
   // Crime (ward total, 12 months)
   crime_total:                     { lo:"Fewer", hi:"More",   wh:true,  min:500,  max:8000 },
-  // Core20 density
+  // Core20 density (count of LSOAs in IMD deciles 1-2)
   core20_lsoa_count:               { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:15   },
-  // Population & housing
+  // Population & demographics
   census_population:               { lo:"Fewer", hi:"More",   wh:false, min:6000, max:16000},
   census_non_white_pct:            { lo:"Lower", hi:"Higher", wh:false, min:10,   max:80   },
   census_born_outside_uk_pct:      { lo:"Lower", hi:"Higher", wh:false, min:20,   max:70   },
+  // Housing & transport
   census_owned_pct:                { lo:"Less",  hi:"More",   wh:false, min:10,   max:70   },
   census_social_rented_pct:        { lo:"Less",  hi:"More",   wh:false, min:5,    max:50   },
   census_private_rented_pct:       { lo:"Less",  hi:"More",   wh:false, min:10,   max:60   },
@@ -436,8 +407,6 @@ const OV_CFG = {
   census_routine_semi_routine_pct: { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
   census_level4_qual_pct:          { lo:"Lower", hi:"Higher", wh:false, min:30,   max:80   },
   census_no_qual_pct:              { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
-  ft_child_poverty_low_income:     { lo:"Lower", hi:"Higher", wh:true,  min:10,   max:50   },
-  ft_fuel_poverty_lihc:            { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:20   },
 };
 
 // Transparency state — controlled by sliders
@@ -457,27 +426,12 @@ const CATS = [
     { k: "census_non_white_pct",             l: "Non-White (%)",                 g: "ward" },
     { k: "census_born_outside_uk_pct",       l: "Born outside UK (%)",           g: "ward" },
   ]},
-  { key: "health",       label: "Health outcomes",     ico: "♥", fields: [
-    { k: "ft_life_expectancy_male",          l: "Life expectancy, male",         g: "la"   },
-    { k: "ft_healthy_life_expectancy_male",  l: "Healthy life expectancy, male", g: "la"   },
+  { key: "health",       label: "Health (Census 2021, ward-level)", ico: "♥", fields: [
     { k: "census_good_health_pct",           l: "Good/very good health (%)",     g: "ward" },
     { k: "census_bad_health_pct",            l: "Bad/very bad health (%)",       g: "ward" },
     { k: "census_disability_any_pct",        l: "Disability, any (%)",           g: "ward" },
     { k: "census_disability_lot_pct",        l: "Disability, limited a lot (%)", g: "ward" },
     { k: "census_provides_unpaid_care_pct",  l: "Provides unpaid care (%)",      g: "ward" },
-  ]},
-  { key: "behaviours",   label: "Behaviours & services", ico: "💊", fields: [
-    { k: "ft_smoking_prevalence_adults",     l: "Smoking prevalence (18+)",      g: "la"   },
-    { k: "ft_obesity_year6",                 l: "Year 6 obesity",                g: "la"   },
-    { k: "ft_hypertension_qof",              l: "Hypertension (QOF)",            g: "la"   },
-    { k: "ft_depression_qof",                l: "Depression (QOF, 18+)",         g: "la"   },
-    { k: "ft_severe_mental_illness_qof",     l: "Severe mental illness (QOF)",   g: "la"   },
-    { k: "ft_suicide_rate",                  l: "Suicide rate",                  g: "la"   },
-    { k: "ft_a_e_attendance_under_5",        l: "A&E attendances (0-4 yrs)",     g: "la"   },
-    { k: "ft_mmr_2_doses_age5",              l: "MMR, 2 doses at age 5",         g: "la"   },
-    { k: "ft_flu_vaccination_65plus",        l: "Flu vaccination (65+)",         g: "la"   },
-    { k: "ft_cervical_screening_25_49",      l: "Cervical screening (25-49)",    g: "la"   },
-    { k: "ft_gp_patient_satisfaction",       l: "GP patient satisfaction",       g: "la"   },
   ]},
   { key: "economy",      label: "Economy & education", ico: "£", fields: [
     { k: "census_unemployed_pct",            l: "Unemployed (%)",                g: "ward" },
@@ -485,8 +439,6 @@ const CATS = [
     { k: "census_routine_semi_routine_pct",  l: "Routine/semi-routine (%)",      g: "ward" },
     { k: "census_level4_qual_pct",           l: "Level 4+ qualifications (%)",   g: "ward" },
     { k: "census_no_qual_pct",               l: "No qualifications (%)",         g: "ward" },
-    { k: "ft_child_poverty_low_income",      l: "Child poverty (low income)",    g: "la"   },
-    { k: "ft_fuel_poverty_lihc",             l: "Fuel poverty (LIHC)",           g: "la"   },
   ]},
   { key: "housing",      label: "Housing & transport", ico: "🏠", fields: [
     { k: "census_owned_pct",                 l: "Owner occupied (%)",            g: "ward" },
@@ -677,9 +629,7 @@ const boroughL = L.geoJSON(BOROUGH_GJ, {
     // No tooltip — borough labels are distracting on scroll
   }
 });
-boroughL.addTo(map);
-// Keep borough lines on top of ward fill
-boroughL.bringToFront();
+// Borough outlines start off — user toggles via 'NW London boroughs' checkbox
 
 // ── NW London context wards layer ────────────────────────────────────────────
 const nwWardsL = L.geoJSON(NW_WARDS_GJ, {
@@ -936,7 +886,9 @@ function initVCSEFilters() {
 // ═══════════════════════════════════════════════════════════════════════════
 let wLyr = null, selW = null, curOv = 'none';
 let WARD_DATA = {};
+let WARD_DATA_BY_CODE = {};
 let focusedNbhd = 'all';   // neighbourhood focus: 'all' or key like 'sw'
+let showNbhdColors = false; // colored neighbourhood fills/borders start OFF (blank map on load)
 
 function setNbhdFocus(key) {
   focusedNbhd = key;
@@ -1019,37 +971,45 @@ function ovColor(wn, ovKey) {
 // Track which neighbourhoods are hidden via filter checkboxes
 const hiddenNbhds = new Set();
 
-// Core20 overlay state + helper
+// Core20 overlay state + helper (now highlights LSOAs in IMD deciles 1-2, not wards)
 let showCore20Overlay = false;
+let core20LsoaLyr = null;
 function isCore20Ward(wn) {
-  if (typeof WARD_DATA === 'undefined' || !WARD_DATA) return false;
-  const wards = WARD_DATA.wards || WARD_DATA;
-  for (const k in wards) {
-    const w = wards[k];
-    if (w && w.name === wn) return !!w.is_core20;
-  }
-  return false;
+  const w = WARD_DATA && WARD_DATA[wn];
+  return !!(w && w.is_core20);
 }
+// No-op: ward outlines are no longer used for Core20 — highlighting is at LSOA level
 function applyCore20Outline(style, wn) {
-  if (!showCore20Overlay) return style;
-  if (!isCore20Ward(wn)) return style;
-  return Object.assign({}, style, {
-    color: '#C4003C',
-    weight: Math.max(style.weight || 0, 3.5),
-    opacity: 0.95,
-    dashArray: '6 3'
+  return style;
+}
+function buildCore20LsoaLayer() {
+  if (core20LsoaLyr || typeof LSOA_IMD === 'undefined') return;
+  const feats = (LSOA_IMD.features || []).filter(f => {
+    const d = f.properties && f.properties.imd_decile;
+    return d === 1 || d === 2;
+  });
+  core20LsoaLyr = L.geoJSON({ type:'FeatureCollection', features: feats }, {
+    style: f => ({
+      color: '#8b0035',
+      weight: 1.2,
+      fillColor: '#C4003C',
+      fillOpacity: 0.55,
+      opacity: 0.9,
+    }),
+    interactive: false,
   });
 }
 
 function wstyle(wn, ov, state) {
   const nk = nbhdOf(wn), nb = nk ? NEIGHBOURHOODS[nk] : null;
 
-  // Completely hidden neighbourhoods
-  if (nk && hiddenNbhds.has(nk)) return { opacity:0, fillOpacity:0 };
+  // Completely hidden neighbourhoods (only applies when colours are on — otherwise treat as normal)
+  if (showNbhdColors && nk && hiddenNbhds.has(nk)) return { opacity:0, fillOpacity:0 };
 
-  // Neighbourhood focus dimming — fade wards not in the focused neighbourhood
-  const dimmed = focusedNbhd && focusedNbhd !== 'all' && nbhdOf(wn) !== focusedNbhd;
-  const stroke = nb ? nb.color : '#475569';
+  // Neighbourhood focus dimming — fade wards not in the focused neighbourhood (only when colours on)
+  const dimmed = showNbhdColors && focusedNbhd && focusedNbhd !== 'all' && nbhdOf(wn) !== focusedNbhd;
+  // Neutral gray stroke/fill until the user turns neighbourhood colours on
+  const stroke = (showNbhdColors && nb) ? nb.color : '#94a3b8';
 
   if (ov === 'none') {
     const baseFo = {default:0.22, hover:0.32, selected:0.42}[state] || 0.22;
@@ -1123,9 +1083,8 @@ function showWard(wn) {
 
   const pop = inds.census_population ? `~${parseInt(inds.census_population).toLocaleString()}` : (wdata.pop || '');
 
-  // ── Key stats strip: life expectancy (LA), good health %, GP count, Core20 ratio ──
+  // ── Key stats strip: population, good health %, GP count, Core20 ratio (all ward-level) ──
   const fmt = v => (v === null || v === undefined || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
-  const leVal   = fmt(inds.ft_life_expectancy_male);
   const goodHlt = fmt(inds.census_good_health_pct);
   const gpN     = fmt(inds.gp_practice_count);
   const popN    = fmt(inds.census_population);
@@ -1140,7 +1099,7 @@ function showWard(wn) {
   };
   const keyStats = `
     <div class="keystats">
-      ${stat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years, male (LA)')}
+      ${stat('Population', popN !== null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
       ${stat('Good health', goodHlt !== null ? goodHlt.toFixed(0) + '%' : null, 'of residents')}
       ${stat('GP practices', gpN !== null ? gpN.toFixed(0) : null, 'in ward')}
       ${stat('Core20 LSOAs', (c20L !== null && totL !== null) ? c20L.toFixed(0) + '/' + totL.toFixed(0) : null, 'most deprived')}
@@ -1188,13 +1147,13 @@ window.generateWardReport = function(wn) {
   }
   gpN = (inds.gp_practice_count && parseInt(inds.gp_practice_count)) || 0;
 
-  // Headline stats
+  // Headline stats (ward-level only)
   const fmt = v => (v === null || v === undefined || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
-  const leVal    = fmt(inds.ft_life_expectancy_male);
-  const hleVal   = fmt(inds.ft_healthy_life_expectancy_male);
   const popN     = fmt(inds.census_population);
   const goodHlt  = fmt(inds.census_good_health_pct);
-  const smokeVal = fmt(inds.ft_smoking_prevalence_adults);
+  const badHlt   = fmt(inds.census_bad_health_pct);
+  const disAny   = fmt(inds.census_disability_any_pct);
+  const unempPct = fmt(inds.census_unemployed_pct);
   const c20L     = fmt(inds.core20_lsoa_count);
   const totL     = fmt(inds.total_lsoa_count);
 
@@ -1215,6 +1174,69 @@ window.generateWardReport = function(wn) {
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
   const borough = (wdata && wdata.lad) || '';
   const population = popN ? popN.toLocaleString() : '—';
+
+  // ── Mini-map SVG: ward polygon on a borough-context backdrop ────────────
+  // Find the ward + borough features in GJ, project lng/lat into a 260×200 SVG.
+  let miniMapSVG = '';
+  try {
+    const wardFeat = GJ.features.find(f =>
+      f.properties && (f.properties.WD24CD === (wdata && wdata.code) ||
+                        f.properties.WD24NM === (wdata && wdata.name)));
+    if (wardFeat) {
+      const wardLad = wardFeat.properties.LAD;
+      const contextFeats = GJ.features.filter(f => f.properties && f.properties.LAD === wardLad);
+      // Collect all coords from context to compute bounds
+      const allCoords = [];
+      const collectCoords = g => {
+        if (!g) return;
+        if (g.type === 'Polygon') g.coordinates.forEach(r => r.forEach(c => allCoords.push(c)));
+        else if (g.type === 'MultiPolygon') g.coordinates.forEach(p => p.forEach(r => r.forEach(c => allCoords.push(c))));
+      };
+      contextFeats.forEach(f => collectCoords(f.geometry));
+      if (allCoords.length) {
+        let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+        for (const [lng, lat] of allCoords) {
+          if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+          if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+        }
+        const W = 260, H = 200, PAD = 8;
+        // lat is inverted; also correct for aspect at this latitude
+        const midLat = (minLat + maxLat) / 2;
+        const lngScale = Math.cos(midLat * Math.PI / 180);
+        const dLng = (maxLng - minLng) * lngScale;
+        const dLat = (maxLat - minLat);
+        const sx = (W - 2*PAD) / dLng;
+        const sy = (H - 2*PAD) / dLat;
+        const s = Math.min(sx, sy);
+        const offX = (W - dLng * s) / 2;
+        const offY = (H - dLat * s) / 2;
+        const proj = ([lng, lat]) => {
+          const x = offX + (lng - minLng) * lngScale * s;
+          const y = offY + (maxLat - lat) * s;
+          return x.toFixed(2) + ',' + y.toFixed(2);
+        };
+        const polygonPath = (rings) => rings.map(r => 'M' + r.map(proj).join(' L') + 'Z').join(' ');
+        const geomPath = g => {
+          if (!g) return '';
+          if (g.type === 'Polygon') return polygonPath(g.coordinates);
+          if (g.type === 'MultiPolygon') return g.coordinates.map(polygonPath).join(' ');
+          return '';
+        };
+        const contextPaths = contextFeats
+          .filter(f => f !== wardFeat)
+          .map(f => `<path d="${geomPath(f.geometry)}" fill="#eeeee8" stroke="#c8c8c0" stroke-width="0.6"/>`)
+          .join('');
+        const wardFill = nb ? nb.color : '#2f6fb8';
+        const wardPath = `<path d="${geomPath(wardFeat.geometry)}" fill="${wardFill}" fill-opacity="0.55" stroke="${wardFill}" stroke-width="1.6"/>`;
+        miniMapSVG = `<svg class="minimap" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Location of ${wdata.name} within ${wardLad}">
+          <rect width="${W}" height="${H}" fill="#f6f6f1"/>
+          ${contextPaths}
+          ${wardPath}
+        </svg>
+        <div class="minimap-cap">${wdata.name} within ${wardLad}</div>`;
+      }
+    }
+  } catch(e) { /* minimap is decorative — fail silent */ }
 
   const bigStat = (lbl, val, sub) => {
     const hasVal = val !== null && val !== undefined && val !== '';
@@ -1263,11 +1285,16 @@ window.generateWardReport = function(wn) {
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#f4f4ef; color:#1a1a1a; margin:0; padding:32px 24px; line-height:1.5; }
   .report { max-width: 880px; margin: 0 auto; background:#fff; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,.06); overflow:hidden; }
-  .hero { padding: 28px 32px 22px; border-bottom: 1px solid #eee; }
+  .hero { padding: 28px 32px 22px; border-bottom: 1px solid #eee; display:flex; gap:22px; align-items:flex-start; }
+  .hero .hero-text { flex:1; min-width:0; }
+  .hero .hero-map { flex:0 0 260px; }
+  .minimap { width:260px; height:200px; border:1px solid #e6e6df; border-radius:6px; background:#f6f6f1; display:block; }
+  .minimap-cap { font-size:10px; color:#888; text-align:center; margin-top:4px; }
   .hero .kicker { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.08em; }
   .hero h1 { margin:4px 0 2px; font-size:28px; font-weight:700; letter-spacing:-0.01em; }
   .hero .sub { color:#555; font-size:13px; }
   .hero .nb { display:inline-block; margin-top:8px; padding:3px 11px; border-radius:20px; font-size:11px; font-weight:600; ${nb ? `background:${nb.bg};color:${nb.color};` : 'background:#eee;color:#555;'} }
+  @media (max-width: 720px) { .hero { flex-direction:column; } .hero .hero-map { flex:0 0 auto; } }
   .headline { display:grid; grid-template-columns: repeat(4, 1fr); gap:0; border-top:1px solid #eee; }
   .hstat { padding:18px 14px; text-align:center; border-right:1px solid #f0f0ec; }
   .hstat:last-child { border-right: none; }
@@ -1308,16 +1335,20 @@ window.generateWardReport = function(wn) {
 </head><body>
 <div class="report">
   <div class="hero">
-    <div class="kicker">NW London ward report · ${today}</div>
-    <h1>${wdata ? wdata.name : wn}</h1>
-    <div class="sub">${borough || ''}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population: ' + population : ''}</div>
-    ${nb ? `<div class="nb">${nb.label}</div>` : ''}${core20Badge}
+    <div class="hero-text">
+      <div class="kicker">NW London ward report · ${today}</div>
+      <h1>${wdata ? wdata.name : wn}</h1>
+      <div class="sub">${borough || ''}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population: ' + population : ''}</div>
+      ${nb ? `<div class="nb">${nb.label}</div>` : ''}${core20Badge}
+    </div>
+    ${miniMapSVG ? `<div class="hero-map">${miniMapSVG}</div>` : ''}
   </div>
   <div class="headline">
-    ${bigStat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years, male (LA)')}
-    ${bigStat('Healthy life exp.', hleVal !== null ? hleVal.toFixed(1) : null, 'years, male (LA)')}
+    ${bigStat('Population', popN !== null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
     ${bigStat('Good health', goodHlt !== null ? goodHlt.toFixed(0) + '%' : null, 'of residents')}
-    ${bigStat('Smoking', smokeVal !== null ? smokeVal.toFixed(1) + '%' : null, 'of adults (LA)')}
+    ${bigStat('Bad health', badHlt !== null ? badHlt.toFixed(1) + '%' : null, 'of residents')}
+    ${bigStat('Disability (any)', disAny !== null ? disAny.toFixed(1) + '%' : null, 'of residents')}
+    ${bigStat('Unemployed', unempPct !== null ? unempPct.toFixed(1) + '%' : null, '16-74 economically active')}
     ${bigStat('Core20 LSOAs', (c20L !== null && totL !== null) ? c20L.toFixed(0) + ' of ' + totL.toFixed(0) : null, 'most deprived')}
   </div>
   <div class="services">
@@ -1373,7 +1404,8 @@ function buildWardLayer() {
   });
   wLyr.addTo(map);
   map.fitBounds(wLyr.getBounds(), { padding:[28,28] });
-  buildNbhdBorders();
+  // Neighbourhood colours/borders start OFF; user can toggle on via 'Neighbourhood colours'
+  if (showNbhdColors) buildNbhdBorders();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1518,6 +1550,18 @@ Object.entries(NEIGHBOURHOODS).forEach(([k, nb]) => {
 document.getElementById('tb').addEventListener('change',  e => {
   if (e.target.checked) { boroughL.addTo(map); boroughL.bringToFront(); }
   else { map.removeLayer(boroughL); }
+});
+document.getElementById('tnc').addEventListener('change', e => {
+  showNbhdColors = e.target.checked;
+  if (showNbhdColors) {
+    buildNbhdBorders();
+  } else {
+    if (nbhdBorderLyr && nbhdBorderLyr._map) map.removeLayer(nbhdBorderLyr);
+    nbhdBorderLyr = null;
+  }
+  // Restyle all wards so stroke/fill switches between neighbourhood colour and neutral gray
+  if (wLyr) wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+  if (boroughL && boroughL._map) boroughL.bringToFront();
 });
 document.getElementById('tnw').addEventListener('change', e => {
   if (e.target.checked) { nwWardsL.addTo(map); if (boroughL._map) boroughL.bringToFront(); }
@@ -1845,10 +1889,25 @@ async function loadData() {
     const json = await response.json();
     const wards = json.wards || {};
 
-    // Index by ward name (normalised) for fast lookup
+    // Index by ward code first (unambiguous), then by the GJ display name so
+    // disambiguated names like "Kilburn (Brent)" resolve to the right ward.
     WARD_DATA = {};
+    WARD_DATA_BY_CODE = {};
     for (const [code, ward] of Object.entries(wards)) {
-      WARD_DATA[ward.name] = ward;
+      WARD_DATA_BY_CODE[code] = ward;
+    }
+    if (typeof GJ !== 'undefined' && GJ.features) {
+      for (const f of GJ.features) {
+        const code = f.properties && f.properties.WD24CD;
+        const name = f.properties && f.properties.WD24NM;
+        if (code && name && WARD_DATA_BY_CODE[code]) {
+          WARD_DATA[name] = WARD_DATA_BY_CODE[code];
+        }
+      }
+    }
+    // Fallback: any ward not matched via GJ still keyed by its raw name
+    for (const ward of Object.values(wards)) {
+      if (!WARD_DATA[ward.name]) WARD_DATA[ward.name] = ward;
     }
 
     const meta     = json.metadata || {};
@@ -1866,7 +1925,7 @@ async function loadData() {
     document.getElementById('src-lbl').textContent =
       `Data: police.uk (crime) · NHS Digital ODS (GP) · OHID Fingertips (health) · ONS Census 2021 · Westminster One Directory (VCSE)`;
     document.getElementById('data-date').textContent =
-      `${realPoints} real data points across 18 wards${dateStr ? ' · Generated ' + dateStr : ''}`;
+      `${realPoints} real data points across ${Object.keys(wards).length} wards${dateStr ? ' · Generated ' + dateStr : ''}`;
 
     // Update overlay vintage note
     document.getElementById('data-vintage').innerHTML =
@@ -1916,23 +1975,29 @@ loadData();
     if (!cb) return;
     cb.addEventListener("change", e => {
       showCore20Overlay = !!e.target.checked;
-      if (typeof wLyr !== "undefined" && wLyr) {
-        wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+      if (showCore20Overlay) {
+        buildCore20LsoaLayer();
+        if (core20LsoaLyr) {
+          core20LsoaLyr.addTo(map);
+          core20LsoaLyr.bringToFront();
+          if (boroughL && boroughL._map) boroughL.bringToFront();
+        }
+      } else if (core20LsoaLyr && core20LsoaLyr._map) {
+        map.removeLayer(core20LsoaLyr);
       }
     });
     function updateCount() {
-      if (typeof WARD_DATA === "undefined" || !WARD_DATA) {
+      if (typeof LSOA_IMD === "undefined" || !LSOA_IMD || !LSOA_IMD.features) {
         setTimeout(updateCount, 500);
         return;
       }
-      const wards = WARD_DATA.wards || WARD_DATA;
-      let c20 = 0, total = 0;
-      for (const k in wards) {
-        total++;
-        if (wards[k] && wards[k].is_core20) c20++;
-      }
+      const total = LSOA_IMD.features.length;
+      const c20 = LSOA_IMD.features.filter(f => {
+        const d = f.properties && f.properties.imd_decile;
+        return d === 1 || d === 2;
+      }).length;
       const el = document.getElementById("core20-count");
-      if (el) el.textContent = c20 + " of " + total + " wards are Core20";
+      if (el) el.textContent = c20 + " of " + total + " LSOAs in deciles 1-2";
     }
     updateCount();
   }

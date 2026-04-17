@@ -692,6 +692,44 @@ function fmtNum(v, decimals=0) {
   if (isNaN(n)) return '—';
   return decimals > 0 ? n.toFixed(decimals) : Math.round(n).toLocaleString();
 }
+// ---- Overlay tooltip helpers (hover values) ----
+function ovLabel(k) {
+  if (!k || k === 'none') return '';
+  for (const cat of CATS) {
+    for (const f of (cat.fields || [])) {
+      if (f.k === k) return f.l;
+    }
+  }
+  return k;
+}
+function wardOvValue(wn, k) {
+  const w = (typeof WARD_DATA !== 'undefined') ? WARD_DATA[wn] : null;
+  if (!w) return null;
+  return (w.indicators || w)[k];
+}
+function lsoaOvValue(code, k) {
+  const d = (typeof LSOA_DATA !== 'undefined') ? LSOA_DATA[code] : null;
+  if (!d) return null;
+  return (d.indicators || d)[k];
+}
+function fmtOv(v, k) {
+  if (v === null || v === undefined || v === '') return '—';
+  const isPct = /_pct$|_rate$/.test(k || '');
+  return isPct ? fmtNum(v, 1) + '%' : fmtNum(v, 0);
+}
+function ovTooltipRows(valueForKey) {
+  // valueForKey: function(k) -> raw value
+  let rows = '';
+  if (typeof curOv !== 'undefined' && curOv && curOv !== 'none') {
+    const v = valueForKey(curOv);
+    rows += `<br><span style="font-size:10.5px"><b>${ovLabel(curOv)}:</b> ${fmtOv(v, curOv)}</span>`;
+  }
+  if (typeof curOv2 !== 'undefined' && curOv2 && curOv2 !== 'none') {
+    const v2 = valueForKey(curOv2);
+    rows += `<br><span style="font-size:10.5px"><b>${ovLabel(curOv2)}:</b> ${fmtOv(v2, curOv2)}</span>`;
+  }
+  return rows;
+}
 function mkicon(color, label) {
   return L.divIcon({ html: `<div style="background:${color};width:28px;height:28px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)">${label}</div>`, iconSize:[28,28], iconAnchor:[14,14], className:'' });
 }
@@ -1627,7 +1665,8 @@ function buildWardLayer() {
       lyr.on('mouseover', e => {
         if (wn !== selW) lyr.setStyle(wstyle(wn, curOv, 'hover'));
         const nk = nbhdOf(wn), nb = nk ? NEIGHBOURHOODS[nk] : null;
-        lyr.bindTooltip(`<b style="font-size:12px">${wn}</b>${nb ? `<br><span style="font-size:10px;color:${nb.color}">${nb.label}</span>` : ''}`, { sticky:true, opacity:.94 }).openTooltip(e.latlng);
+        const ovRows = ovTooltipRows(k => wardOvValue(wn, k));
+        lyr.bindTooltip(`<b style="font-size:12px">${wn}</b>${nb ? `<br><span style="font-size:10px;color:${nb.color}">${nb.label}</span>` : ''}${ovRows}`, { sticky:true, opacity:.94 }).openTooltip(e.latlng);
       });
       lyr.on('mouseout', () => { if (wn !== selW) lyr.setStyle(wstyle(wn, curOv, 'default')); });
     }
@@ -2255,7 +2294,8 @@ function buildEmbeddedLSOALayer() {
                          (typeof curOv2 !== 'undefined' && curOv2 !== 'none');
         if (p.code !== selLSOA && !ovActive) lyr.setStyle(imdStyle(feat, 'hover'));
         const decStr = p.imd_decile ? `IMD decile ${p.imd_decile}` : '';
-        lyr.bindTooltip(`<b style="font-size:11px">${p.name}</b><br><span style="font-size:10px;color:#888">${p.ward}</span>${decStr ? '<br><span style="font-size:10px">'+decStr+'</span>' : ''}`, {sticky:true, opacity:.94}).openTooltip(e.latlng);
+        const ovRows = ovTooltipRows(k => lsoaOvValue(p.code, k));
+        lyr.bindTooltip(`<b style="font-size:11px">${p.name}</b><br><span style="font-size:10px;color:#888">${p.ward}</span>${decStr ? '<br><span style="font-size:10px">'+decStr+'</span>' : ''}${ovRows}`, {sticky:true, opacity:.94}).openTooltip(e.latlng);
       });
       lyr.on('mouseout', () => {
         const ovActive = (typeof curOv !== 'undefined' && curOv !== 'none') ||

@@ -769,7 +769,7 @@ function loadPharmacyLayer(practices) {
   pharmCluster.clearLayers();
   pharmData = [];
   practices.forEach(p => {
-    if (\!p.lat || \!p.lng) return;
+    if (!p.lat || !p.lng) return;
     const marker = L.marker([p.lat, p.lng], {icon: mkPharmacyIcon()});
     const telRow = p.tel ? `<div class="pop-row"><span class="pop-key">Tel</span><span>${p.tel}</span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#E89B1B">${p.n}</div><div class="pop-body"><div class="pop-addr">${p.a||''}${p.pc?'<br>'+p.pc:''}</div>${telRow}</div>`);
@@ -1109,9 +1109,9 @@ function showWard(wn) {
   };
   const keyStats = `
     <div class="keystats">
-      ${stat('Life expectancy', leVal \!== null ? leVal.toFixed(1) : null, 'years (MSOA)')}
-      ${stat('Aged 65+', o65Val \!== null ? o65Val.toFixed(1) + '%' : null, 'of residents')}
-      ${stat('GP patients / 1k', gpPer1k \!== null ? gpPer1k.toFixed(0) : null, 'registered')}
+      ${stat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years (MSOA)')}
+      ${stat('Aged 65+', o65Val !== null ? o65Val.toFixed(1) + '%' : null, 'of residents')}
+      ${stat('GP patients / 1k', gpPer1k !== null ? gpPer1k.toFixed(0) : null, 'registered')}
     </div>`;
 
   p.innerHTML = `
@@ -1170,21 +1170,21 @@ window.generateWardReport = function(wn) {
     const rows = cat.fields.map(f => {
       const val = inds[f.k];
       if (val === null || val === undefined || val === '') return '';
-      const isNum = \!isNaN(parseFloat(val));
+      const isNum = !isNaN(parseFloat(val));
       const display = isNum ? parseFloat(val).toLocaleString(undefined, {maximumFractionDigits:1}) : val;
       return `<tr><td>${f.l} <span class="g g-${f.g}">${f.g}</span></td><td class="v">${display}</td></tr>`;
     }).filter(Boolean).join('');
-    if (\!rows) return '';
+    if (!rows) return '';
     return `<section class="cat"><h3>${cat.ico} ${cat.label}</h3><table class="kv">${rows}</table></section>`;
   }).join('');
 
-  const noData = \!catRows;
+  const noData = !catRows;
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
   const borough = (wdata && wdata.lad) || '';
   const population = popN ? popN.toLocaleString() : '—';
 
   const bigStat = (lbl, val, sub) => {
-    const hasVal = val \!== null && val \!== undefined && val \!== '';
+    const hasVal = val !== null && val !== undefined && val !== '';
     return `<div class="hstat">
       <div class="hstat-val ${hasVal ? '' : 'dim'}">${hasVal ? val : '—'}</div>
       <div class="hstat-lbl">${lbl}</div>
@@ -1192,7 +1192,7 @@ window.generateWardReport = function(wn) {
     </div>`;
   };
 
-  const html = `<\!doctype html>
+  const html = `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <title>${wdata ? wdata.name : wn} — Ward Report</title>
@@ -1246,14 +1246,14 @@ window.generateWardReport = function(wn) {
   <div class="hero">
     <div class="kicker">NW London ward report · ${today}</div>
     <h1>${wdata ? wdata.name : wn}</h1>
-    <div class="sub">${borough || ''}${borough && population \!== '—' ? ' · ' : ''}${population \!== '—' ? 'Population: ' + population : ''}</div>
+    <div class="sub">${borough || ''}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population: ' + population : ''}</div>
     ${nb ? `<div class="nb">${nb.label}</div>` : ''}
   </div>
   <div class="headline">
-    ${bigStat('Life expectancy', leVal \!== null ? leVal.toFixed(1) : null, 'years')}
-    ${bigStat('Aged 65+', o65Val \!== null ? o65Val.toFixed(1) + '%' : null, 'of residents')}
-    ${bigStat('GP patients per 1,000', gpPer1k \!== null ? gpPer1k.toFixed(0) : null, 'registered')}
-    ${bigStat('IMD decile', imd \!== null ? imd.toFixed(1) : null, '1 = most deprived')}
+    ${bigStat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years')}
+    ${bigStat('Aged 65+', o65Val !== null ? o65Val.toFixed(1) + '%' : null, 'of residents')}
+    ${bigStat('GP patients per 1,000', gpPer1k !== null ? gpPer1k.toFixed(0) : null, 'registered')}
+    ${bigStat('IMD decile', imd !== null ? imd.toFixed(1) : null, '1 = most deprived')}
   </div>
   <div class="services">
     <div class="svc"><div class="svc-val">${gpN || '—'}</div><div class="svc-lbl">GP practices</div></div>
@@ -1277,7 +1277,7 @@ window.generateWardReport = function(wn) {
 </body></html>`;
 
   const w = window.open('', '_blank');
-  if (\!w) { alert('Please allow pop-ups to generate the ward report.'); return; }
+  if (!w) { alert('Please allow pop-ups to generate the ward report.'); return; }
   w.document.open();
   w.document.write(html);
   w.document.close();

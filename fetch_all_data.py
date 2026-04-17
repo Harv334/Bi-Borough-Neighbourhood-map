@@ -41,6 +41,8 @@ from open APIs on the fly.
 No cache needed - the script hits these APIs directly (cached between runs):
   - OHID Fingertips      (health outcomes per LAD)
   - data.police.uk       (crime per borough polygon per month)
+  - Nomis Census 2021    (topic-summary tables, ~150 MB first run, cached)
+  - Nomis Census 2021    (topic-summary tables, ~150 MB first run, cached)
 
 ------------------------------------------------------------------------------
 USAGE
@@ -533,6 +535,330 @@ def run_imd2025() -> pd.DataFrame:
 
 
 # ============================================================================
+# SOURCE 3b: Census 2021  (Nomis bulk topic-summary tables, LSOA-level)
+# ============================================================================
+# We pull ~13 Topic Summary (TS) tables from the Nomis bulk endpoint, extract
+# the LSOA-level CSV from each, and compute the per-LSOA metrics the map
+# dropdowns expect (census_* keys). No manual download needed - Nomis is a
+# public endpoint. First run downloads ~150 MB to .cache/census2021/.
+# Column names inside each table vary, so we match by keyword substrings
+# rather than exact names, which survives the periodic Nomis renames.
+#
+# Indicator -> table mapping:
+#   census_population              TS001  (residents total)
+#   census_under16_pct / over65_pct TS009 (age, 18 categories)
+#   census_non_white_pct           TS021  (ethnic group)
+#   census_born_outside_uk_pct     TS004  (country of birth)
+#   census_good_health_pct / bad   TS037  (general health)
+#   census_disability_any / lot    TS038  (disability, Equality Act)
+#   census_provides_unpaid_care_pct TS039
+#   census_housing_deprived_pct    TS044  (household deprivation, any dim.)
+#   census_no_car_pct              TS045
+#   census_owned_pct / social_rented / private_rented  TS054  (tenure)
+#   census_higher_managerial_pct / routine_semi_routine_pct  TS062  (NS-SEC)
+#   census_unemployed_pct          TS066
+#   census_no_qual_pct / level4_qual_pct  TS067
+
+CENSUS_TABLES = [
+    "TS001", "TS004", "TS009", "TS021", "TS037", "TS038", "TS039",
+    "TS044", "TS045", "TS054", "TS062", "TS066", "TS067",
+]
+
+
+def _nomis_urls(tab_id: str) -> list[str]:
+    """Nomis has shipped the bulk zips under two URL patterns. Try both."""
+    t = tab_id.lower()
+    return [
+        f"https://www.nomisweb.co.uk/output/census/2021/census2021-{t}.zip",
+        f"https://www.nomisweb.co.uk/output/census/2021/{t}-2021-1.zip",
+    ]
+
+
+def _fetch_census_table(tab_id: str) -> pd.DataFrame | None:
+    """Cache-first download + return the LSOA CSV as a DataFrame. None on failure."""
+    cache_dir = CACHE_DIR / "census2021"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_zip = cache_dir / f"{tab_id.lower()}.zip"
+
+    need_download = not cache_zip.exists() or cache_zip.stat().st_size < 2048
+    if not need_download:
+        try:
+            with zipfile.ZipFile(cache_zip) as z:
+                z.namelist()
+        except zipfile.BadZipFile:
+            need_download = True
+
+    if need_download:
+        sess = browser_session(referer="https://www.nomisweb.co.uk/")
+        downloaded = False
+        for url in _nomis_urls(tab_id):
+            try:
+                r = sess.get(url, timeout=180)
+                if r.status_code == 200 and len(r.content) > 2048:
+                    cache_zip.write_bytes(r.content)
+                    info(f"  {tab_id}: downloaded {len(r.content)/1e6:.1f} MB")
+                    downloaded = True
+                    break
+            except requests.RequestException:
+                continue
+        if not downloaded:
+            warn(f"  {tab_id}: all URL patterns failed")
+            return None
+
+    try:
+        with zipfile.ZipFile(cache_zip) as z:
+            names = z.namelist()
+            lsoa_name = next(
+                (n for n in names if "lsoa" in n.lower() and n.endswith(".csv")),
+                None,
+            )
+            if not lsoa_name:
+                warn(f"  {tab_id}: no LSOA CSV inside zip ({names[:3]}...)")
+                return None
+            with z.open(lsoa_name) as f:
+                return pd.read_csv(f, low_memory=False)
+    except (zipfile.BadZipFile, pd.errors.EmptyDataError):
+        warn(f"  {tab_id}: zip/CSV corrupt - delete .cache/census2021/{tab_id.lower()}.zip and rerun")
+        return None
+
+
+def _cen_code_col(df: pd.DataFrame) -> str | None:
+    return next(
+        (c for c in df.columns if c.strip().lower() in
+         ("geography code", "lsoa code", "geographycode", "lsoa21cd", "2021 super output area - lower layer")),
+        None,
+    )
+
+
+def _cen_find(df: pd.DataFrame, *kws, exclude=()) -> str | None:
+    """First column whose lowercased name contains ALL kws and no excludes."""
+    for c in df.columns:
+        cl = c.lower()
+        if all(k.lower() in cl for k in kws) and not any(e.lower() in cl for e in exclude):
+            return c
+    return None
+
+
+def _cen_findall(df: pd.DataFrame, *kws, exclude=()) -> list[str]:
+    """All columns whose lowercased name contains ALL kws and no excludes."""
+    out = []
+    for c in df.columns:
+        cl = c.lower()
+        if all(k.lower() in cl for k in kws) and not any(e.lower() in cl for e in exclude):
+            out.append(c)
+    return out
+
+
+def _cen_pct(df: pd.DataFrame, num_cols: list[str], den_col: str) -> "pd.Series":
+    """Compute (sum(numerator) / denominator) * 100, as a float Series."""
+    num = df[num_cols].apply(pd.to_numeric, errors="coerce").sum(axis=1)
+    den = pd.to_numeric(df[den_col], errors="coerce").replace(0, pd.NA)
+    return (num / den) * 100
+
+
+def run_census2021() -> pd.DataFrame:
+    rule("Census 2021 (Nomis bulk, LSOA)")
+    tables: dict[str, pd.DataFrame] = {}
+    for tab in CENSUS_TABLES:
+        df = _fetch_census_table(tab)
+        if df is not None:
+            tables[tab] = df
+            info(f"  {tab}: {len(df):,} rows x {len(df.columns)} cols")
+
+    if "TS001" not in tables:
+        warn("census2021: TS001 (population) missing - can't anchor, skipping")
+        return pd.DataFrame()
+
+    t001 = tables["TS001"]
+    code_col = _cen_code_col(t001)
+    if not code_col:
+        warn("census2021: TS001 has no recognisable LSOA code column")
+        return pd.DataFrame()
+
+    pop_col = (_cen_find(t001, "observation")
+               or _cen_find(t001, "total", "residents")
+               or _cen_find(t001, "age: total")
+               or _cen_find(t001, "age", "total"))
+    out = pd.DataFrame({
+        "LSOA21CD": t001[code_col].astype(str).str.strip(),
+    })
+    if pop_col:
+        out["census_population"] = pd.to_numeric(t001[pop_col], errors="coerce")
+
+    # Helper: compute one metric from a table and merge onto `out` by LSOA
+    def attach(key: str, tab: str, num_kw_list: list[tuple], den_kw=("total",),
+               den_exclude=(), num_exclude=()):
+        nonlocal out
+        t = tables.get(tab)
+        if t is None:
+            return
+        cc = _cen_code_col(t)
+        if not cc:
+            return
+        num_cols: list[str] = []
+        for kws in num_kw_list:
+            for c in _cen_findall(t, *kws, exclude=num_exclude):
+                if c not in num_cols:
+                    num_cols.append(c)
+        den_col = _cen_find(t, *den_kw, exclude=den_exclude)
+        if not num_cols or not den_col:
+            warn(f"  {tab}/{key}: num={len(num_cols)} den={den_col} - column match failed")
+            return
+        vals = _cen_pct(t, num_cols, den_col)
+        df = pd.DataFrame({
+            "LSOA21CD": t[cc].astype(str).str.strip(),
+            key: vals.values,
+        })
+        out = out.merge(df, on="LSOA21CD", how="left")
+
+    # TS009 age bands -----------------------------------------------------
+    # Column names look like "Age: Aged 4 years and under", "Age: Aged 5 to 9 years" ...
+    # "Age: Aged 85 years and over". We include "aged 15 years" too for under-16.
+    attach("census_under16_pct", "TS009", [
+        ("aged 4 years and under",),
+        ("aged 5 to 9",),
+        ("aged 10 to 14",),
+        ("aged 15 years",),
+    ], num_exclude=("and over",))
+    attach("census_over65_pct", "TS009", [
+        ("aged 65 to 69",),
+        ("aged 70 to 74",),
+        ("aged 75 to 79",),
+        ("aged 80 to 84",),
+        ("aged 85 years and over",),
+    ])
+
+    # TS004 country of birth ---------------------------------------------
+    attach("census_born_outside_uk_pct", "TS004",
+           [("not born in the uk",)])
+    if "census_born_outside_uk_pct" not in out.columns:
+        # Fallback: 1 - UK
+        t = tables.get("TS004")
+        if t is not None:
+            cc = _cen_code_col(t)
+            uk_col = _cen_find(t, "united kingdom", exclude=("not",))
+            tot_col = _cen_find(t, "total")
+            if cc and uk_col and tot_col:
+                vals = (1 - pd.to_numeric(t[uk_col], errors="coerce")
+                        / pd.to_numeric(t[tot_col], errors="coerce").replace(0, pd.NA)) * 100
+                out = out.merge(pd.DataFrame({
+                    "LSOA21CD": t[cc].astype(str).str.strip(),
+                    "census_born_outside_uk_pct": vals.values,
+                }), on="LSOA21CD", how="left")
+
+    # TS021 ethnic group -> non-white = 1 - (white/total) -----------------
+    t = tables.get("TS021")
+    if t is not None:
+        cc = _cen_code_col(t)
+        white_col = _cen_find(t, "white", exclude=("not",))
+        tot_col = _cen_find(t, "total")
+        if cc and white_col and tot_col:
+            vals = (1 - pd.to_numeric(t[white_col], errors="coerce")
+                    / pd.to_numeric(t[tot_col], errors="coerce").replace(0, pd.NA)) * 100
+            out = out.merge(pd.DataFrame({
+                "LSOA21CD": t[cc].astype(str).str.strip(),
+                "census_non_white_pct": vals.values,
+            }), on="LSOA21CD", how="left")
+
+    # TS037 general health -----------------------------------------------
+    # "Very good health" + "Good health" for good; "Bad health" + "Very bad health" for bad.
+    # The `exclude` guards stop "good health" from also catching "very good health" twice
+    # (but our dedup in attach() already does that via findall + set-insert).
+    attach("census_good_health_pct", "TS037",
+           [("very good health",), ("good health",)],
+           num_exclude=("fair",))
+    attach("census_bad_health_pct", "TS037",
+           [("bad health",), ("very bad health",)])
+
+    # TS038 disability ---------------------------------------------------
+    attach("census_disability_lot_pct", "TS038",
+           [("limited a lot",)])
+    attach("census_disability_any_pct", "TS038",
+           [("limited a lot",), ("limited a little",)])
+
+    # TS039 unpaid care --------------------------------------------------
+    # Easier: pick "provides NO unpaid care" and do 1 - that/total
+    t = tables.get("TS039")
+    if t is not None:
+        cc = _cen_code_col(t)
+        none_col = _cen_find(t, "provides no unpaid care") or _cen_find(t, "no unpaid care")
+        tot_col = _cen_find(t, "total")
+        if cc and none_col and tot_col:
+            vals = (1 - pd.to_numeric(t[none_col], errors="coerce")
+                    / pd.to_numeric(t[tot_col], errors="coerce").replace(0, pd.NA)) * 100
+            out = out.merge(pd.DataFrame({
+                "LSOA21CD": t[cc].astype(str).str.strip(),
+                "census_provides_unpaid_care_pct": vals.values,
+            }), on="LSOA21CD", how="left")
+
+    # TS044 household deprivation (any of 4 dimensions) ------------------
+    t = tables.get("TS044")
+    if t is not None:
+        cc = _cen_code_col(t)
+        none_col = _cen_find(t, "not deprived in any dimension") or _cen_find(t, "not deprived")
+        tot_col = _cen_find(t, "total")
+        if cc and none_col and tot_col:
+            vals = (1 - pd.to_numeric(t[none_col], errors="coerce")
+                    / pd.to_numeric(t[tot_col], errors="coerce").replace(0, pd.NA)) * 100
+            out = out.merge(pd.DataFrame({
+                "LSOA21CD": t[cc].astype(str).str.strip(),
+                "census_housing_deprived_pct": vals.values,
+            }), on="LSOA21CD", how="left")
+
+    # TS045 car/van ------------------------------------------------------
+    attach("census_no_car_pct", "TS045",
+           [("no cars or vans",)])
+
+    # TS054 tenure -------------------------------------------------------
+    # Column names: "Tenure: Owned: Owns outright"/"Owns with a mortgage"/"Shared ownership"
+    #               "Social rented: ..."/"Private rented: ..."/"Lives rent free"
+    attach("census_owned_pct", "TS054",
+           [("owned",)],
+           num_exclude=("shared",))
+    attach("census_social_rented_pct", "TS054",
+           [("social rented",)])
+    attach("census_private_rented_pct", "TS054",
+           [("private rented",)])
+
+    # TS062 NS-SEC -------------------------------------------------------
+    # L1-L3 = higher managerial/professional; L7+L8 = semi-routine + routine
+    attach("census_higher_managerial_pct", "TS062",
+           [("l1, l2 and l3",), ("higher managerial",)])
+    attach("census_routine_semi_routine_pct", "TS062",
+           [("l7 ",), ("l8 ",), ("routine occupations",), ("semi-routine",)])
+
+    # TS066 economic activity -------------------------------------------
+    attach("census_unemployed_pct", "TS066",
+           [("unemployed",)],
+           den_kw=("economically active", "total"), den_exclude=())
+    if "census_unemployed_pct" not in out.columns:
+        # Fallback: use "all categories" total
+        attach("census_unemployed_pct", "TS066",
+               [("unemployed",)])
+
+    # TS067 qualifications ----------------------------------------------
+    attach("census_no_qual_pct", "TS067",
+           [("no qualifications",)])
+    attach("census_level4_qual_pct", "TS067",
+           [("level 4 qualifications",)])
+
+    # Clean up + save ----------------------------------------------------
+    out = out.dropna(subset=["LSOA21CD"]).drop_duplicates(subset=["LSOA21CD"])
+
+    # Round percentages to 2dp for smaller output
+    for col in out.columns:
+        if col.endswith("_pct"):
+            out[col] = pd.to_numeric(out[col], errors="coerce").round(2)
+    if "census_population" in out.columns:
+        out["census_population"] = pd.to_numeric(out["census_population"], errors="coerce").astype("Int64")
+
+    out_path = DATA_DIR / "demographics" / "census2021.parquet"
+    write_parquet_atomic(out_path, out)
+    ok(f"census2021: {len(out):,} LSOAs x {len(out.columns)-1} indicators -> {out_path.relative_to(REPO_ROOT)}")
+    return out
+
+
+# ============================================================================
 # SOURCE 4: OHID Fingertips  (public health outcomes per LAD)
 # ============================================================================
 FINGERTIPS_INDICATORS = [
@@ -850,6 +1176,56 @@ def build_ward_data() -> dict:
                     if v is not None:
                         w["indicators"][f"ft_{k}"] = v
 
+    # --- Census 2021: per-LSOA -> per-ward via population-weighted mean ----
+    cen = _read_parquet_opt(DATA_DIR / "demographics" / "census2021.parquet")
+    if cen is not None and not cen.empty:
+        sources["census"] = "ONS Census 2021 (Nomis)"
+        # Build LSOA21CD -> WD25CD mapping using ONSPD postcodes. The modal
+        # (most-common) ward across postcodes in that LSOA wins.
+        lookup = get_postcode_lookup()
+        from collections import Counter, defaultdict
+        lsoa_to_ward_votes = defaultdict(Counter)
+        for rec in lookup.values():
+            lc = rec.get("LSOA21CD") or ""
+            wd = rec.get("WD25CD") or ""
+            if lc and wd:
+                lsoa_to_ward_votes[lc][wd] += 1
+        lsoa_to_ward = {lc: votes.most_common(1)[0][0]
+                        for lc, votes in lsoa_to_ward_votes.items()}
+
+        pop_by_lsoa = dict(zip(
+            cen["LSOA21CD"].astype(str),
+            pd.to_numeric(cen.get("census_population", pd.Series(dtype="float")),
+                          errors="coerce").fillna(0),
+        ))
+        pct_cols = [c for c in cen.columns if c.endswith("_pct")]
+        from collections import defaultdict as _dd
+        ward_num = _dd(lambda: _dd(float))
+        ward_den = _dd(lambda: _dd(float))
+        ward_pop_sum = _dd(float)
+
+        for _, row in cen.iterrows():
+            lc = str(row["LSOA21CD"])
+            wd = lsoa_to_ward.get(lc)
+            if not wd:
+                continue
+            pop = pop_by_lsoa.get(lc, 0) or 0
+            if pop > 0:
+                ward_pop_sum[wd] += float(pop)
+            for pc in pct_cols:
+                v = row[pc]
+                if pd.notna(v) and pop > 0:
+                    ward_num[wd][pc] += float(v) * float(pop)
+                    ward_den[wd][pc] += float(pop)
+
+        for wd, w in wards.items():
+            if ward_pop_sum.get(wd, 0) > 0:
+                w["indicators"]["census_population"] = int(round(ward_pop_sum[wd]))
+            for pc in pct_cols:
+                den = ward_den[wd].get(pc, 0)
+                if den > 0:
+                    w["indicators"][pc] = round(ward_num[wd][pc] / den, 2)
+
     return {
         "wards": wards,
         "metadata": {
@@ -875,6 +1251,25 @@ def build_lsoa_data() -> dict:
                 rec[col] = (int(v) if col in ("imd_decile", "imd_rank") and pd.notna(v)
                             else (None if pd.isna(v) else v))
             out[code] = rec
+
+    # Merge census 2021 LSOA-level fields onto the same dict
+    cen = _read_parquet_opt(DATA_DIR / "demographics" / "census2021.parquet")
+    if cen is not None and not cen.empty:
+        for _, row in cen.iterrows():
+            code = str(row["LSOA21CD"])
+            if not code:
+                continue
+            rec = out.setdefault(code, {})
+            for col in cen.columns:
+                if col == "LSOA21CD":
+                    continue
+                v = row[col]
+                if pd.isna(v):
+                    continue
+                if col == "census_population":
+                    rec[col] = int(v)
+                else:
+                    rec[col] = float(v)
     return out
 
 def build_pharmacies_json() -> list:
@@ -946,6 +1341,7 @@ SOURCES = {
     "gp":          run_gp_practices,
     "pharmacies":  run_pharmacies,
     "imd":         run_imd2025,
+    "census":      run_census2021,
     "fingertips":  run_fingertips,
     "crime":       run_police_crime,
     "hospitals":   run_hospitals,

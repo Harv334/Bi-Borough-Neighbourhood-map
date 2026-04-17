@@ -1007,22 +1007,26 @@ function wstyle(wn, ov, state) {
   // Neutral gray stroke/fill until the user turns neighbourhood colours on
   const stroke = (showNbhdColors && nb) ? nb.color : '#94a3b8';
 
+  // Black border for hover + selected states so the interactive ward is unmistakable.
+  const isFocus = state === 'hover' || state === 'selected';
+
   if (ov === 'none') {
     const baseFo = {default:0.22, hover:0.32, selected:0.42}[state] || 0.22;
-    const baseW  = {default:2.2,  hover:2.8,  selected:3.2}[state]  || 2.2;
+    const baseW  = {default:2.2,  hover:3.5,  selected:4.5}[state]  || 2.2;
     const fo = dimmed ? 0.02 : Math.min(0.95, baseFo * fillOpacityMult);
     const w  = dimmed ? 1.0  : baseW * borderWeightMult;
-    const op = dimmed ? 0.3  : 0.9;
-    return applyCore20Outline({ color:stroke, weight:w, fillColor:stroke, fillOpacity:fo, opacity:op }, wn);
+    const op = dimmed ? 0.3  : 0.95;
+    const borderColor = isFocus ? '#000' : stroke;
+    return applyCore20Outline({ color:borderColor, weight:w, fillColor:stroke, fillOpacity:fo, opacity:op }, wn);
   }
   const fill = ovColor(wn, ov);
-  // When overlay is active, selected ward just gets a heavier border — not a different fill opacity
+  // When overlay is active, selected/hover ward gets a heavy black border.
   const baseFo = {default:0.45, hover:0.55, selected:0.45}[state] || 0.45;
-  const baseW  = {default:1.5, hover:2,    selected:3}[state] || 1.5;
-  const selBorder = state === 'selected' ? '#000' : (dimmed ? '#aaa' : '#333');
+  const baseW  = {default:1.5, hover:3.2,   selected:4.5}[state]  || 1.5;
+  const selBorder = isFocus ? '#000' : (dimmed ? '#aaa' : '#333');
   const fo = dimmed ? 0.05 : Math.min(0.95, baseFo * fillOpacityMult);
   const w  = dimmed ? 1.0  : baseW * borderWeightMult;
-  const op = dimmed ? 0.3  : 0.85;
+  const op = dimmed ? 0.3  : (isFocus ? 1.0 : 0.85);
   return applyCore20Outline({ color:selBorder, weight:w, fillColor:fill, fillOpacity:fo, opacity:op }, wn);
 }
 
@@ -2046,6 +2050,32 @@ function injectWardIMD() {
       wdata.indicators.imd_worst_decile = worst;
       wdata.indicators.imd_best_decile = best;
       wdata.indicators.imd_lsoa_count = deciles.length;
+    }
+  }
+
+  // Recompute LSOA totals per ward from the visible LSOA_IMD features so the
+  // ward profile's "Core20 LSOAs 7 / 7" matches exactly what the user sees on
+  // the map. ward_data.json's totals are built from a postcode->ward voting
+  // step and can disagree with the GeoJSON ward-assignment for 2021 boundary
+  // splits (e.g. Roundwood shows as 7/7 but actually has 8 LSOAs, 6 Core20).
+  if (typeof LSOA_IMD !== 'undefined' && LSOA_IMD && LSOA_IMD.features) {
+    const byWard = {};
+    for (const f of LSOA_IMD.features) {
+      const wn = f.properties && f.properties.ward;
+      const d  = f.properties && f.properties.imd_decile;
+      if (!wn) continue;
+      if (!byWard[wn]) byWard[wn] = { total: 0, core20: 0 };
+      byWard[wn].total += 1;
+      if (d === 1 || d === 2) byWard[wn].core20 += 1;
+    }
+    for (const [wardName, counts] of Object.entries(byWard)) {
+      const wdata = WARD_DATA[wardName] ||
+        Object.values(WARD_DATA).find(w => w.name === wardName);
+      if (!wdata) continue;
+      if (!wdata.indicators) wdata.indicators = {};
+      wdata.indicators.total_lsoa_count  = counts.total;
+      wdata.indicators.core20_lsoa_count = counts.core20;
+      wdata.is_core20 = counts.core20 > 0;
     }
   }
 }

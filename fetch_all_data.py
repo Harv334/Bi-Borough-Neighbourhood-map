@@ -575,8 +575,11 @@ def run_imd2025() -> pd.DataFrame:
 #   census_no_qual_pct / level4_qual_pct  TS067
 
 CENSUS_TABLES = [
-    "TS001", "TS004", "TS009", "TS021", "TS037", "TS038", "TS039",
+    "TS001", "TS004", "TS007A", "TS021", "TS037", "TS038", "TS039",
     "TS044", "TS045", "TS054", "TS062", "TS066", "TS067",
+    # Note: TS009 was previously requested but its Nomis bulk zip has no
+    # LSOA-level sheet. TS007A ("Age by five-year age bands") is the
+    # canonical LSOA-granularity age source.
 ]
 
 
@@ -754,22 +757,35 @@ def run_census2021() -> pd.DataFrame:
         })
         out = out.merge(df, on="LSOA21CD", how="left")
 
-    # TS009 age bands -----------------------------------------------------
-    # Column names look like "Age: Aged 4 years and under", "Age: Aged 5 to 9 years" ...
-    # "Age: Aged 85 years and over". We include "aged 15 years" too for under-16.
-    attach("census_under16_pct", "TS009", [
-        ("aged 4 years and under",),
-        ("aged 5 to 9",),
-        ("aged 10 to 14",),
-        ("aged 15 years",),
+    # TS007A age bands (LSOA-level) ---------------------------------------
+    # Column names look like "Age (5 category broad age bands): Aged 0 to 15
+    # years" etc. We try TS007A first; fall back to TS009 if the
+    # downstream format ever reintroduces LSOA rows.
+    _age_tab = "TS007A" if "TS007A" in tables else "TS009"
+    attach("census_under16_pct", _age_tab, [
+        ("aged 0 to 15",),
+        ("aged 4 years and under",), ("aged 5 to 9",),
+        ("aged 10 to 14",), ("aged 15 years",),
     ], num_exclude=("and over",))
-    attach("census_over65_pct", "TS009", [
-        ("aged 65 to 69",),
-        ("aged 70 to 74",),
-        ("aged 75 to 79",),
-        ("aged 80 to 84",),
+    # Children under 5 (health-need indicator: child immunisation, HV caseload).
+    # Only TS009's single-year bands give this directly; on TS007A the
+    # youngest band is 0-15, so this stays blank there.
+    attach("census_under5_pct", _age_tab, [
+        ("aged 4 years and under",),
+    ], num_exclude=("and over",))
+    attach("census_over65_pct", _age_tab, [
+        ("aged 65",), ("aged 70 to 74",), ("aged 75 to 79",),
+        ("aged 80 to 84",), ("aged 85 years and over",),
+    ])
+    # Frail-elderly 85+ (falls, dementia, end-of-life care demand)
+    attach("census_over85_pct", _age_tab, [
         ("aged 85 years and over",),
     ])
+    # Derived working-age 16-64 band (computed once under16 + over65 are present).
+    if "census_under16_pct" in out.columns and "census_over65_pct" in out.columns:
+        wa = 100 - pd.to_numeric(out["census_under16_pct"], errors="coerce") \
+                 - pd.to_numeric(out["census_over65_pct"], errors="coerce")
+        out["census_working_age_pct"] = wa
 
     # TS004 country of birth ---------------------------------------------
     attach("census_born_outside_uk_pct", "TS004",
@@ -796,29 +812,58 @@ def run_census2021() -> pd.DataFrame:
     t = tables.get("TS021")
     if t is not None:
         cc = _cen_code_col(t)
-        # Exact parent-category match. Falls back to any "white" column whose
-        # name has exactly one ":" (i.e. top-level, not a leaf sub-category),
-        # and is not a "Mixed ... White and X" entry.
-        white_col = next(
-            (c for c in t.columns if c.strip().lower() == "ethnic group: white"),
-            None,
-        )
-        if not white_col:
-            white_col = next(
-                (c for c in t.columns
-                 if "white" in c.lower()
-                 and "mixed" not in c.lower()
-                 and c.count(":") == 1),
-                None,
-            )
         tot_col = _cen_find(t, "total")
-        if cc and white_col and tot_col:
-            vals = (1 - pd.to_numeric(t[white_col], errors="coerce")
-                    / pd.to_numeric(t[tot_col], errors="coerce").replace(0, pd.NA)) * 100
-            out = out.merge(pd.DataFrame({
+        # TS021 has five top-level ethnic-group categories whose Nomis column
+        # names start with "Ethnic group: <cat>" and have exactly one colon
+        # (sub-categories like "Ethnic group: White: Irish" have two). We match
+        # each parent by prefix and use column-count==1 to filter out leaves.
+        # Parents of interest (as they appear in Nomis, verbatim):
+        #   Ethnic group: White
+        #   Ethnic group: Asian, Asian British or Asian Welsh
+        #   Ethnic group: Black, Black British, Black Welsh, Caribbean or African
+        #   Ethnic group: Mixed or Multiple ethnic groups
+        #   Ethnic group: Other ethnic group
+        def _parent_col(prefix_kw: str, must_include_all: tuple = ()) -> str | None:
+            """Find the top-level TS021 column whose name starts with
+            "Ethnic group: <prefix_kw...>" and has exactly one ":".
+            must_include_all tightens the match when a prefix could be
+            ambiguous (e.g. "white" vs "white and asian")."""
+            pk = prefix_kw.lower()
+            for c in t.columns:
+                cl = c.lower()
+                if not cl.startswith("ethnic group:"):
+                    continue
+                if c.count(":") != 1:
+                    continue
+                head = cl.split(":", 1)[1].strip()
+                if not head.startswith(pk):
+                    continue
+                if must_include_all and not all(k in cl for k in must_include_all):
+                    continue
+                return c
+            return None
+
+        parents = {
+            "census_white_pct": _parent_col("white"),
+            "census_asian_pct": _parent_col("asian"),
+            "census_black_pct": _parent_col("black"),
+            "census_mixed_pct": _parent_col("mixed"),
+            "census_other_ethnic_pct": _parent_col("other"),
+        }
+        if cc and tot_col:
+            den = pd.to_numeric(t[tot_col], errors="coerce").replace(0, pd.NA)
+            merge_df = pd.DataFrame({
                 "LSOA21CD": t[cc].astype(str).str.strip(),
-                "census_non_white_pct": vals.values,
-            }), on="LSOA21CD", how="left")
+            })
+            for key, col in parents.items():
+                if not col:
+                    warn(f"  TS021/{key}: parent column not found")
+                    continue
+                merge_df[key] = (pd.to_numeric(t[col], errors="coerce") / den) * 100
+            # Derive non-white as 100 - white (kept for back-compat with the UI).
+            if "census_white_pct" in merge_df.columns:
+                merge_df["census_non_white_pct"] = 100 - merge_df["census_white_pct"]
+            out = out.merge(merge_df, on="LSOA21CD", how="left")
 
     # TS037 general health -----------------------------------------------
     # "Very good health" + "Good health" for good; "Bad health" + "Very bad health" for bad.

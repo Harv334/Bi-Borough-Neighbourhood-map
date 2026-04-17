@@ -297,6 +297,19 @@
               <option value="census_non_white_pct">Non-White %</option>
               <option value="census_born_outside_uk_pct">Born outside UK %</option>
             </optgroup>
+            <optgroup label="Ethnicity (Census 2021)">
+              <option value="census_white_pct">White %</option>
+              <option value="census_asian_pct">Asian / Asian British %</option>
+              <option value="census_black_pct">Black / Black British %</option>
+              <option value="census_mixed_pct">Mixed / Multiple %</option>
+              <option value="census_other_ethnic_pct">Other ethnic group %</option>
+            </optgroup>
+            <optgroup label="Age profile (Census 2021)">
+              <option value="census_under16_pct">Under 16 %</option>
+              <option value="census_working_age_pct">Working age (16–64) %</option>
+              <option value="census_over65_pct">65+ %</option>
+              <option value="census_over85_pct">85+ %</option>
+            </optgroup>
             <optgroup label="Economy (Census)">
               <option value="census_level4_qual_pct">Level 4+ qualifications %</option>
               <option value="census_higher_managerial_pct">Higher managerial/professional %</option>
@@ -407,6 +420,19 @@ const OV_CFG = {
   census_routine_semi_routine_pct: { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
   census_level4_qual_pct:          { lo:"Lower", hi:"Higher", wh:false, min:30,   max:80   },
   census_no_qual_pct:              { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
+  // Ethnicity (top-level Census 2021 groups). wh=false — these are descriptive,
+  // not health "worse/better" scales. Ranges chosen to span NW London spread.
+  census_white_pct:                { lo:"Lower", hi:"Higher", wh:false, min:5,    max:85   },
+  census_asian_pct:                { lo:"Lower", hi:"Higher", wh:false, min:2,    max:80   },
+  census_black_pct:                { lo:"Lower", hi:"Higher", wh:false, min:1,    max:40   },
+  census_mixed_pct:                { lo:"Lower", hi:"Higher", wh:false, min:2,    max:12   },
+  census_other_ethnic_pct:         { lo:"Lower", hi:"Higher", wh:false, min:2,    max:20   },
+  // Age profile. wh=false — descriptive, but higher 85+ indicates higher
+  // frail-elderly care need and is usually read that way.
+  census_under16_pct:              { lo:"Lower", hi:"Higher", wh:false, min:10,   max:28   },
+  census_working_age_pct:          { lo:"Lower", hi:"Higher", wh:false, min:55,   max:80   },
+  census_over65_pct:               { lo:"Lower", hi:"Higher", wh:false, min:5,    max:22   },
+  census_over85_pct:               { lo:"Lower", hi:"Higher", wh:false, min:0.5,  max:4    },
 };
 
 // Transparency state — controlled by sliders
@@ -425,6 +451,19 @@ const CATS = [
   { key: "demographics", label: "Demographics",        ico: "👥", fields: [
     { k: "census_non_white_pct",             l: "Non-White (%)",                 g: "ward" },
     { k: "census_born_outside_uk_pct",       l: "Born outside UK (%)",           g: "ward" },
+  ]},
+  { key: "ethnicity",    label: "Ethnicity (Census 2021)", ico: "🌐", fields: [
+    { k: "census_white_pct",                 l: "White (%)",                     g: "ward" },
+    { k: "census_asian_pct",                 l: "Asian / Asian British (%)",     g: "ward" },
+    { k: "census_black_pct",                 l: "Black / Black British (%)",     g: "ward" },
+    { k: "census_mixed_pct",                 l: "Mixed / Multiple (%)",          g: "ward" },
+    { k: "census_other_ethnic_pct",          l: "Other ethnic group (%)",        g: "ward" },
+  ]},
+  { key: "age",          label: "Age profile (Census 2021)", ico: "⏳", fields: [
+    { k: "census_under16_pct",               l: "Under 16 (%)",                  g: "ward" },
+    { k: "census_working_age_pct",           l: "Working age, 16–64 (%)",        g: "ward" },
+    { k: "census_over65_pct",                l: "65 and over (%)",               g: "ward" },
+    { k: "census_over85_pct",                l: "85 and over (%)",               g: "ward" },
   ]},
   { key: "health",       label: "Health (Census 2021, ward-level)", ico: "♥", fields: [
     { k: "census_good_health_pct",           l: "Good/very good health (%)",     g: "ward" },
@@ -1062,6 +1101,36 @@ function showWard(wn) {
   const inds = wdata.indicators || {};
   const hasReal = Object.values(inds).some(v => v !== null && v !== '' && v !== undefined);
 
+  // Small helper for stacked bars (ethnic group, age). Returns empty string if
+  // the category has no values populated (e.g. age before TS007A is fetched).
+  function stackedBar(parts) {
+    const present = parts.filter(p => p.v != null && p.v !== '');
+    if (!present.length) return '';
+    const total = present.reduce((s, p) => s + parseFloat(p.v), 0);
+    if (!(total > 0)) return '';
+    const segs = present.map(p => {
+      const pct = (parseFloat(p.v) / total) * 100;
+      return `<div title="${p.l}: ${parseFloat(p.v).toFixed(1)}%" style="background:${p.c};width:${pct}%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:600;overflow:hidden;white-space:nowrap">${pct >= 8 ? p.l.split(' ')[0] : ''}</div>`;
+    }).join('');
+    const legend = present.map(p =>
+      `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px;font-size:10px"><span style="width:8px;height:8px;background:${p.c};border-radius:2px;display:inline-block"></span>${p.l} ${parseFloat(p.v).toFixed(1)}%</span>`
+    ).join('');
+    return `<div style="display:flex;height:18px;border-radius:4px;overflow:hidden;margin:6px 0">${segs}</div><div style="line-height:1.6">${legend}</div>`;
+  }
+
+  const ethBar = stackedBar([
+    { k:'census_white_pct',        l:'White',  v:inds.census_white_pct,        c:'#5b8db8' },
+    { k:'census_asian_pct',        l:'Asian',  v:inds.census_asian_pct,        c:'#d47a2c' },
+    { k:'census_black_pct',        l:'Black',  v:inds.census_black_pct,        c:'#6b4e71' },
+    { k:'census_mixed_pct',        l:'Mixed',  v:inds.census_mixed_pct,        c:'#8ca757' },
+    { k:'census_other_ethnic_pct', l:'Other',  v:inds.census_other_ethnic_pct, c:'#999999' },
+  ]);
+  const ageBar = stackedBar([
+    { k:'census_under16_pct',      l:'<16',    v:inds.census_under16_pct,      c:'#2ea8a0' },
+    { k:'census_working_age_pct',  l:'16–64',  v:inds.census_working_age_pct,  c:'#3b6eaf' },
+    { k:'census_over65_pct',       l:'65+',    v:inds.census_over65_pct,       c:'#a05a9e' },
+  ]);
+
   const cats = CATS.map(cat => {
     const rows = cat.fields.map(f => {
       const val = inds[f.k];
@@ -1072,12 +1141,14 @@ function showWard(wn) {
       return `<div class="sr"><span class="sl">${f.l}<span class="${pillClass(f.g)}">${f.g}</span></span><span class="${cls}">${display}</span></div>`;
     }).filter(Boolean).join('');
     if (!rows) return '';
+    // Prepend a stacked bar at the top of the ethnicity/age category bodies.
+    const pre = cat.key === 'ethnicity' ? ethBar : (cat.key === 'age' ? ageBar : '');
     return `<div class="cat-block">
       <div class="cat-hdr" onclick="toggleCat(this)">
         <span class="cat-hdr-l"><span class="cat-ico">${cat.ico}</span>${cat.label}</span>
         <span class="cat-arrow open">▶</span>
       </div>
-      <div class="cat-body open">${rows}</div>
+      <div class="cat-body open">${pre}${rows}</div>
     </div>`;
   }).join('');
 
@@ -1667,9 +1738,19 @@ function showLSOA(feat) {
       { k:'census_social_rented_pct', l:'Social rented (%)' },
       { k:'census_private_rented_pct', l:'Private rented (%)' },
       { k:'census_no_car_pct', l:'No car/van (%)' },
-      { k:'census_non_white_pct', l:'Non-White (%)' },
       { k:'census_born_outside_uk_pct', l:'Born outside UK (%)' },
       { k:'census_provides_unpaid_care_pct', l:'Provides unpaid care (%)' },
+      // Ethnic group breakdown (Census 2021, TS021, top-level categories)
+      { k:'census_white_pct',          l:'White (%)' },
+      { k:'census_asian_pct',          l:'Asian / Asian British (%)' },
+      { k:'census_black_pct',          l:'Black / Black British (%)' },
+      { k:'census_mixed_pct',          l:'Mixed / Multiple (%)' },
+      { k:'census_other_ethnic_pct',   l:'Other ethnic group (%)' },
+      // Age profile (appears once TS007A has been fetched)
+      { k:'census_under16_pct',        l:'Under 16 (%)' },
+      { k:'census_working_age_pct',    l:'Working age, 16–64 (%)' },
+      { k:'census_over65_pct',         l:'65 and over (%)' },
+      { k:'census_over85_pct',         l:'85 and over (%)' },
     ];
     censusRows = lsoaFields.map(f => {
       const val = inds[f.k];

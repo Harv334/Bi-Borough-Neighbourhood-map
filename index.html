@@ -220,7 +220,6 @@
               <option value="all">All NW London</option>
             </select>
           </div>
-          <label class="lrow"><div style="width:9px;height:9px;background:linear-gradient(90deg,#8ecae6,#ffb703,#fb8500,#c05299);border-radius:2px;flex-shrink:0"></div><span class="lname">Neighbourhood colours</span><input type="checkbox" id="tnc"></label>
           <label class="lrow"><div style="width:9px;height:9px;border:1.5px solid #000;border-radius:2px;flex-shrink:0"></div><span class="lname">Ward boundaries <span class="lcount">188</span></span><input type="checkbox" id="tnw"></label>
           <label class="lrow"><div style="width:9px;height:9px;border:1.5px dashed #e67e22;border-radius:2px;flex-shrink:0"></div><span class="lname">LSOA boundaries <span class="lcount">123</span></span><input type="checkbox" id="tlsoa"></label>
           <label id="lsoa-imd-row" class="lrow" style="display:none;margin-left:18px;padding:3px 0 0"><div style="width:9px;height:9px;background:linear-gradient(90deg,#67000d,#cb181d,#fb6a4a,#a1d99b,#006d2c);border-radius:2px;flex-shrink:0"></div><span class="lname" style="font-size:11px">Colour by IMD decile</span><input type="checkbox" id="tlsoa-imd"></label>
@@ -262,8 +261,8 @@
           </div>
           <div class="opacity-row" style="margin-top:6px">
             <label>Border</label>
-            <input type="range" id="border-weight" min="0" max="8" value="2" step="0.5">
-            <span class="opacity-val" id="border-weight-val">2</span>
+            <input type="range" id="border-weight" min="0" max="8" value="0" step="0.5">
+            <span class="opacity-val" id="border-weight-val">0</span>
           </div>
         </div>
       </div>
@@ -415,6 +414,7 @@
           </div>
         </div>
         <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto;padding-top:0">
+          <label class="lrow" style="margin-bottom:8px"><div style="width:9px;height:9px;background:linear-gradient(90deg,#8ecae6,#ffb703,#fb8500,#c05299);border-radius:2px;flex-shrink:0"></div><span class="lname">Neighbourhood colours</span><input type="checkbox" id="tnc"></label>
           <div class="sb-lbl">Shade neighbourhoods</div>
           <div id="nfilters"></div>
           <div class="data-note" style="margin:4px 0 10px">
@@ -523,7 +523,7 @@ const OV_CFG = {
 // fillOpacityMult is an absolute fill opacity in [0,1]; 0 = fully transparent, 1 = opaque.
 // borderWeightMult is an absolute black-border weight in px (0 = no border).
 let fillOpacityMult = 0.40;  // matches the #fill-opacity slider default of 40
-let borderWeightMult = 2;    // matches the #border-weight slider default of 2
+let borderWeightMult = 0;    // matches the #border-weight slider default of 0 (no borders until user opts in)
 
 const CATS = [
   { key: "headline",     label: "At a glance",         ico: "◎", fields: [
@@ -1415,12 +1415,28 @@ window.generateWardReport = function(wn) {
           .join('');
         const wardFill = nb ? nb.color : '#2f6fb8';
         const wardPath = `<path d="${geomPath(wardFeat.geometry)}" fill="${wardFill}" fill-opacity="0.55" stroke="${wardFill}" stroke-width="1.6"/>`;
+        // Pharmacy dots inside the ward
+        let pharmDots = '';
+        let pharmCount = 0;
+        try {
+          if (Array.isArray(pharmData) && pharmData.length) {
+            const inWard = pharmData.filter(p => {
+              try { return typeof pointInWardLayer === 'function' && pointInWardLayer(p.lat, p.lng, wdata.name); } catch(e) { return false; }
+            });
+            pharmCount = inWard.length;
+            pharmDots = inWard.map(p => {
+              const [x, y] = proj([p.lng, p.lat]).split(',');
+              return `<circle cx="${x}" cy="${y}" r="3.2" fill="#E89B1B" stroke="#fff" stroke-width="0.9"><title>${(p.name || 'Pharmacy').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}</title></circle>`;
+            }).join('');
+          }
+        } catch(e) { /* silent */ }
         miniMapSVG = `<svg class="minimap" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Location of ${wdata.name} within ${wardLad}">
           <rect width="${W}" height="${H}" fill="#f6f6f1"/>
           ${contextPaths}
           ${wardPath}
+          ${pharmDots}
         </svg>
-        <div class="minimap-cap">${wdata.name} within ${wardLad}</div>`;
+        <div class="minimap-cap">${wdata.name} within ${wardLad}${pharmCount ? ` · <span style="color:#E89B1B;font-weight:600">●</span> ${pharmCount} pharmac${pharmCount === 1 ? 'y' : 'ies'}` : ''}</div>`;
       }
     }
   } catch(e) { /* minimap is decorative — fail silent */ }

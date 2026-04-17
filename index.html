@@ -242,10 +242,8 @@
           </div>
         </div>
         <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto">
-          <div class="sb-lbl">Neighbourhood filter</div>
-          <div id="nfilters"></div>
-          <div class="data-note" style="margin-top:12px">
-            Click a badge above to zoom to a neighbourhood.<br>
+          <div class="data-note" style="margin-top:4px">
+            Switch to the <b>Nbhds</b> tab to shade individual neighbourhoods and compare their indicators.
             Click any ward to explore its data in the Ward tab.
           </div>
         </div>
@@ -375,13 +373,13 @@
             <div id="biv-legend" style="display:none;margin-top:10px">
               <div style="display:grid;grid-template-columns:22px repeat(3,1fr);grid-template-rows:1fr 1fr 1fr 22px;gap:0;width:140px">
                 <div style="grid-row:1/4;grid-column:1;writing-mode:vertical-rl;transform:rotate(180deg);font-size:9px;color:#666;text-align:center;padding:2px 0" id="biv-y-label">Indicator 2 &rarr;</div>
-                <div style="background:#f3e7d3"></div><div style="background:#cba58d"></div><div style="background:#8d4f2b"></div>
-                <div style="background:#cfe0c3"></div><div style="background:#998b75"></div><div style="background:#6e5835"></div>
-                <div style="background:#9fc4a1"></div><div style="background:#6b9074"></div><div style="background:#334a2e"></div>
+                <div style="background:#e8e8e8"></div><div style="background:#b0d5df"></div><div style="background:#64acbe"></div>
+                <div style="background:#e4acac"></div><div style="background:#ad9ea5"></div><div style="background:#627f8c"></div>
+                <div style="background:#c85a5a"></div><div style="background:#985356"></div><div style="background:#574249"></div>
                 <div style="grid-column:2/5;font-size:9px;color:#666;text-align:center;padding:3px 0" id="biv-x-label">Indicator 1 &rarr;</div>
               </div>
               <div style="font-size:10px;color:#666;margin-top:4px;line-height:1.4">
-                Each ward is binned into thirds (low/mid/high) for each indicator. Dark brown/green = both high.
+                Each ward is binned into thirds (low/mid/high) for each indicator. Teal = ov1 high, pink = ov2 high, dark slate = both high.
               </div>
             </div>
           </div>
@@ -412,6 +410,11 @@
           </div>
         </div>
         <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto;padding-top:0">
+          <div class="sb-lbl">Shade neighbourhoods</div>
+          <div id="nfilters"></div>
+          <div class="data-note" style="margin:4px 0 10px">
+            Tick to fill an area with its neighbourhood colour.
+          </div>
           <label class="lrow" style="margin-bottom:8px"><div style="width:9px;height:9px;background:linear-gradient(90deg,#1a1a1a,#fff);border:1px solid #ccc;border-radius:2px;flex-shrink:0"></div><span class="lname">Spotlight focused neighbourhood</span><input type="checkbox" id="tspot"></label>
           <div id="nbhd-table"></div>
           <div class="sb-lbl" style="margin-top:14px">Indicator</div>
@@ -531,8 +534,10 @@ const OV_CFG = {
 };
 
 // Transparency state — controlled by sliders
-let fillOpacityMult = 1.0;   // multiplier on base fill opacity
-let borderWeightMult = 1.0;  // multiplier on base border weight
+// fillOpacityMult is an absolute fill opacity in [0,1]; 0 = fully transparent, 1 = opaque.
+// borderWeightMult is an absolute black-border weight in px (0 = no border).
+let fillOpacityMult = 0.40;  // matches the #fill-opacity slider default of 40
+let borderWeightMult = 2;    // matches the #border-weight slider default of 2
 
 const CATS = [
   { key: "headline",     label: "At a glance",         ico: "◎", fields: [
@@ -1103,8 +1108,9 @@ function ovColor(wn, ovKey) {
   return ramp(t, !cfg.wh);
 }
 
-// Track which neighbourhoods are hidden via filter checkboxes
-const hiddenNbhds = new Set();
+// Track which neighbourhoods are shaded (filled with their colour) via filter checkboxes.
+// Empty by default — map starts blank; ticking a checkbox in the Nbhds tab paints that area.
+const shadedNbhds = new Set();
 
 // Core20 overlay state + helper (now highlights LSOAs in IMD deciles 1-2, not wards)
 let showCore20Overlay = false;
@@ -1137,42 +1143,42 @@ function buildCore20LsoaLayer() {
 
 function wstyle(wn, ov, state) {
   const nk = nbhdOf(wn), nb = nk ? NEIGHBOURHOODS[nk] : null;
-
-  // Completely hidden neighbourhoods (only applies when colours are on — otherwise treat as normal)
-  if (showNbhdColors && nk && hiddenNbhds.has(nk)) return { opacity:0, fillOpacity:0 };
+  const shaded = !!(nk && shadedNbhds.has(nk));
 
   // Neighbourhood focus dimming — fade wards not in the focused neighbourhood.
-  // Spotlight mode forces this even when showNbhdColors is off, and dims harder.
-  const outOfFocus = focusedNbhd && focusedNbhd !== 'all' && nbhdOf(wn) !== focusedNbhd;
-  const dimmed = outOfFocus && (showNbhdColors || spotlightMode);
+  // Spotlight mode always dims out-of-focus areas, regardless of shading.
+  const outOfFocus = focusedNbhd && focusedNbhd !== 'all' && nk !== focusedNbhd;
+  const dimmed = outOfFocus && (shaded || spotlightMode);
   const spot   = outOfFocus && spotlightMode;
-  // Neutral gray stroke/fill until the user turns neighbourhood colours on
-  const stroke = (showNbhdColors && nb) ? nb.color : '#94a3b8';
 
   // Black border for hover + selected states so the interactive ward is unmistakable.
   const isFocus = state === 'hover' || state === 'selected';
 
+  // Fill slider → absolute transparency (0–100 maps to 0.0–1.0 fill opacity).
+  // Border slider → black outline thickness (0 hides the outline).
+  const absFill = Math.max(0, Math.min(1, fillOpacityMult));
+
   if (ov === 'none' && curOv2 === 'none') {
-    const baseFo = {default:0.22, hover:0.32, selected:0.42}[state] || 0.22;
-    const baseW  = {default:2.2,  hover:3.5,  selected:4.5}[state]  || 2.2;
-    const fo = spot ? 0.015 : (dimmed ? 0.02 : Math.min(0.95, baseFo * fillOpacityMult));
-    const w  = spot ? 0.6   : (dimmed ? 1.0  : baseW * borderWeightMult);
-    const op = spot ? 0.18  : (dimmed ? 0.3  : 0.95);
-    const borderColor = isFocus ? '#000' : stroke;
-    return applyCore20Outline({ color:borderColor, weight:w, fillColor:stroke, fillOpacity:fo, opacity:op }, wn);
+    // No overlay: fill is the neighbourhood colour when shaded, otherwise a faint neutral.
+    const fillColor = shaded ? nb.color : '#94a3b8';
+    const baseFo = shaded ? absFill : Math.min(absFill, 0.12);
+    const baseW  = {default:1.0, hover:3.0, selected:4.0}[state] || 1.0;
+    const fo = spot ? 0.02 : (dimmed ? Math.min(0.08, baseFo) : baseFo);
+    const w  = spot ? 0.6  : (dimmed ? 1.0 : Math.max(0, baseW * borderWeightMult));
+    const op = spot ? 0.25 : (dimmed ? 0.4 : 0.95);
+    const borderColor = '#000';
+    return applyCore20Outline({ color:borderColor, weight:w, fillColor, fillOpacity:fo, opacity:op }, wn);
   }
-  // Bivariate when a second indicator is picked, otherwise regular univariate.
+
+  // Overlay / bivariate: fill comes from the chosen indicator colour.
   const fill = (curOv2 && curOv2 !== 'none' && ov !== 'none')
     ? bivariateColor(wn, ov, curOv2)
     : ovColor(wn, ov);
-  // When overlay is active, selected/hover ward gets a heavy black border.
-  const baseFo = {default:0.45, hover:0.55, selected:0.45}[state] || 0.45;
-  const baseW  = {default:1.5, hover:3.2,   selected:4.5}[state]  || 1.5;
-  const selBorder = isFocus ? '#000' : (dimmed ? '#aaa' : '#333');
-  const fo = spot ? 0.04 : (dimmed ? 0.05 : Math.min(0.95, baseFo * fillOpacityMult));
-  const w  = spot ? 0.6  : (dimmed ? 1.0  : baseW * borderWeightMult);
-  const op = spot ? 0.2  : (dimmed ? 0.3  : (isFocus ? 1.0 : 0.85));
-  return applyCore20Outline({ color:selBorder, weight:w, fillColor:fill, fillOpacity:fo, opacity:op }, wn);
+  const baseW  = {default:1.0, hover:3.0, selected:4.0}[state] || 1.0;
+  const fo = spot ? 0.05 : (dimmed ? Math.min(0.12, absFill) : absFill);
+  const w  = spot ? 0.6  : (dimmed ? 1.0 : Math.max(0, baseW * borderWeightMult));
+  const op = spot ? 0.25 : (dimmed ? 0.4 : (isFocus ? 1.0 : 0.9));
+  return applyCore20Outline({ color:'#000', weight:w, fillColor:fill, fillOpacity:fo, opacity:op }, wn);
 }
 
 function pillClass(g) {
@@ -1624,53 +1630,16 @@ function buildNbhdBorders() {
 // POINT VISIBILITY — hide markers in hidden neighbourhoods
 // ═══════════════════════════════════════════════════════════════════════════
 function refreshPointVisibility() {
-  // For each point layer, check if the marker falls in a hidden neighbourhood
-  const allPoints = [
-    ...GPS.map((d,i) => ({ lat:d.lat, lng:d.lng, cluster:null, layer:gpL, idx:i })),
-  ];
-
-  // GP markers
-  gpL.eachLayer(m => {
-    const ll = m.getLatLng();
-    const nk = nbhdOfLatLng(ll.lat, ll.lng);
-    if (nk && hiddenNbhds.has(nk)) m.setOpacity(0);
-    else m.setOpacity(1);
+  // Shading mode no longer hides points — all markers stay visible whenever
+  // their layer is toggled on. Kept as a stub so existing callers don't break.
+  if (typeof gpL !== 'undefined' && gpL) gpL.eachLayer(m => m.setOpacity(1));
+  if (typeof hL  !== 'undefined' && hL)  hL.eachLayer(m  => m.setOpacity(1));
+  if (typeof grL !== 'undefined' && grL) grL.eachLayer(m => m.setOpacity(1));
+  if (typeof vcseData !== 'undefined') vcseData.forEach(o => {
+    if (vcseCluster && !vcseCluster.hasLayer(o.marker)) vcseCluster.addLayer(o.marker);
   });
-
-  // Hospitals
-  hL.eachLayer(m => {
-    const ll = m.getLatLng();
-    const nk = nbhdOfLatLng(ll.lat, ll.lng);
-    if (nk && hiddenNbhds.has(nk)) m.setOpacity(0);
-    else m.setOpacity(1);
-  });
-
-  // Green spaces
-  grL.eachLayer(m => {
-    const ll = m.getLatLng();
-    const nk = nbhdOfLatLng(ll.lat, ll.lng);
-    if (nk && hiddenNbhds.has(nk)) m.setOpacity(0);
-    else m.setOpacity(1);
-  });
-
-  // VCSE — add/remove from cluster
-  vcseData.forEach(o => {
-    const nk = nbhdOfLatLng(o.lat, o.lng);
-    if (nk && hiddenNbhds.has(nk)) {
-      if (vcseCluster.hasLayer(o.marker)) vcseCluster.removeLayer(o.marker);
-    } else {
-      if (!vcseCluster.hasLayer(o.marker)) vcseCluster.addLayer(o.marker);
-    }
-  });
-
-  // Dental — add/remove from cluster
-  dentalData.forEach(o => {
-    const nk = nbhdOfLatLng(o.lat, o.lng);
-    if (nk && hiddenNbhds.has(nk)) {
-      if (dentalCluster.hasLayer(o.marker)) dentalCluster.removeLayer(o.marker);
-    } else {
-      if (!dentalCluster.hasLayer(o.marker)) dentalCluster.addLayer(o.marker);
-    }
+  if (typeof dentalData !== 'undefined') dentalData.forEach(o => {
+    if (dentalCluster && !dentalCluster.hasLayer(o.marker)) dentalCluster.addLayer(o.marker);
   });
 }
 
@@ -1700,27 +1669,20 @@ Object.entries(NEIGHBOURHOODS).forEach(([k, nb]) => {
   fb.onclick = () => setNbhdFocus(focusedNbhd === k ? 'all' : k);
   nbFocusBar.appendChild(fb);
 
-  // Sidebar filter
+  // Sidebar filter — unchecked by default; ticking shades that neighbourhood.
   const r = document.createElement('label');
   r.className = 'lrow';
-  r.innerHTML = `<div style="width:11px;height:11px;border-radius:3px;border:2px solid ${nb.color};background:${nb.bg};flex-shrink:0"></div><span class="lname" style="font-size:12px">${nb.label}</span><input type="checkbox" checked style="accent-color:${nb.color}">`;
+  r.innerHTML = `<div style="width:11px;height:11px;border-radius:3px;border:2px solid ${nb.color};background:${nb.bg};flex-shrink:0"></div><span class="lname" style="font-size:12px">${nb.label}</span><input type="checkbox" style="accent-color:${nb.color}">`;
   r.querySelector('input').addEventListener('change', e => {
     if (!wLyr) return;
     const on = e.target.checked;
     b.classList.toggle('on', on);
-    if (on) hiddenNbhds.delete(k); else hiddenNbhds.add(k);
-    // Restyle wards
+    if (on) shadedNbhds.add(k); else shadedNbhds.delete(k);
+    // Restyle wards in this neighbourhood
     wLyr.eachLayer(l => {
       if (nbhdOf(l.feature.properties.WD24NM) === k)
         l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM)));
     });
-    // Restyle neighbourhood boundary layer
-    if (nbhdBorderLyr) nbhdBorderLyr.eachLayer(l => {
-      if (l.feature.properties._nbhd === k)
-        l.setStyle({ opacity: on ? 0.8 : 0 });
-    });
-    // Hide/show point markers in this neighbourhood's wards
-    refreshPointVisibility();
   });
   nfiltersEl.appendChild(r);
 });
@@ -2532,13 +2494,15 @@ function _restyleAll() {
   const fov = document.getElementById('fill-opacity-val');
   const bw = document.getElementById('border-weight');
   const bwv = document.getElementById('border-weight-val');
+  // Fill slider = absolute transparency (0–100 % → 0.0–1.0 fill opacity).
   if (fo) fo.addEventListener('input', () => {
-    fillOpacityMult = (+fo.value) / 40;
+    fillOpacityMult = (+fo.value) / 100;
     if (fov) fov.textContent = fo.value + '%';
     _restyleAll();
   });
+  // Border slider = black outline thickness. Value is the stroke weight in px.
   if (bw) bw.addEventListener('input', () => {
-    borderWeightMult = (+bw.value) / 2;
+    borderWeightMult = (+bw.value);  // used as an absolute weight multiplier on a base of 1px
     if (bwv) bwv.textContent = bw.value;
     _restyleAll();
   });
@@ -2547,11 +2511,12 @@ function _restyleAll() {
 // ═══════════════════════════════════════════════════════════════════════════
 // BIVARIATE CHOROPLETH — two-indicator 3x3 brown/green palette
 // ═══════════════════════════════════════════════════════════════════════════
-// Palette: low-low = cream; high ov1 = brown; high ov2 = green; both high = dark.
+// Palette: Joshua Stevens' 3x3 "pink-teal-blue" — low-low = light grey,
+// ov1 high = teal, ov2 high = pink, both high = deep blue-purple.
 const BIV_PALETTE = [
-  ['#f3e7d3', '#cba58d', '#8d4f2b'], // ov2 low row
-  ['#cfe0c3', '#998b75', '#6e5835'], // ov2 mid
-  ['#9fc4a1', '#6b9074', '#334a2e'], // ov2 high
+  ['#e8e8e8', '#b0d5df', '#64acbe'], // ov2 low row
+  ['#e4acac', '#ad9ea5', '#627f8c'], // ov2 mid
+  ['#c85a5a', '#985356', '#574249'], // ov2 high
 ];
 
 function _bivTercile(wn, key) {
@@ -2889,4 +2854,4 @@ loadData();
 })();
 </script>
 </body>
-</html>
+</html>                                                                                                                                                                                                                                                                                                                                                                         

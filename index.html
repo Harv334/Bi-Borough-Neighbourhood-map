@@ -310,6 +310,10 @@
               <option value="census_over65_pct">65+ %</option>
               <option value="census_over85_pct">85+ %</option>
             </optgroup>
+            <optgroup label="Environment &amp; access">
+              <option value="fuel_poverty_pct">Fuel poverty % (DESNZ LILEE)</option>
+              <option value="ptai_score">PTAL — average PTAI score</option>
+            </optgroup>
             <optgroup label="Economy (Census)">
               <option value="census_level4_qual_pct">Level 4+ qualifications %</option>
               <option value="census_higher_managerial_pct">Higher managerial/professional %</option>
@@ -433,6 +437,10 @@ const OV_CFG = {
   census_working_age_pct:          { lo:"Lower", hi:"Higher", wh:false, min:55,   max:80   },
   census_over65_pct:               { lo:"Lower", hi:"Higher", wh:false, min:5,    max:22   },
   census_over85_pct:               { lo:"Lower", hi:"Higher", wh:false, min:0.5,  max:4    },
+  // Environment & access. Higher fuel poverty = worse (wh:true). PTAL: higher
+  // PTAI = better transport access, so we invert with hiIsWorse:false via wh:false.
+  fuel_poverty_pct:                { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
+  ptai_score:                      { lo:"Lower", hi:"Higher", wh:false, min:2,    max:25   },
 };
 
 // Transparency state — controlled by sliders
@@ -464,6 +472,10 @@ const CATS = [
     { k: "census_working_age_pct",           l: "Working age, 16–64 (%)",        g: "ward" },
     { k: "census_over65_pct",                l: "65 and over (%)",               g: "ward" },
     { k: "census_over85_pct",                l: "85 and over (%)",               g: "ward" },
+  ]},
+  { key: "environment",  label: "Environment & access", ico: "🚆", fields: [
+    { k: "fuel_poverty_pct",                 l: "Fuel poverty % (DESNZ LILEE)",  g: "ward" },
+    { k: "ptai_score",                       l: "PTAL — average PTAI score",     g: "ward" },
   ]},
   { key: "health",       label: "Health (Census 2021, ward-level)", ico: "♥", fields: [
     { k: "census_good_health_pct",           l: "Good/very good health (%)",     g: "ward" },
@@ -1751,6 +1763,9 @@ function showLSOA(feat) {
       { k:'census_working_age_pct',    l:'Working age, 16–64 (%)' },
       { k:'census_over65_pct',         l:'65 and over (%)' },
       { k:'census_over85_pct',         l:'85 and over (%)' },
+      // Environment & access
+      { k:'fuel_poverty_pct',          l:'Fuel poverty (%) (DESNZ LILEE)' },
+      { k:'ptai_score',                l:'PTAL — average PTAI score' },
     ];
     censusRows = lsoaFields.map(f => {
       const val = inds[f.k];
@@ -2234,7 +2249,9 @@ async function loadData() {
     ldrTxt.textContent = 'Loading ward data...';
     ldrSub.textContent = 'Fetching ward_data.json';
 
-    const response = await fetch('ward_data.json');
+    // Cache-bust so newly patched fields (ethnic/age) always load fresh
+    // rather than showing a stale browser copy.
+    const response = await fetch('ward_data.json?v=' + Date.now(), { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const json = await response.json();
@@ -2290,7 +2307,7 @@ async function loadData() {
     injectWardIMD();
 
     // Load optional LSOA census data (enriches LSOA detail panel)
-    fetch('lsoa_data.json').then(r => r.ok ? r.json() : null).catch(() => null)
+    fetch('lsoa_data.json?v=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)
       .then(ld => { if (ld) LSOA_DATA = ld; });
 
     // Now ward layer exists — init VCSE filters

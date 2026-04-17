@@ -1049,6 +1049,211 @@ def _tofloat(v):
     try: return float(v)
     except (TypeError, ValueError): return None
 
+
+# ============================================================================
+# SOURCE 4b: DESNZ sub-regional fuel poverty 2023 (LSOA-level, LILEE)
+# ============================================================================
+# DESNZ publishes "sub-regional fuel poverty" statistics annually — latest
+# dataset (2023 data, published Feb 2025) gives % of households in fuel
+# poverty by LSOA under the Low Income Low Energy Efficiency (LILEE)
+# definition. That's the canonical small-area cold-homes / excess winter
+# deaths proxy. Source page:
+#   https://www.gov.uk/government/collections/fuel-poverty-sub-regional-statistics
+#
+# Point the fetcher at the XLSX of "Table 3 (LSOA)"; column we want is
+# "Proportion of households fuel poor (%)".
+# URLs rotate on each release, so default may 404 — drop the file manually
+# in .cache/fuel_poverty/ and the fetcher will pick it up.
+FUEL_POVERTY_DEFAULT_URL = os.environ.get(
+    "FUEL_POVERTY_URL",
+    # 2023 data (pub. Feb 2025). If 404, grab the latest XLSX from
+    # https://www.gov.uk/government/collections/fuel-poverty-sub-regional-statistics
+    # and save as .cache/fuel_poverty/fuel_poverty_lsoa.xlsx.
+    "https://assets.publishing.service.gov.uk/media/"
+    "67a5a52fd0346e3cb63419c7/"
+    "sub-regional-fuel-poverty-2025-tables.xlsx",
+)
+
+
+def run_fuel_poverty() -> pd.DataFrame | None:
+    rule("Fuel poverty (DESNZ sub-regional, LSOA)")
+    cache_dir = CACHE_DIR / "fuel_poverty"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # Prefer any XLSX the user has dropped in; else try the default URL.
+    candidates = sorted(cache_dir.glob("*.xlsx"),
+                        key=lambda p: p.stat().st_size, reverse=True)
+    if not candidates:
+        url = FUEL_POVERTY_DEFAULT_URL
+        src = cache_dir / "fuel_poverty_lsoa.xlsx"
+        info(f"No local cache — downloading {url}")
+        try:
+            r = browser_session(referer="https://www.gov.uk/").get(url, timeout=120)
+            r.raise_for_status()
+            src.write_bytes(r.content)
+            candidates = [src]
+        except Exception as e:
+            warn(f"fuel_poverty download failed: {e}. "
+                 f"Drop the DESNZ sub-regional XLSX (LSOA tab) in {cache_dir}/ "
+                 "and re-run `python fetch_all_data.py --only fuel_poverty`.")
+            return None
+
+    src = candidates[0]
+    info(f"fuel_poverty: reading {src.name}")
+    xl = pd.ExcelFile(src)
+
+    # Find the LSOA sheet (header rows vary year to year — DESNZ tabs are
+    # usually called "Table 3", "LSOA", or "Table 3 LSOA").
+    lsoa_sheets = [s for s in xl.sheet_names
+                   if "lsoa" in s.lower() or s.lower().startswith("table 3")]
+    if not lsoa_sheets:
+        warn(f"fuel_poverty: no LSOA-looking sheet in {xl.sheet_names}")
+        return None
+
+    # Try each header row until we find the LSOA21CD column.
+    df = None
+    for sheet in lsoa_sheets:
+        for hdr in range(0, 5):
+            try:
+                tmp = pd.read_excel(src, sheet_name=sheet, header=hdr,
+                                    dtype=str)
+            except Exception:
+                continue
+            norm = {c.strip().lower(): c for c in tmp.columns if isinstance(c, str)}
+            if any("lsoa" in k and "code" in k for k in norm):
+                df = tmp
+                break
+        if df is not None:
+            break
+    if df is None:
+        warn("fuel_poverty: could not locate LSOA code column")
+        return None
+
+    def find_col(*kws, exclude=()):
+        for c in df.columns:
+            if not isinstance(c, str): continue
+            lc = c.lower()
+            if (all(k in lc for k in kws)
+                    and not any(e in lc for e in exclude)):
+                return c
+        return None
+
+    code_col = find_col("lsoa", "code")
+    # "Proportion of households fuel poor (%)" — or "% of households fuel poor"
+    pct_col = (find_col("proportion", "fuel", "poor")
+               or find_col("%", "fuel", "poor")
+               or find_col("percentage", "fuel", "poor"))
+    if not code_col or not pct_col:
+        warn(f"fuel_poverty: columns not found (code={code_col!r}, "
+             f"pct={pct_col!r}). Columns seen: {list(df.columns)[:10]}")
+        return None
+
+    out = pd.DataFrame({
+        "LSOA21CD": df[code_col].astype(str).str.strip(),
+        "fuel_poverty_pct": pd.to_numeric(df[pct_col], errors="coerce"),
+    }).dropna(subset=["LSOA21CD"])
+    # Many DESNZ releases use LSOA 2011 codes (E01xxxxxx) which still align
+    # with most 2021 boundaries — keep as-is; mismatches will just be skipped
+    # in build_lsoa_data.
+    out_path = DATA_DIR / "demographics" / "fuel_poverty.parquet"
+    write_parquet_atomic(out_path, out)
+    ok(f"fuel_poverty: {len(out):,} LSOAs -> "
+       f"{out_path.relative_to(REPO_ROOT)}")
+    return out
+
+
+# ============================================================================
+# SOURCE 4c: GLA LSOA Atlas — PTAI score (LSOA-level)
+# ============================================================================
+# PTAL (Public Transport Accessibility Level) is TfL's 0-6b banded score of
+# how well-connected a location is by public transport. The underlying
+# continuous score (PTAI) is published at LSOA level in the GLA's
+# "LSOA Atlas". Source:
+#   https://data.london.gov.uk/dataset/lsoa-atlas
+#
+# The LSOA Atlas CSV contains a column "Average PTAI score" per LSOA. Bigger
+# is better (6b ~= 25+, 0 ~= <0.01).
+PTAL_DEFAULT_URL = os.environ.get(
+    "PTAL_URL",
+    # LSOA Atlas CSV on London Datastore. If this 404s, grab the CSV from
+    # https://data.london.gov.uk/dataset/lsoa-atlas and drop in
+    # .cache/ptal/lsoa_atlas.csv.
+    "https://data.london.gov.uk/download/lsoa-atlas/"
+    "00f1a8c6-9a8e-4d90-a48e-7b2d2b4ab15b/lsoa-data.csv",
+)
+
+
+def run_ptal() -> pd.DataFrame | None:
+    rule("PTAL (GLA LSOA Atlas, average PTAI)")
+    cache_dir = CACHE_DIR / "ptal"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    candidates = sorted(cache_dir.glob("*.csv"),
+                        key=lambda p: p.stat().st_size, reverse=True)
+    if not candidates:
+        url = PTAL_DEFAULT_URL
+        src = cache_dir / "lsoa_atlas.csv"
+        info(f"No local cache — downloading {url}")
+        try:
+            r = browser_session(referer="https://data.london.gov.uk/").get(
+                url, timeout=120)
+            r.raise_for_status()
+            src.write_bytes(r.content)
+            candidates = [src]
+        except Exception as e:
+            warn(f"PTAL download failed: {e}. "
+                 f"Download the LSOA Atlas CSV from "
+                 "https://data.london.gov.uk/dataset/lsoa-atlas and save as "
+                 f"{cache_dir}/lsoa_atlas.csv, then re-run `python "
+                 "fetch_all_data.py --only ptal`.")
+            return None
+
+    src = candidates[0]
+    info(f"ptal: reading {src.name}")
+    # GLA atlas ships with two header rows (category, variable). Read with a
+    # simple single-row header and pick the PTAI column by substring.
+    df = None
+    for enc in ("utf-8", "latin-1", "cp1252"):
+        try:
+            df = pd.read_csv(src, dtype=str, encoding=enc, low_memory=False)
+            break
+        except UnicodeDecodeError:
+            continue
+    if df is None or df.empty:
+        warn("ptal: empty or unreadable CSV")
+        return None
+
+    def find_col(*kws):
+        for c in df.columns:
+            if not isinstance(c, str): continue
+            lc = c.lower()
+            if all(k in lc for k in kws):
+                return c
+        return None
+
+    code_col = (find_col("lower super output area")
+                or find_col("lsoa", "code")
+                or find_col("codes"))
+    ptai_col = (find_col("average", "ptai")
+                or find_col("ptai", "score")
+                or find_col("ptai"))
+    if not code_col or not ptai_col:
+        warn(f"ptal: columns not found (code={code_col!r}, "
+             f"ptai={ptai_col!r}). Columns seen: {list(df.columns)[:10]}")
+        return None
+
+    out = pd.DataFrame({
+        "LSOA21CD": df[code_col].astype(str).str.strip(),
+        "ptai_score": pd.to_numeric(df[ptai_col], errors="coerce"),
+    }).dropna(subset=["LSOA21CD", "ptai_score"])
+    # Filter to well-formed E01 LSOA codes.
+    out = out[out["LSOA21CD"].str.startswith("E01")]
+    out_path = DATA_DIR / "demographics" / "ptal.parquet"
+    write_parquet_atomic(out_path, out)
+    ok(f"ptal: {len(out):,} LSOAs -> {out_path.relative_to(REPO_ROOT)}")
+    return out
+
+
 # ============================================================================
 # SOURCE 5: Police.uk street crime  (polygon queries per borough per month)
 # ============================================================================
@@ -1387,6 +1592,50 @@ def build_ward_data() -> dict:
                 if den > 0:
                     w["indicators"][pc] = round(ward_num[wd][pc] / den, 2)
 
+    # --- Fuel poverty + PTAL: per-LSOA -> per-ward (population weighted) ----
+    # Reuses lsoa_to_ward + pop_by_lsoa built in the census block above. If
+    # census was absent both dicts may be missing, so guard for that.
+    if "lsoa_to_ward" not in locals():
+        lookup = get_postcode_lookup()
+        from collections import Counter as _Ctr3, defaultdict as _dd3
+        _votes = _dd3(_Ctr3)
+        for rec in lookup.values():
+            if isinstance(rec, (tuple, list)) and len(rec) >= 5:
+                lc, wd = rec[2] or "", rec[4] or ""
+                if lc and wd:
+                    _votes[lc][wd] += 1
+        lsoa_to_ward = {lc: v.most_common(1)[0][0] for lc, v in _votes.items()}
+    if "pop_by_lsoa" not in locals():
+        pop_by_lsoa = {}
+
+    def _agg_to_wards(df, value_col, ward_key):
+        if df is None or df.empty or value_col not in df.columns:
+            return
+        num, den = {}, {}
+        for _, row in df.iterrows():
+            lc = str(row["LSOA21CD"])
+            wd = lsoa_to_ward.get(lc)
+            v = row.get(value_col)
+            if not wd or pd.isna(v):
+                continue
+            pop = pop_by_lsoa.get(lc, 0) or 0
+            weight = float(pop) if pop > 0 else 1.0
+            num[wd] = num.get(wd, 0.0) + float(v) * weight
+            den[wd] = den.get(wd, 0.0) + weight
+        for wd, w in wards.items():
+            if den.get(wd, 0) > 0:
+                w["indicators"][ward_key] = round(num[wd] / den[wd], 2)
+
+    fp = _read_parquet_opt(DATA_DIR / "demographics" / "fuel_poverty.parquet")
+    _agg_to_wards(fp, "fuel_poverty_pct", "fuel_poverty_pct")
+    if fp is not None:
+        sources["fuel_poverty"] = "DESNZ sub-regional fuel poverty (LILEE)"
+
+    pt = _read_parquet_opt(DATA_DIR / "demographics" / "ptal.parquet")
+    _agg_to_wards(pt, "ptai_score", "ptai_score")
+    if pt is not None:
+        sources["ptal"] = "GLA LSOA Atlas (average PTAI score)"
+
     # --- Core20: ward is Core20 if any of its LSOAs is in IMD decile 1-2 -----
     # NHS Core20PLUS5 framework definition.
     imd = _read_parquet_opt(DATA_DIR / "demographics" / "imd2025.parquet")
@@ -1468,6 +1717,24 @@ def build_lsoa_data() -> dict:
                     rec[col] = int(v)
                 else:
                     rec[col] = float(v)
+
+    # Fuel poverty (DESNZ LILEE) — one field per LSOA
+    fp = _read_parquet_opt(DATA_DIR / "demographics" / "fuel_poverty.parquet")
+    if fp is not None and not fp.empty:
+        for _, row in fp.iterrows():
+            code = str(row["LSOA21CD"])
+            v = row.get("fuel_poverty_pct")
+            if code in out and pd.notna(v):
+                out[code]["fuel_poverty_pct"] = round(float(v), 2)
+
+    # PTAL (GLA LSOA Atlas, average PTAI score)
+    pt = _read_parquet_opt(DATA_DIR / "demographics" / "ptal.parquet")
+    if pt is not None and not pt.empty:
+        for _, row in pt.iterrows():
+            code = str(row["LSOA21CD"])
+            v = row.get("ptai_score")
+            if code in out and pd.notna(v):
+                out[code]["ptai_score"] = round(float(v), 2)
     return out
 
 def build_pharmacies_json() -> list:
@@ -1541,6 +1808,8 @@ SOURCES = {
     "imd":         run_imd2025,
     "census":      run_census2021,
     "fingertips":  run_fingertips,
+    "fuel_poverty": run_fuel_poverty,
+    "ptal":        run_ptal,
     "crime":       run_police_crime,
     "hospitals":   run_hospitals,
 }

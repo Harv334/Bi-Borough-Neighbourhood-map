@@ -1388,8 +1388,10 @@ function buildWardLayer() {
     onEachFeature: (feat, lyr) => {
       const wn = feat.properties.WD24NM;
       lyr.on('click', () => {
-        if (wLyr) wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+        // Update selection BEFORE the reset so the previously-selected ward
+        // actually loses its 'selected' style (gs() reads selW).
         selW = wn;
+        if (wLyr) wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
         lyr.setStyle(wstyle(wn, curOv, 'selected'));
         lyr.bringToFront();
         showWard(wn);

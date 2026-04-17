@@ -790,10 +790,27 @@ def run_census2021() -> pd.DataFrame:
                 }), on="LSOA21CD", how="left")
 
     # TS021 ethnic group -> non-white = 1 - (white/total) -----------------
+    # IMPORTANT: the "white" column must be the PARENT "Ethnic group: White"
+    # total — NOT a sub-category like "Mixed ... White and Asian" (which is
+    # what a naive substring match picks up first in Nomis column order).
     t = tables.get("TS021")
     if t is not None:
         cc = _cen_code_col(t)
-        white_col = _cen_find(t, "white", exclude=("not",))
+        # Exact parent-category match. Falls back to any "white" column whose
+        # name has exactly one ":" (i.e. top-level, not a leaf sub-category),
+        # and is not a "Mixed ... White and X" entry.
+        white_col = next(
+            (c for c in t.columns if c.strip().lower() == "ethnic group: white"),
+            None,
+        )
+        if not white_col:
+            white_col = next(
+                (c for c in t.columns
+                 if "white" in c.lower()
+                 and "mixed" not in c.lower()
+                 and c.count(":") == 1),
+                None,
+            )
         tot_col = _cen_find(t, "total")
         if cc and white_col and tot_col:
             vals = (1 - pd.to_numeric(t[white_col], errors="coerce")

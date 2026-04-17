@@ -33,6 +33,8 @@
   .tab-pane { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
   .tab-pane.active { display: flex; }
   .sb-sec { padding: 11px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
+  .deselect-btn { border: 1px solid #c9c9c4; background: #fff; color: #555; font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 5px; cursor: pointer; line-height: 1.2; white-space: nowrap; flex-shrink: 0; }
+  .deselect-btn:hover { background: #f2f2ec; border-color: #999; color: #222; }
   .sb-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 8px; }
   .lrow { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: default; }
   .ldot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
@@ -220,7 +222,7 @@
               <option value="all">All NW London</option>
             </select>
           </div>
-          <label class="lrow"><div style="width:9px;height:9px;border:1.5px solid #000;border-radius:2px;flex-shrink:0"></div><span class="lname">Ward boundaries <span class="lcount">188</span></span><input type="checkbox" id="tnw"></label>
+          <label class="lrow"><div style="width:9px;height:9px;border:1.5px solid #000;border-radius:2px;flex-shrink:0"></div><span class="lname">Ward boundaries <span class="lcount">188</span></span><input type="checkbox" id="tnw" checked></label>
           <label class="lrow"><div style="width:9px;height:9px;border:1.5px dashed #e67e22;border-radius:2px;flex-shrink:0"></div><span class="lname">LSOA boundaries <span class="lcount">123</span></span><input type="checkbox" id="tlsoa"></label>
           <label id="lsoa-imd-row" class="lrow" style="display:none;margin-left:18px;padding:3px 0 0"><div style="width:9px;height:9px;background:linear-gradient(90deg,#67000d,#cb181d,#fb6a4a,#a1d99b,#006d2c);border-radius:2px;flex-shrink:0"></div><span class="lname" style="font-size:11px">Colour by IMD decile</span><input type="checkbox" id="tlsoa-imd"></label>
           <div id="lsoa-filter-row" style="display:none;margin:4px 0 0 18px">
@@ -248,21 +250,8 @@
         </div>
         <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto">
           <div class="data-note" style="margin-top:4px">
-            Switch to the <b>Nbhds</b> tab to shade individual neighbourhoods and compare their indicators.
+            Switch to the <b>Neighbourhoods</b> tab to shade individual neighbourhoods and compare their indicators.
             Click any ward to explore its data in the Ward tab.
-          </div>
-        </div>
-        <div class="sb-sec" style="flex-shrink:0;border-top:1px solid #e5e5e0">
-          <div class="sb-lbl">Ward transparency</div>
-          <div class="opacity-row">
-            <label>Fill</label>
-            <input type="range" id="fill-opacity" min="0" max="100" value="40">
-            <span class="opacity-val" id="fill-opacity-val">40%</span>
-          </div>
-          <div class="opacity-row" style="margin-top:6px">
-            <label>Border</label>
-            <input type="range" id="border-weight" min="0" max="8" value="0" step="0.5">
-            <span class="opacity-val" id="border-weight-val">0</span>
           </div>
         </div>
       </div>
@@ -432,6 +421,20 @@
             <div class="ph-icon">↖</div>
             Click any ward on the map to explore its health, crime, deprivation and service data
           </div>
+        </div>
+      </div>
+      <!-- Shared slider footer — visible on every tab -->
+      <div class="sb-sec" style="flex-shrink:0;border-top:1px solid #e5e5e0;background:#fafaf6">
+        <div class="sb-lbl">Ward transparency</div>
+        <div class="opacity-row">
+          <label>Fill</label>
+          <input type="range" id="fill-opacity" min="0" max="100" value="40">
+          <span class="opacity-val" id="fill-opacity-val">40%</span>
+        </div>
+        <div class="opacity-row" style="margin-top:6px">
+          <label>Border</label>
+          <input type="range" id="border-weight" min="0" max="8" value="0" step="0.5">
+          <span class="opacity-val" id="border-weight-val">0</span>
         </div>
       </div>
     </div>
@@ -1165,12 +1168,18 @@ function wstyle(wn, ov, state) {
   if (ov === 'none' && curOv2 === 'none') {
     // No overlay: fill is the neighbourhood colour when shaded, otherwise a faint neutral.
     const fillColor = shaded ? nb.color : '#94a3b8';
-    const baseFo = shaded ? absFill : Math.min(absFill, 0.12);
+    // Shaded wards get a strong opacity floor (0.55) so the shade is clearly
+    // visible even if the Fill slider is at 0. Unshaded wards stay faint.
+    const baseFo = shaded ? Math.max(absFill, 0.55) : Math.min(absFill, 0.12);
     const baseW  = {default:1.0, hover:3.0, selected:4.0}[state] || 1.0;
     const fo = spot ? 0.02 : (dimmed ? Math.min(0.08, baseFo) : baseFo);
-    const w  = spot ? 0.6  : (dimmed ? 1.0 : Math.max(0, baseW * borderWeightMult));
+    // Shaded wards always get a coloured outline so they stand out even when
+    // the Border slider is 0; the state weights (hover/selected) still win.
+    const sliderW = Math.max(0, baseW * borderWeightMult);
+    const shadedMinW = shaded ? Math.max(1.5, sliderW) : sliderW;
+    const w  = spot ? 0.6  : (dimmed ? 1.0 : shadedMinW);
     const op = spot ? 0.25 : (dimmed ? 0.4 : 0.95);
-    const borderColor = '#000';
+    const borderColor = shaded ? nb.color : '#000';
     return applyCore20Outline({ color:borderColor, weight:w, fillColor, fillOpacity:fo, opacity:op }, wn);
   }
 
@@ -1293,7 +1302,10 @@ function showWard(wn) {
     </div>`;
 
   p.innerHTML = `
-    ${nb ? `<div style="margin-bottom:8px"><span class="nbadge-sm" style="background:${nb.bg};color:${nb.color}">${nb.label}</span></div>` : ''}
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px">
+      ${nb ? `<span class="nbadge-sm" style="background:${nb.bg};color:${nb.color}">${nb.label}</span>` : '<span></span>'}
+      <button class="deselect-btn" onclick="deselectWard()" title="Deselect this ward">Deselect &times;</button>
+    </div>
     <div class="wname">${wdata.name} <span class="wpop">${pop}</span></div>
     ${keyStats}
     <button class="wbtn" onclick="generateWardReport('${wn.replace(/'/g, "\\'")}')">Generate ward report ↗</button>
@@ -1309,6 +1321,19 @@ function showWard(wn) {
 window.toggleCat = function(hdr) {
   hdr.querySelector('.cat-arrow').classList.toggle('open');
   hdr.nextElementSibling.classList.toggle('open');
+};
+
+window.deselectWard = function() {
+  selW = null;
+  if (typeof _restyleAll === 'function') _restyleAll();
+  const p = document.getElementById('wpanel');
+  if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
+};
+window.deselectLSOA = function() {
+  selLSOA = null;
+  if (typeof _restyleAll === 'function') _restyleAll();
+  const p = document.getElementById('wpanel');
+  if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1763,6 +1788,11 @@ document.getElementById('tnw').addEventListener('change', e => {
     map.removeLayer(wardBoundaryLyr);
   }
 });
+// Ward boundaries on by default — layer is added once the map is ready
+if (document.getElementById('tnw').checked) {
+  wardBoundaryLyr.addTo(map);
+  wardBoundaryLyr.bringToFront();
+}
 document.getElementById('tg').addEventListener('change',  e => e.target.checked ? gpL.addTo(map) : map.removeLayer(gpL));
 document.getElementById('th').addEventListener('change',  e => e.target.checked ? hL.addTo(map)  : map.removeLayer(hL));
 document.getElementById('tgr').addEventListener('change', e => e.target.checked ? grL.addTo(map) : map.removeLayer(grL));
@@ -1945,8 +1975,13 @@ function showLSOA(feat) {
   }
 
   p.innerHTML = `
-    <div style="margin-bottom:6px"><span class="gpill" style="background:#fdebd0;color:#e67e22;border:1px solid #e67e22">LSOA</span>
-      <span style="font-size:11px;color:#666;margin-left:4px">in ${props.ward}</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px">
+      <div>
+        <span class="gpill" style="background:#fdebd0;color:#e67e22;border:1px solid #e67e22">LSOA</span>
+        <span style="font-size:11px;color:#666;margin-left:4px">in ${props.ward}</span>
+      </div>
+      <button class="deselect-btn" onclick="deselectLSOA()" title="Deselect this LSOA">Deselect &times;</button>
+    </div>
     <div class="wname">${props.name} <span class="wpop">${code}</span></div>
     <div class="cat-block">
       <div class="cat-hdr" onclick="toggleCat(this)">

@@ -272,29 +272,35 @@
           <div class="sb-lbl">Choropleth overlay</div>
           <select id="ov">
             <option value="none">— none (neighbourhood colours) —</option>
-            <optgroup label="Health">
-              <option value="health_life_expectancy">Life expectancy</option>
-              <option value="health_premature_mortality">Premature mortality (&lt;75)</option>
-              <option value="health_mortality_cvd">CVD mortality</option>
-              <option value="health_stroke_admissions">Stroke admissions</option>
+            <optgroup label="Health outcomes">
+              <option value="ft_life_expectancy_male">Life expectancy (male)</option>
+              <option value="ft_healthy_life_expectancy_male">Healthy life expectancy (male)</option>
               <option value="census_good_health_pct">Good/very good health %</option>
               <option value="census_bad_health_pct">Bad/very bad health %</option>
               <option value="census_disability_any_pct">Disability (any) %</option>
               <option value="census_disability_lot_pct">Disability (limited a lot) %</option>
               <option value="census_provides_unpaid_care_pct">Provides unpaid care %</option>
             </optgroup>
-            <optgroup label="Crime">
-              <option value="crime_rate_per_1000">Crime rate per 1,000</option>
-              <option value="crime_violent_annual">Violent crime (annual)</option>
-              <option value="crime_asb_annual">Anti-social behaviour</option>
+            <optgroup label="Behaviours &amp; services">
+              <option value="ft_smoking_prevalence_adults">Adult smoking %</option>
+              <option value="ft_obesity_year6">Year 6 obesity %</option>
+              <option value="ft_hypertension_qof">Hypertension (QOF)</option>
+              <option value="ft_depression_qof">Depression (QOF)</option>
+              <option value="ft_severe_mental_illness_qof">Severe mental illness (QOF)</option>
+              <option value="ft_suicide_rate">Suicide rate</option>
+              <option value="ft_a_e_attendance_under_5">A&amp;E attendance (0-4)</option>
+              <option value="ft_mmr_2_doses_age5">MMR 2 doses by age 5</option>
+              <option value="ft_flu_vaccination_65plus">Flu vaccination (65+)</option>
+              <option value="ft_cervical_screening_25_49">Cervical screening (25-49)</option>
+              <option value="ft_gp_patient_satisfaction">GP patient satisfaction</option>
             </optgroup>
-            <optgroup label="Deprivation">
-              <option value="imd_avg_decile">IMD average decile</option>
-              <option value="imd_pct_deprived_30">% LSOAs in most deprived 30%</option>
-              <option value="claimant_rate_pct">Claimant rate (%)</option>
-              <option value="census_housing_deprived_pct">Housing deprived %</option>
-              <option value="census_no_qual_pct">No qualifications %</option>
+            <optgroup label="Crime &amp; deprivation">
+              <option value="crime_total">Total crimes (12 months)</option>
+              <option value="core20_lsoa_count">Core20 LSOAs in ward</option>
+              <option value="ft_child_poverty_low_income">Child poverty (low income)</option>
+              <option value="ft_fuel_poverty_lihc">Fuel poverty (LIHC)</option>
               <option value="census_unemployed_pct">Unemployed %</option>
+              <option value="census_no_qual_pct">No qualifications %</option>
               <option value="census_no_car_pct">No car/van %</option>
             </optgroup>
             <optgroup label="Housing (Census)">
@@ -304,9 +310,6 @@
             </optgroup>
             <optgroup label="Population (Census)">
               <option value="census_population">Resident population</option>
-              <option value="gp_registered_patients">GP registered patients</option>
-              <option value="census_under16_pct">Under 16 %</option>
-              <option value="census_over65_pct">Aged 65+ %</option>
               <option value="census_non_white_pct">Non-White %</option>
               <option value="census_born_outside_uk_pct">Born outside UK %</option>
             </optgroup>
@@ -395,43 +398,46 @@ const NEIGHBOURHOODS = {
 };
 
 const OV_CFG = {
-  // Health
-  health_life_expectancy:         { lo:"Lower", hi:"Higher", wh:false, min:75,   max:85   },
-  health_premature_mortality:     { lo:"Lower", hi:"Higher", wh:true,  min:200,  max:800  },
-  health_mortality_cvd:           { lo:"Lower", hi:"Higher", wh:true,  min:50,   max:400  },
-  health_stroke_admissions:       { lo:"Lower", hi:"Higher", wh:true,  min:50,   max:300  },
-  census_good_health_pct:         { lo:"Lower", hi:"Higher", wh:false, min:50,   max:95   },
-  census_bad_health_pct:          { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:15   },
-  census_disability_any_pct:      { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:30   },
-  census_disability_lot_pct:      { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:15   },
-  census_provides_unpaid_care_pct:{ lo:"Lower", hi:"Higher", wh:true,  min:0,    max:15   },
-  // Crime
-  crime_rate_per_1000:            { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:250  },
-  crime_violent_annual:           { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:5000 },
-  crime_asb_annual:               { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:3000 },
-  // Deprivation
-  imd_avg_decile:                 { lo:"More deprived", hi:"Less deprived", wh:false, min:1, max:10 },
-  imd_pct_deprived_30:            { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:100  },
-  claimant_rate_pct:              { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:25   },
-  census_housing_deprived_pct:    { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:35   },
-  census_no_qual_pct:             { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:30   },
-  census_unemployed_pct:          { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:15   },
-  census_no_car_pct:              { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:80   },
-  // Housing
-  census_social_rented_pct:       { lo:"Less",  hi:"More",   wh:false, min:0,    max:70   },
-  census_private_rented_pct:      { lo:"Less",  hi:"More",   wh:false, min:0,    max:70   },
-  census_owned_pct:               { lo:"Less",  hi:"More",   wh:false, min:0,    max:70   },
-  // Population
-  census_population:              { lo:"Fewer", hi:"More",   wh:false, min:6000, max:16000},
-  gp_registered_patients:         { lo:"Fewer", hi:"More",   wh:false, min:5000, max:40000},
-  census_under16_pct:             { lo:"Lower", hi:"Higher", wh:false, min:5,    max:30   },
-  census_over65_pct:              { lo:"Lower", hi:"Higher", wh:false, min:3,    max:25   },
-  census_non_white_pct:           { lo:"Lower", hi:"Higher", wh:false, min:0,    max:70   },
-  census_born_outside_uk_pct:     { lo:"Lower", hi:"Higher", wh:false, min:0,    max:80   },
-  // Economy
-  census_level4_qual_pct:         { lo:"Lower", hi:"Higher", wh:false, min:20,   max:90   },
-  census_higher_managerial_pct:   { lo:"Lower", hi:"Higher", wh:false, min:10,   max:80   },
-  census_routine_semi_routine_pct:{ lo:"Lower", hi:"Higher", wh:true,  min:0,    max:30   },
+  // Health outcomes
+  ft_life_expectancy_male:         { lo:"Lower", hi:"Higher", wh:false, min:75,   max:86   },
+  ft_healthy_life_expectancy_male: { lo:"Lower", hi:"Higher", wh:false, min:55,   max:70   },
+  census_good_health_pct:          { lo:"Lower", hi:"Higher", wh:false, min:75,   max:95   },
+  census_bad_health_pct:           { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:8    },
+  census_disability_any_pct:       { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
+  census_disability_lot_pct:       { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:10   },
+  census_provides_unpaid_care_pct: { lo:"Lower", hi:"Higher", wh:true,  min:2,    max:10   },
+  // Behaviours & services
+  ft_smoking_prevalence_adults:    { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:20   },
+  ft_obesity_year6:                { lo:"Lower", hi:"Higher", wh:true,  min:15,   max:35   },
+  ft_hypertension_qof:             { lo:"Lower", hi:"Higher", wh:true,  min:3,    max:15   },
+  ft_depression_qof:               { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:15   },
+  ft_severe_mental_illness_qof:    { lo:"Lower", hi:"Higher", wh:true,  min:60,   max:200  },
+  ft_suicide_rate:                 { lo:"Lower", hi:"Higher", wh:true,  min:4,    max:15   },
+  ft_a_e_attendance_under_5:       { lo:"Lower", hi:"Higher", wh:true,  min:15,   max:50   },
+  ft_mmr_2_doses_age5:             { lo:"Lower", hi:"Higher", wh:false, min:60,   max:95   },
+  ft_flu_vaccination_65plus:       { lo:"Lower", hi:"Higher", wh:false, min:5,    max:25   },
+  ft_cervical_screening_25_49:     { lo:"Lower", hi:"Higher", wh:false, min:45,   max:75   },
+  ft_gp_patient_satisfaction:      { lo:"Lower", hi:"Higher", wh:false, min:15,   max:50   },
+  // Crime (ward total, 12 months)
+  crime_total:                     { lo:"Fewer", hi:"More",   wh:true,  min:500,  max:8000 },
+  // Core20 density
+  core20_lsoa_count:               { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:15   },
+  // Population & housing
+  census_population:               { lo:"Fewer", hi:"More",   wh:false, min:6000, max:16000},
+  census_non_white_pct:            { lo:"Lower", hi:"Higher", wh:false, min:10,   max:80   },
+  census_born_outside_uk_pct:      { lo:"Lower", hi:"Higher", wh:false, min:20,   max:70   },
+  census_owned_pct:                { lo:"Less",  hi:"More",   wh:false, min:10,   max:70   },
+  census_social_rented_pct:        { lo:"Less",  hi:"More",   wh:false, min:5,    max:50   },
+  census_private_rented_pct:       { lo:"Less",  hi:"More",   wh:false, min:10,   max:60   },
+  census_no_car_pct:               { lo:"Lower", hi:"Higher", wh:false, min:20,   max:70   },
+  // Economy & education
+  census_unemployed_pct:           { lo:"Lower", hi:"Higher", wh:true,  min:2,    max:10   },
+  census_higher_managerial_pct:    { lo:"Lower", hi:"Higher", wh:false, min:15,   max:60   },
+  census_routine_semi_routine_pct: { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
+  census_level4_qual_pct:          { lo:"Lower", hi:"Higher", wh:false, min:30,   max:80   },
+  census_no_qual_pct:              { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
+  ft_child_poverty_low_income:     { lo:"Lower", hi:"Higher", wh:true,  min:10,   max:50   },
+  ft_fuel_poverty_lihc:            { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:20   },
 };
 
 // Transparency state — controlled by sliders
@@ -439,64 +445,54 @@ let fillOpacityMult = 1.0;   // multiplier on base fill opacity
 let borderWeightMult = 1.0;  // multiplier on base border weight
 
 const CATS = [
-  { key: "population",    label: "Population & Services", ico: "◎", fields: [
-    { k: "census_population",      l: "Census 2021 population",   g: "ward" },
-    { k: "gp_registered_patients", l: "GP registered patients",   g: "ward" },
-    { k: "gp_practice_count",      l: "GP practices in ward",     g: "ward" },
-    { k: "dental_practice_count",  l: "Dental practices in ward", g: "ward" },
+  { key: "headline",     label: "At a glance",         ico: "◎", fields: [
+    { k: "census_population",                l: "Census 2021 population",        g: "ward" },
+    { k: "gp_practice_count",                l: "GP practices",                  g: "ward" },
+    { k: "pharmacy_count",                   l: "Pharmacies",                    g: "ward" },
+    { k: "crime_total",                      l: "Total crimes (12 months)",      g: "ward" },
+    { k: "core20_lsoa_count",                l: "Core20 LSOAs in ward",          g: "ward" },
+    { k: "total_lsoa_count",                 l: "Total LSOAs in ward",           g: "ward" },
   ]},
-  { key: "crime",         label: "Crime",         ico: "⚠", fields: [
-    { k: "crime_total_annual",    l: "Total crimes (annual)",       g: "ward" },
-    { k: "crime_rate_per_1000",   l: "Crime rate per 1,000 people", g: "ward" },
-    { k: "crime_violent_annual",  l: "Violent crime (annual)",      g: "ward" },
-    { k: "crime_burglary_annual", l: "Burglary (annual)",           g: "ward" },
-    { k: "crime_asb_annual",      l: "Anti-social behaviour",       g: "ward" },
-    { k: "crime_robbery_annual",  l: "Robbery (annual)",            g: "ward" },
-    { k: "crime_drugs_annual",    l: "Drug offences (annual)",      g: "ward" },
+  { key: "demographics", label: "Demographics",        ico: "👥", fields: [
+    { k: "census_non_white_pct",             l: "Non-White (%)",                 g: "ward" },
+    { k: "census_born_outside_uk_pct",       l: "Born outside UK (%)",           g: "ward" },
   ]},
-  { key: "deprivation",   label: "Deprivation",   ico: "£", fields: [
-    { k: "imd_avg_decile",        l: "IMD average decile (1=most deprived)", g: "ward" },
-    { k: "imd_pct_deprived_30",   l: "% LSOAs in most deprived 30%",        g: "ward" },
-    { k: "imd_worst_decile",      l: "Worst LSOA decile (most deprived)",    g: "ward" },
-    { k: "imd_best_decile",       l: "Best LSOA decile (least deprived)",    g: "ward" },
-    { k: "claimant_count",        l: "UC claimant count",          g: "ward" },
-    { k: "claimant_rate_pct",     l: "Claimant rate (% of pop.)",  g: "ward" },
-    { k: "census_housing_deprived_pct", l: "Housing deprived (%)",  g: "ward" },
-    { k: "census_no_car_pct",     l: "No car/van (%)",             g: "ward" },
+  { key: "health",       label: "Health outcomes",     ico: "♥", fields: [
+    { k: "ft_life_expectancy_male",          l: "Life expectancy, male",         g: "la"   },
+    { k: "ft_healthy_life_expectancy_male",  l: "Healthy life expectancy, male", g: "la"   },
+    { k: "census_good_health_pct",           l: "Good/very good health (%)",     g: "ward" },
+    { k: "census_bad_health_pct",            l: "Bad/very bad health (%)",       g: "ward" },
+    { k: "census_disability_any_pct",        l: "Disability, any (%)",           g: "ward" },
+    { k: "census_disability_lot_pct",        l: "Disability, limited a lot (%)", g: "ward" },
+    { k: "census_provides_unpaid_care_pct",  l: "Provides unpaid care (%)",      g: "ward" },
   ]},
-  { key: "health",        label: "Health",        ico: "♥", fields: [
-    { k: "health_life_expectancy",        l: "Life expectancy (combined)", g: "msoa" },
-    { k: "health_life_exp_male",          l: "Life expectancy (male)",     g: "msoa" },
-    { k: "health_life_exp_female",        l: "Life expectancy (female)",   g: "msoa" },
-    { k: "census_good_health_pct",        l: "Good/very good health (%)",  g: "ward" },
-    { k: "census_bad_health_pct",         l: "Bad/very bad health (%)",    g: "ward" },
-    { k: "census_disability_any_pct",     l: "Disability (any) (%)",       g: "ward" },
-    { k: "census_disability_lot_pct",     l: "Disability (limited a lot) (%)", g: "ward" },
-    { k: "census_provides_unpaid_care_pct",l:"Provides unpaid care (%)",   g: "ward" },
-    { k: "health_premature_mortality",    l: "Premature mortality (<75)",   g: "msoa" },
-    { k: "health_mortality_all_causes",   l: "Mortality (all causes)",      g: "msoa" },
-    { k: "health_mortality_cvd",          l: "CVD mortality",               g: "msoa" },
-    { k: "health_mortality_cancer",       l: "Cancer mortality",            g: "msoa" },
-    { k: "health_mortality_respiratory",  l: "Respiratory mortality",       g: "msoa" },
-    { k: "health_stroke_admissions",      l: "Stroke admissions",           g: "msoa" },
+  { key: "behaviours",   label: "Behaviours & services", ico: "💊", fields: [
+    { k: "ft_smoking_prevalence_adults",     l: "Smoking prevalence (18+)",      g: "la"   },
+    { k: "ft_obesity_year6",                 l: "Year 6 obesity",                g: "la"   },
+    { k: "ft_hypertension_qof",              l: "Hypertension (QOF)",            g: "la"   },
+    { k: "ft_depression_qof",                l: "Depression (QOF, 18+)",         g: "la"   },
+    { k: "ft_severe_mental_illness_qof",     l: "Severe mental illness (QOF)",   g: "la"   },
+    { k: "ft_suicide_rate",                  l: "Suicide rate",                  g: "la"   },
+    { k: "ft_a_e_attendance_under_5",        l: "A&E attendances (0-4 yrs)",     g: "la"   },
+    { k: "ft_mmr_2_doses_age5",              l: "MMR, 2 doses at age 5",         g: "la"   },
+    { k: "ft_flu_vaccination_65plus",        l: "Flu vaccination (65+)",         g: "la"   },
+    { k: "ft_cervical_screening_25_49",      l: "Cervical screening (25-49)",    g: "la"   },
+    { k: "ft_gp_patient_satisfaction",       l: "GP patient satisfaction",       g: "la"   },
   ]},
-  { key: "demographics",  label: "Demographics",  ico: "👥", fields: [
-    { k: "census_white_british_pct",      l: "White British (%)",          g: "ward" },
-    { k: "census_non_white_pct",          l: "Non-White (%)",              g: "ward" },
-    { k: "census_born_outside_uk_pct",    l: "Born outside UK (%)",        g: "ward" },
-    { k: "census_under16_pct",            l: "Under 16 (%)",               g: "ward" },
-    { k: "census_over65_pct",             l: "Aged 65+ (%)",               g: "ward" },
+  { key: "economy",      label: "Economy & education", ico: "£", fields: [
+    { k: "census_unemployed_pct",            l: "Unemployed (%)",                g: "ward" },
+    { k: "census_higher_managerial_pct",     l: "Higher managerial (%)",         g: "ward" },
+    { k: "census_routine_semi_routine_pct",  l: "Routine/semi-routine (%)",      g: "ward" },
+    { k: "census_level4_qual_pct",           l: "Level 4+ qualifications (%)",   g: "ward" },
+    { k: "census_no_qual_pct",               l: "No qualifications (%)",         g: "ward" },
+    { k: "ft_child_poverty_low_income",      l: "Child poverty (low income)",    g: "la"   },
+    { k: "ft_fuel_poverty_lihc",             l: "Fuel poverty (LIHC)",           g: "la"   },
   ]},
-  { key: "economy",       label: "Economy & Housing", ico: "🏠", fields: [
-    { k: "census_employed_pct",           l: "Employed (%)",               g: "la" },
-    { k: "census_unemployed_pct",         l: "Unemployed (%)",             g: "la" },
-    { k: "census_higher_managerial_pct",  l: "Higher managerial (%)",      g: "ward" },
-    { k: "census_routine_semi_routine_pct",l:"Routine/semi-routine (%)",   g: "ward" },
-    { k: "census_level4_qual_pct",        l: "Level 4+ qualifications (%)",g: "ward" },
-    { k: "census_no_qual_pct",            l: "No qualifications (%)",      g: "ward" },
-    { k: "census_owned_pct",              l: "Owner occupied (%)",         g: "ward" },
-    { k: "census_social_rented_pct",      l: "Social rented (%)",          g: "ward" },
-    { k: "census_private_rented_pct",     l: "Private rented (%)",         g: "ward" },
+  { key: "housing",      label: "Housing & transport", ico: "🏠", fields: [
+    { k: "census_owned_pct",                 l: "Owner occupied (%)",            g: "ward" },
+    { k: "census_social_rented_pct",         l: "Social rented (%)",             g: "ward" },
+    { k: "census_private_rented_pct",        l: "Private rented (%)",            g: "ward" },
+    { k: "census_no_car_pct",                l: "No car/van (%)",                g: "ward" },
   ]},
 ];
 
@@ -1125,15 +1121,16 @@ function showWard(wn) {
     </div>`;
   }).join('');
 
-  const pop = inds.ons_population ? `~${parseInt(inds.ons_population).toLocaleString()}` : (wdata.pop || '');
+  const pop = inds.census_population ? `~${parseInt(inds.census_population).toLocaleString()}` : (wdata.pop || '');
 
-  // ── Key stats strip: life expectancy, 65+ %, GP list size per 1,000 ──
+  // ── Key stats strip: life expectancy (LA), good health %, GP count, Core20 ratio ──
   const fmt = v => (v === null || v === undefined || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
-  const leVal  = fmt(inds.health_life_expectancy);
-  const o65Val = fmt(inds.census_over65_pct);
-  const gpPat  = fmt(inds.gp_registered_patients);
-  const popN   = fmt(inds.census_population) || fmt(inds.ons_population);
-  const gpPer1k = (gpPat && popN) ? (gpPat / popN * 1000) : null;
+  const leVal   = fmt(inds.ft_life_expectancy_male);
+  const goodHlt = fmt(inds.census_good_health_pct);
+  const gpN     = fmt(inds.gp_practice_count);
+  const popN    = fmt(inds.census_population);
+  const c20L    = fmt(inds.core20_lsoa_count);
+  const totL    = fmt(inds.total_lsoa_count);
 
   const stat = (lbl, val, sub) => {
     if (val === null || val === undefined) {
@@ -1143,9 +1140,10 @@ function showWard(wn) {
   };
   const keyStats = `
     <div class="keystats">
-      ${stat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years (MSOA)')}
-      ${stat('Aged 65+', o65Val !== null ? o65Val.toFixed(1) + '%' : null, 'of residents')}
-      ${stat('GP patients / 1k', gpPer1k !== null ? gpPer1k.toFixed(0) : null, 'registered')}
+      ${stat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years, male (LA)')}
+      ${stat('Good health', goodHlt !== null ? goodHlt.toFixed(0) + '%' : null, 'of residents')}
+      ${stat('GP practices', gpN !== null ? gpN.toFixed(0) : null, 'in ward')}
+      ${stat('Core20 LSOAs', (c20L !== null && totL !== null) ? c20L.toFixed(0) + '/' + totL.toFixed(0) : null, 'most deprived')}
     </div>`;
 
   p.innerHTML = `
@@ -1192,12 +1190,13 @@ window.generateWardReport = function(wn) {
 
   // Headline stats
   const fmt = v => (v === null || v === undefined || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
-  const leVal   = fmt(inds.health_life_expectancy);
-  const o65Val  = fmt(inds.census_over65_pct);
-  const gpPat   = fmt(inds.gp_registered_patients);
-  const popN    = fmt(inds.census_population) || fmt(inds.ons_population);
-  const gpPer1k = (gpPat && popN) ? (gpPat / popN * 1000) : null;
-  const imd     = fmt(inds.imd_avg_decile);
+  const leVal    = fmt(inds.ft_life_expectancy_male);
+  const hleVal   = fmt(inds.ft_healthy_life_expectancy_male);
+  const popN     = fmt(inds.census_population);
+  const goodHlt  = fmt(inds.census_good_health_pct);
+  const smokeVal = fmt(inds.ft_smoking_prevalence_adults);
+  const c20L     = fmt(inds.core20_lsoa_count);
+  const totL     = fmt(inds.total_lsoa_count);
 
   // Build category rows from the canonical CATS config (same as sidebar)
   const catRows = CATS.map(cat => {
@@ -1226,9 +1225,8 @@ window.generateWardReport = function(wn) {
     </div>`;
   };
 
-  // Core20 flag + LSOA ratio
+  // Core20 flag
   const isCore20 = !!(wdata && wdata.is_core20);
-  const c20L = inds.core20_lsoa_count, totL = inds.total_lsoa_count;
   const core20Badge = isCore20
     ? `<div style="display:inline-block;margin-top:8px;margin-left:6px;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;background:#fde6ee;color:#8b0035;border:1px solid #f0b5cb">Core20 ward</div>`
     : '';
@@ -1316,10 +1314,11 @@ window.generateWardReport = function(wn) {
     ${nb ? `<div class="nb">${nb.label}</div>` : ''}${core20Badge}
   </div>
   <div class="headline">
-    ${bigStat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years')}
-    ${bigStat('Aged 65+', o65Val !== null ? o65Val.toFixed(1) + '%' : null, 'of residents')}
-    ${bigStat('GP patients per 1,000', gpPer1k !== null ? gpPer1k.toFixed(0) : null, 'registered')}
-    ${bigStat('IMD decile', imd !== null ? imd.toFixed(1) : null, '1 = most deprived')}
+    ${bigStat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years, male (LA)')}
+    ${bigStat('Healthy life exp.', hleVal !== null ? hleVal.toFixed(1) : null, 'years, male (LA)')}
+    ${bigStat('Good health', goodHlt !== null ? goodHlt.toFixed(0) + '%' : null, 'of residents')}
+    ${bigStat('Smoking', smokeVal !== null ? smokeVal.toFixed(1) + '%' : null, 'of adults (LA)')}
+    ${bigStat('Core20 LSOAs', (c20L !== null && totL !== null) ? c20L.toFixed(0) + ' of ' + totL.toFixed(0) : null, 'most deprived')}
   </div>
   <div class="services">
     <div class="svc"><div class="svc-val">${gpN || '—'}</div><div class="svc-lbl">GP practices</div></div>

@@ -196,7 +196,7 @@
         <div class="sb-tab active" data-tab="layers">Layers</div>
         <div class="sb-tab" data-tab="vcse">VCSE</div>
         <div class="sb-tab" data-tab="overlay">Overlay</div>
-        <div class="sb-tab" data-tab="nbhd">Nbhds</div>
+        <div class="sb-tab" data-tab="nbhd">Neighbourhoods</div>
         <div class="sb-tab" data-tab="ward">Ward</div>
       </div>
 
@@ -214,6 +214,12 @@
         <div class="sb-sec" style="flex-shrink:0;border-bottom:1px solid #e5e5e0">
           <div class="sb-lbl">Borough boundaries</div>
           <label class="lrow"><div style="width:9px;height:9px;border:2px solid #1a1a1a;border-radius:2px;flex-shrink:0"></div><span class="lname">NW London boroughs</span><input type="checkbox" id="tb"></label>
+          <div style="margin:4px 0 8px 0">
+            <div style="font-size:10.5px;color:#666;margin-bottom:3px">Focus by borough</div>
+            <select id="borough-focus" style="width:100%;padding:4px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
+              <option value="all">All NW London</option>
+            </select>
+          </div>
           <label class="lrow"><div style="width:9px;height:9px;background:linear-gradient(90deg,#8ecae6,#ffb703,#fb8500,#c05299);border-radius:2px;flex-shrink:0"></div><span class="lname">Neighbourhood colours</span><input type="checkbox" id="tnc"></label>
           <label class="lrow"><div style="width:9px;height:9px;border:1.5px solid #000;border-radius:2px;flex-shrink:0"></div><span class="lname">Ward boundaries <span class="lcount">188</span></span><input type="checkbox" id="tnw"></label>
           <label class="lrow"><div style="width:9px;height:9px;border:1.5px dashed #e67e22;border-radius:2px;flex-shrink:0"></div><span class="lname">LSOA boundaries <span class="lcount">123</span></span><input type="checkbox" id="tlsoa"></label>
@@ -403,39 +409,19 @@
       <!-- Neighbourhoods tab -->
       <div class="tab-pane" id="tab-nbhd">
         <div class="sb-sec" style="padding-bottom:8px">
-          <div class="sb-lbl">Neighbourhood summary</div>
-          <div style="font-size:10px;color:#888;line-height:1.5;margin-bottom:8px">
-            4 Westminster neighbourhoods · population-weighted aggregates from Census 2021 + IMD 2019.
-            Click a row to zoom; click a ward name to open its report.
+          <div class="sb-lbl">Neighbourhoods</div>
+          <div style="font-size:10px;color:#888;line-height:1.5;margin-bottom:0">
+            4 Westminster neighbourhoods · 18 wards.
           </div>
         </div>
         <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto;padding-top:0">
           <div class="sb-lbl">Shade neighbourhoods</div>
           <div id="nfilters"></div>
           <div class="data-note" style="margin:4px 0 10px">
-            Tick to fill an area with its neighbourhood colour.
+            Tick to fill an area with its neighbourhood colour. Click a card to focus / zoom.
           </div>
           <label class="lrow" style="margin-bottom:8px"><div style="width:9px;height:9px;background:linear-gradient(90deg,#1a1a1a,#fff);border:1px solid #ccc;border-radius:2px;flex-shrink:0"></div><span class="lname">Spotlight focused neighbourhood</span><input type="checkbox" id="tspot"></label>
           <div id="nbhd-table"></div>
-          <div class="sb-lbl" style="margin-top:14px">Indicator</div>
-          <select id="nbhd-ov" style="width:100%;padding:5px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
-            <option value="census_bad_health_pct">Bad/very bad health %</option>
-            <option value="census_good_health_pct">Good/very good health %</option>
-            <option value="census_disability_any_pct">Disability (any) %</option>
-            <option value="core20_lsoa_count">Core20 LSOA count</option>
-            <option value="census_unemployed_pct">Unemployed %</option>
-            <option value="census_no_car_pct">No car/van %</option>
-            <option value="census_social_rented_pct">Social rented %</option>
-            <option value="census_over65_pct">65+ %</option>
-            <option value="census_under16_pct">Under 16 %</option>
-            <option value="fuel_poverty_pct">Fuel poverty %</option>
-            <option value="crime_total">Crime (12 mo.)</option>
-          </select>
-          <div id="nbhd-radar" style="margin-top:12px"></div>
-          <div class="data-note" style="margin-top:10px">
-            Values shown are population-weighted means across wards in each neighbourhood (counts are summed).
-            Spotlight mode dims non-focused wards hard so one neighbourhood pops off the map.
-          </div>
         </div>
       </div>
 
@@ -669,9 +655,25 @@ const VCSE_RAW = [["The Portman Early Childhood Centre","12-18 Salisbury Street,
 // ═══════════════════════════════════════════════════════════════════════════
 function norm(n) { return (n||'').toLowerCase().replace(/\u2019/g,"'").trim(); }
 function nbhdOf(wn) {
+  // Use norm() so curly vs straight apostrophes (St James's, Queen's Park,
+  // Regent's Park) match between the GeoJSON and the hardcoded ward lists.
+  const target = norm(wn);
   for (const [k,n] of Object.entries(NEIGHBOURHOODS))
-    if (n.wards.includes(wn)) return k;
+    if (n.wards.some(w => norm(w) === target)) return k;
   return null;
+}
+// Ward-name → borough (LAD) lookup, built lazily from GJ.features. Returns ''
+// if the ward isn't found.
+const _ladByWard = {};
+function ladOf(wn) {
+  if (typeof GJ === 'undefined' || !GJ.features) return '';
+  if (Object.keys(_ladByWard).length === 0) {
+    GJ.features.forEach(f => {
+      const p = f.properties || {};
+      if (p.WD24NM) _ladByWard[norm(p.WD24NM)] = p.LAD || '';
+    });
+  }
+  return _ladByWard[norm(wn)] || '';
 }
 function ramp(t, inv) {
   if (inv) t = 1 - t;
@@ -1026,6 +1028,7 @@ let wLyr = null, selW = null, curOv = 'none';
 let WARD_DATA = {};
 let WARD_DATA_BY_CODE = {};
 let focusedNbhd = 'all';   // neighbourhood focus: 'all' or key like 'sw'
+let focusedBorough = 'all'; // borough focus: 'all' or an LAD string (e.g. "City of Westminster")
 let showNbhdColors = false; // colored neighbourhood fills/borders start OFF (blank map on load)
 let spotlightMode = false; // hard-dim everything outside focused nbhd regardless of showNbhdColors
 let curOv2 = 'none';       // bivariate: secondary overlay indicator
@@ -1145,11 +1148,12 @@ function wstyle(wn, ov, state) {
   const nk = nbhdOf(wn), nb = nk ? NEIGHBOURHOODS[nk] : null;
   const shaded = !!(nk && shadedNbhds.has(nk));
 
-  // Neighbourhood focus dimming — fade wards not in the focused neighbourhood.
-  // Spotlight mode always dims out-of-focus areas, regardless of shading.
-  const outOfFocus = focusedNbhd && focusedNbhd !== 'all' && nk !== focusedNbhd;
-  const dimmed = outOfFocus && (shaded || spotlightMode);
-  const spot   = outOfFocus && spotlightMode;
+  // Focus dimming — neighbourhood focus AND borough focus both fade non-matching wards.
+  const outOfNbhd    = focusedNbhd && focusedNbhd !== 'all' && nk !== focusedNbhd;
+  const outOfBorough = focusedBorough && focusedBorough !== 'all' && ladOf(wn) !== focusedBorough;
+  const outOfFocus   = outOfNbhd || outOfBorough;
+  const dimmed = outOfFocus && (shaded || spotlightMode || outOfBorough);
+  const spot   = outOfFocus && (spotlightMode || outOfBorough);
 
   // Black border for hover + selected states so the interactive ward is unmistakable.
   const isFocus = state === 'hover' || state === 'selected';
@@ -1674,15 +1678,15 @@ Object.entries(NEIGHBOURHOODS).forEach(([k, nb]) => {
   r.className = 'lrow';
   r.innerHTML = `<div style="width:11px;height:11px;border-radius:3px;border:2px solid ${nb.color};background:${nb.bg};flex-shrink:0"></div><span class="lname" style="font-size:12px">${nb.label}</span><input type="checkbox" style="accent-color:${nb.color}">`;
   r.querySelector('input').addEventListener('change', e => {
-    if (!wLyr) return;
     const on = e.target.checked;
     b.classList.toggle('on', on);
     if (on) shadedNbhds.add(k); else shadedNbhds.delete(k);
-    // Restyle wards in this neighbourhood
-    wLyr.eachLayer(l => {
-      if (nbhdOf(l.feature.properties.WD24NM) === k)
-        l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM)));
-    });
+    // Full restyle — guarantees every ward repaints (avoids stale state if a
+    // ward's nbhd mapping slipped through due to name edge-cases).
+    if (typeof _restyleAll === 'function') _restyleAll();
+    else if (wLyr) wLyr.eachLayer(l =>
+      l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+    if (typeof renderNbhdTable === 'function') renderNbhdTable();
   });
   nfiltersEl.appendChild(r);
 });
@@ -1694,6 +1698,34 @@ document.getElementById('tb').addEventListener('change',  e => {
   if (e.target.checked) { boroughL.addTo(map); boroughL.bringToFront(); }
   else { map.removeLayer(boroughL); }
 });
+
+// ── Borough focus dropdown — populate from the ward GeoJSON LAD property ──
+(function initBoroughFocus() {
+  const sel = document.getElementById('borough-focus');
+  if (!sel || typeof GJ === 'undefined' || !GJ.features) return;
+  const lads = [...new Set(GJ.features.map(f => (f.properties || {}).LAD).filter(Boolean))].sort();
+  lads.forEach(lad => {
+    const opt = document.createElement('option');
+    opt.value = lad;
+    opt.textContent = lad;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', e => {
+    focusedBorough = e.target.value || 'all';
+    if (typeof _restyleAll === 'function') _restyleAll();
+    else if (wLyr) wLyr.eachLayer(l =>
+      l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+    // Zoom to the focused borough's wards
+    if (focusedBorough !== 'all' && wLyr) {
+      const matched = wLyr.getLayers().filter(l =>
+        (l.feature.properties || {}).LAD === focusedBorough);
+      if (matched.length) {
+        const g = L.featureGroup(matched);
+        map.fitBounds(g.getBounds(), { padding:[30,30], maxZoom:12 });
+      }
+    }
+  });
+})();
 document.getElementById('tnc').addEventListener('change', e => {
   showNbhdColors = e.target.checked;
   if (showNbhdColors) {
@@ -2174,11 +2206,20 @@ function buildEmbeddedLSOALayer() {
         showLSOA(feat);
       });
       lyr.on('mouseover', e => {
-        if (p.code !== selLSOA) lyr.setStyle(imdStyle(feat, 'hover'));
+        // When a ward overlay is active (univariate or bivariate), don't repaint
+        // LSOAs on hover — the user wants to see the ward choropleth, not have
+        // it punched through by stray LSOA hover fills. Tooltip still fires.
+        const ovActive = (typeof curOv !== 'undefined' && curOv !== 'none') ||
+                         (typeof curOv2 !== 'undefined' && curOv2 !== 'none');
+        if (p.code !== selLSOA && !ovActive) lyr.setStyle(imdStyle(feat, 'hover'));
         const decStr = p.imd_decile ? `IMD decile ${p.imd_decile}` : '';
         lyr.bindTooltip(`<b style="font-size:11px">${p.name}</b><br><span style="font-size:10px;color:#888">${p.ward}</span>${decStr ? '<br><span style="font-size:10px">'+decStr+'</span>' : ''}`, {sticky:true, opacity:.94}).openTooltip(e.latlng);
       });
-      lyr.on('mouseout', () => { if (p.code !== selLSOA) lyr.setStyle(imdStyle(feat, 'default')); });
+      lyr.on('mouseout', () => {
+        const ovActive = (typeof curOv !== 'undefined' && curOv !== 'none') ||
+                         (typeof curOv2 !== 'undefined' && curOv2 !== 'none');
+        if (p.code !== selLSOA && !ovActive) lyr.setStyle(imdStyle(feat, 'default'));
+      });
     }
   });
 }
@@ -2421,35 +2462,24 @@ function renderNbhdTable() {
     host.innerHTML = '<div class="data-note">Loading ward data\u2026</div>';
     return;
   }
-  const key = (document.getElementById('nbhd-ov') || {}).value || 'census_bad_health_pct';
-  const agg = _nbhdAgg(key);
-  const cfg = NBHD_OV_LABELS[key] || {};
 
+  // Simplified cards: colour header + ward count + ward chips. No indicator.
   const cards = Object.entries(NEIGHBOURHOODS).map(([k, nb]) => {
-    const a = agg[k] || {};
-    const valTxt = _fmtNbhdVal(key, a.val);
-    const popTxt = a.pop ? Math.round(a.pop).toLocaleString() : '\u2014';
-    const lsoaTxt = (a.core20 != null && a.totalLsoa != null)
-      ? `${a.core20}/${a.totalLsoa}` : '\u2014';
-    const crimeTxt = a.crime ? Math.round(a.crime).toLocaleString() : '\u2014';
-    const chips = (a.wards || []).map(w =>
-      `<span class="nbhd-ward-chip" data-ward="${(w.name||'').replace(/"/g,'&quot;')}">${w.name}</span>`
+    const wardNames = nb.wards;
+    const chips = wardNames.map(w =>
+      `<span class="nbhd-ward-chip" data-ward="${w.replace(/"/g,'&quot;')}">${w}</span>`
     ).join('');
     const isFocus = focusedNbhd === k ? ' focused' : '';
+    const isShaded = shadedNbhds.has(k);
     return `
       <div class="nbhd-card${isFocus}" data-nbhd="${k}">
         <div class="nbhd-hdr" style="background:${nb.color}">
           <div class="nbhd-swatch"></div>
           <div>${nb.label}</div>
-          <div class="nbhd-val" title="${cfg.l || key}">${valTxt}</div>
+          <div class="nbhd-val" style="font-size:10px;opacity:0.9">${isShaded ? 'shaded' : ''}</div>
         </div>
         <div class="nbhd-body">
-          <div class="nbhd-stats">
-            <div class="k">Wards</div><div class="v">${a.nWards || 0}</div>
-            <div class="k">Population</div><div class="v">${popTxt}</div>
-            <div class="k">Core20 LSOAs</div><div class="v">${lsoaTxt}</div>
-            <div class="k">Crime (12 mo.)</div><div class="v">${crimeTxt}</div>
-          </div>
+          <div style="font-size:11px;color:#666;margin-bottom:6px">${wardNames.length} wards</div>
           <div class="nbhd-wards">${chips}</div>
         </div>
       </div>`;
@@ -2474,10 +2504,6 @@ function renderNbhdTable() {
     });
   });
 }
-
-document.addEventListener('change', e => {
-  if (e.target && e.target.id === 'nbhd-ov') renderNbhdTable();
-});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FILL / BORDER SLIDERS — live restyle so fills & borders can be stacked
@@ -2854,4 +2880,4 @@ loadData();
 })();
 </script>
 </body>
-</html>                                                                                                                                                                                                                                                                                                                                                                         
+</html>

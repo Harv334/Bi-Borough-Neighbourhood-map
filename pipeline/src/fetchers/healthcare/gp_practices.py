@@ -51,7 +51,8 @@ class GpPracticesFetcher(BaseFetcher):
         """Download the latest EPRACCUR zip and return a DataFrame of all UK practices."""
         cache = self.cache_dir / "epraccur.zip"
         if not cache.exists():
-            # NHS Digital's CDN 403s the default python-requests UA.
+            # NHS Digital fronts this with Cloudflare which 403s python-requests
+            # defaults. Full browser-like header set + Referer gets us through.
             headers = {
                 "User-Agent": (
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -59,8 +60,18 @@ class GpPracticesFetcher(BaseFetcher):
                     "Chrome/124.0.0.0 Safari/537.36"
                 ),
                 "Accept": "application/zip,application/octet-stream,*/*",
+                "Accept-Language": "en-GB,en;q=0.9",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Referer": "https://digital.nhs.uk/services/organisation-data-service/export-data-files/csv-downloads/gp-and-gp-practice-related-data",
+                "Connection": "keep-alive",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "same-origin",
+                "Upgrade-Insecure-Requests": "1",
             }
-            r = requests.get(EPRACCUR_URL, timeout=60, headers=headers)
+            sess = requests.Session()
+            sess.headers.update(headers)
+            r = sess.get(EPRACCUR_URL, timeout=60, allow_redirects=True)
             r.raise_for_status()
             cache.write_bytes(r.content)
 

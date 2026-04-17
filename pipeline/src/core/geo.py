@@ -1,9 +1,8 @@
 """
-Geo helpers shared by all fetchers.
-
-Two main jobs:
-  1. Coordinate transforms (BNG <-> WGS84)
-  2. Point-in-polygon assignment of POIs to wards / LSOAs / boroughs
+Geometry helpers:
+  - BNG <-> WGS84 coordinate conversion
+  - PolygonIndex for point-in-polygon lookup (STRtree-backed)
+  - load_boundary(): cached access to wards/lsoa/boroughs GeoJSON
 """
 from __future__ import annotations
 
@@ -15,22 +14,19 @@ from pyproj import Transformer
 from shapely.geometry import Point, shape
 from shapely.strtree import STRtree
 
-# Reusable transformers (creating these is expensive, so cache)
-_BNG_TO_WGS84 = Transformer.from_crs("EPSG:27700", "EPSG:4326", always_xy=True)
-_WGS84_TO_BNG = Transformer.from_crs("EPSG:4326", "EPSG:27700", always_xy=True)
+_BNG_TO_WGS84 = Transformer.from_crs(27700, 4326, always_xy=True)
+_WGS84_TO_BNG = Transformer.from_crs(4326, 27700, always_xy=True)
 
 
-def bng_to_wgs84(easting: float, northing: float) -> tuple[float, float]:
-    """British National Grid -> WGS84. Returns (lng, lat)."""
-    return _BNG_TO_WGS84.transform(easting, northing)
+def bng_to_wgs84(e: float, n: float) -> tuple[float, float]:
+    lng, lat = _BNG_TO_WGS84.transform(e, n)
+    return lat, lng
 
 
-def wgs84_to_bng(lng: float, lat: float) -> tuple[float, float]:
-    """WGS84 -> British National Grid. Returns (easting, northing)."""
+def wgs84_to_bng(lat: float, lng: float) -> tuple[float, float]:
     return _WGS84_TO_BNG.transform(lng, lat)
 
 
-# ─── Point-in-polygon assignment ──────────────────────────────────────────
 class PolygonIndex:
     """Wraps a GeoJSON FeatureCollection for fast point-in-polygon lookup.
 
@@ -45,18 +41,28 @@ class PolygonIndex:
         self._tree = STRtree(self._geoms)
 
     @classmethod
-    def from_geojson_file(cls, path: Path | str) -> "PolygonIndex":
+    def from_geojson_file(cls, path) -> "PolygonIndex":
         with open(path, encoding="utf-8") as f:
             fc = json.load(f)
         return cls(fc["features"])
 
-    def find(self, lng: float, lat: float) -> dict | None:
+    def find(self, lng: float, lat: float):
         """Returns the first containing polygon's properties, or None."""
         pt = Point(lng, lat)
         for idx in self._tree.query(pt):
             if self._geoms[idx].contains(pt):
                 return self._props[idx]
         return None
+
+    @property
+    def features(self) -> list[dict]:
+        """Reconstruct GeoJSON-style features for callers that need geometry +
+        properties together (e.g. police_uk polygon-string builder)."""
+        from shapely.geometry import mapping
+        return [
+            {"type": "Feature", "geometry": mapping(g), "properties": p}
+            for g, p in zip(self._geoms, self._props)
+        ]
 
 
 @lru_cache(maxsize=4)

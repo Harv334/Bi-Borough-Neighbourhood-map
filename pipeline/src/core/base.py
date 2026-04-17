@@ -113,3 +113,32 @@ class BaseFetcher(ABC):
             f"{out_path.relative_to(self.repo_root)} in {duration:.1f}s"
         )
         return result
+
+
+# ─── Helper: browser-like requests session ─────────────────────────────────
+# Many gov.uk / NHS hosts sit behind Cloudflare or Akamai which 403 the default
+# python-requests User-Agent. Use this session for those fetchers instead of
+# raw `requests.get`.
+def browser_session(referer: str | None = None):
+    """Return a requests.Session with a full browser header set.
+
+    Pass a page-ish `referer` URL if the host checks it (some do).
+    """
+    import requests
+    sess = requests.Session()
+    sess.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                  "image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-GB,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+    })
+    if referer:
+        sess.headers["Referer"] = referer
+    return sess

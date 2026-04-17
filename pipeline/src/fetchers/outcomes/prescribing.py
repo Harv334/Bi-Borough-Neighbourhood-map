@@ -23,7 +23,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-from ...core import BaseFetcher
+from ...core import BaseFetcher, browser_session
 
 # OpenPrescribing measure IDs we care about
 MEASURES = {
@@ -66,7 +66,7 @@ class PrescribingFetcher(BaseFetcher):
                     f"{API_BASE}/measure_by_sicbl/"
                     f"?org={ICB_CODE}&measure={measure_id}&format=csv"
                 )
-                r = requests.get(url, timeout=60)
+                r = self._sess.get(url, timeout=60)
                 r.raise_for_status()
                 cache.write_bytes(r.content)
                 time.sleep(0.5)  # be polite

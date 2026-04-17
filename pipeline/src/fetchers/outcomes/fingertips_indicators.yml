@@ -26,24 +26,28 @@ indicators:
     description: Percentage of adults (aged 18+) classified as overweight or obese
   - id: 90323
     short_name: obesity_year6
-    description: Year 6: Prevalence of obesity (including severe obesity)
+    description: "Year 6: Prevalence of obesity (including severe obesity)"
+
   - id: 92588
     short_name: physical_activity_adults
     description: Percentage of physically active adults
   - id: 241
     short_name: hypertension_qof
-    description: Hypertension: QOF prevalence (all ages)
+    description: "Hypertension: QOF prevalence (all ages)"
+
 
   # ─── Mental health ──────────────────────────────────────────────
   - id: 848
     short_name: depression_qof
-    description: Depression: QOF recorded prevalence (18+)
+    description: "Depression: QOF recorded prevalence (18+)"
+
   - id: 41001
     short_name: suicide_rate
     description: Suicide rate (Persons, age standardised)
   - id: 90813
     short_name: severe_mental_illness_qof
-    description: Severe mental illness: QOF recorded prevalence
+    description: "Severe mental illness: QOF recorded prevalence"
+
 
   # ─── Children & young people ────────────────────────────────────
   - id: 30307
@@ -59,7 +63,8 @@ indicators:
   # ─── Vaccination & screening ────────────────────────────────────
   - id: 30309
     short_name: mmr_2_doses_age5
-    description: Population vaccination coverage: MMR for two doses (5 years old)
+    description: "Population vaccination coverage: MMR for two doses (5 years old)"
+
   - id: 91361
     short_name: flu_vaccination_65plus
     description: Flu vaccination coverage (aged 65+)

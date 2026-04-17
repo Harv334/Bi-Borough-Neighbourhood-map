@@ -19,12 +19,20 @@ import requests
 import yaml
 from pathlib import Path
 
-from ...core import BaseFetcher, get_lookup, normalise_postcode
+from ...core import BaseFetcher, browser_session, get_lookup, normalise_postcode
 
 NHSBSA_PATTERN = "https://www.nhsbsa.nhs.uk/sites/default/files/{ym}/edispensary.csv"
 
 
 class PharmaciesFetcher(BaseFetcher):
+    _session = None
+
+    @property
+    def _sess(self):
+        if type(self)._session is None:
+            type(self)._session = browser_session(referer="https://www.nhsbsa.nhs.uk/")
+        return type(self)._session
+
     source_id = "pharmacies"
     category = "healthcare"
     required_cols = ["code", "name", "addr", "postcode", "lat", "lng",
@@ -42,7 +50,7 @@ class PharmaciesFetcher(BaseFetcher):
             month = (now.month - delta - 1) % 12 + 1
             ym = f"{year}-{month:02d}"
             url = NHSBSA_PATTERN.format(ym=ym)
-            r = requests.get(url, timeout=30)
+            r = self._sess.get(url, timeout=30)
             if r.status_code == 200 and len(r.content) > 1000:
                 cache.write_bytes(r.content)
                 return pd.read_csv(cache, dtype=str)

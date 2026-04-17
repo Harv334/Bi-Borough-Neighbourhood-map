@@ -133,11 +133,26 @@ def write_atomic(path: Path, text: str) -> None:
         os.fsync(f.fileno())
     os.replace(tmp, path)
 
+def _scrub_nan(obj):
+    """Recursively replace NaN/Infinity with None so JSON is browser-parseable."""
+    import math
+    if isinstance(obj, float):
+        if math.isnan(obj) or math.isinf(obj):
+            return None
+        return obj
+    if isinstance(obj, dict):
+        return {k: _scrub_nan(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_scrub_nan(v) for v in obj]
+    return obj
+
 def write_json_atomic(path: Path, data, pretty: bool = False) -> None:
+    data = _scrub_nan(data)
+    # allow_nan=False so we error loudly if any NaN snuck through (browser JSON.parse rejects NaN)
     if pretty:
-        s = json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True)
+        s = json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True, allow_nan=False)
     else:
-        s = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+        s = json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
     write_atomic(path, s)
 
 def write_parquet_atomic(path: Path, df: "pd.DataFrame") -> None:

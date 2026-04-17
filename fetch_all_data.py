@@ -640,11 +640,37 @@ def _cen_find(df: pd.DataFrame, *kws, exclude=()) -> str | None:
 
 
 def _cen_findall(df: pd.DataFrame, *kws, exclude=()) -> list[str]:
-    """All columns whose lowercased name contains ALL kws and no excludes."""
-    out = []
+    """All columns whose lowercased name contains ALL kws and no excludes,
+    with parent/child de-duplication.
+
+    Nomis Census tables use ": " as a hierarchy separator, so the naive
+    match for "owned" in TS054 hits BOTH the "Tenure of household: Owned"
+    parent AND its "...: Owned: Owns outright" / "...: Owns with a mortgage"
+    children. Summing all three double-counts the parent.
+
+    Resolution: when a matched column is a strict descendant of another
+    matched column (same prefix followed by ": "), drop the descendant.
+    This keeps parent totals and returns leaves only when no parent
+    matched the keywords.
+    """
+    raw = []
     for c in df.columns:
         cl = c.lower()
         if all(k.lower() in cl for k in kws) and not any(e.lower() in cl for e in exclude):
+            raw.append(c)
+    if len(raw) <= 1:
+        return raw
+    # Drop any column that is a strict descendant of another matched column.
+    out = []
+    for c in raw:
+        is_descendant = False
+        for other in raw:
+            if other == c:
+                continue
+            if c.startswith(other + ": "):
+                is_descendant = True
+                break
+        if not is_descendant:
             out.append(c)
     return out
 
@@ -676,9 +702,11 @@ def run_census2021() -> pd.DataFrame:
         return pd.DataFrame()
 
     pop_col = (_cen_find(t001, "observation")
+               or _cen_find(t001, "residence type", "total")
                or _cen_find(t001, "total", "residents")
                or _cen_find(t001, "age: total")
-               or _cen_find(t001, "age", "total"))
+               or _cen_find(t001, "age", "total")
+               or _cen_find(t001, "total"))
     out = pd.DataFrame({
         "LSOA21CD": t001[code_col].astype(str).str.strip(),
     })
@@ -1144,6 +1172,17 @@ def build_ward_data() -> dict:
         for wd, n in gps.groupby("WD25CD").size().items():
             if wd:
                 _get(wd)["indicators"]["gp_practice_count"] = int(n)
+        # Named GP list per ward (for ward-profile download)
+        for wd, grp in gps.groupby("WD25CD"):
+            if not wd:
+                continue
+            _get(wd)["gp_list"] = [
+                {"name": str(r.get("name", "") or ""),
+                 "addr": str(r.get("addr", "") or ""),
+                 "postcode": str(r.get("postcode", "") or ""),
+                 "tel": str(r.get("tel", "") or "")}
+                for r in grp.to_dict("records")
+            ]
         sources["gp"] = "NHS Digital ODS"
 
     pharm = _read_parquet_opt(DATA_DIR / "healthcare" / "pharmacies.parquet")
@@ -1151,6 +1190,16 @@ def build_ward_data() -> dict:
         for wd, n in pharm.groupby("WD25CD").size().items():
             if wd:
                 _get(wd)["indicators"]["pharmacy_count"] = int(n)
+        # Named pharmacy list per ward
+        for wd, grp in pharm.groupby("WD25CD"):
+            if not wd:
+                continue
+            _get(wd)["pharmacy_list"] = [
+                {"name": str(r.get("name", "") or ""),
+                 "addr": str(r.get("addr", "") or ""),
+                 "postcode": str(r.get("postcode", "") or "")}
+                for r in grp.to_dict("records")
+            ]
         sources["pharmacy"] = "NHS BSA"
 
     crime = _read_parquet_opt(DATA_DIR / "crime" / "police_uk_crime.parquet")
@@ -1158,6 +1207,13 @@ def build_ward_data() -> dict:
         for wd, n in crime.groupby("WD25CD").size().items():
             if wd:
                 _get(wd)["indicators"]["crime_total"] = int(n)
+        # Per-category crime breakdown (violence, theft, drugs, etc.)
+        if "category" in crime.columns:
+            for (wd, cat), n in crime.groupby(["WD25CD", "category"]).size().items():
+                if not wd or not cat:
+                    continue
+                w = _get(wd)
+                w.setdefault("crime_by_category", {})[str(cat)] = int(n)
         sources["crime"] = "police.uk"
 
     ft = _read_parquet_opt(DATA_DIR / "outcomes" / "fingertips.parquet")
@@ -1184,10 +1240,13 @@ def build_ward_data() -> dict:
         # (most-common) ward across postcodes in that LSOA wins.
         lookup = get_postcode_lookup()
         from collections import Counter, defaultdict
+        # get_postcode_lookup() returns {pc: (lat, lng, LSOA21CD, LAD25CD, WD25CD)}
         lsoa_to_ward_votes = defaultdict(Counter)
         for rec in lookup.values():
-            lc = rec.get("LSOA21CD") or ""
-            wd = rec.get("WD25CD") or ""
+            if not isinstance(rec, (tuple, list)) or len(rec) < 5:
+                continue
+            lc = rec[2] or ""
+            wd = rec[4] or ""
             if lc and wd:
                 lsoa_to_ward_votes[lc][wd] += 1
         lsoa_to_ward = {lc: votes.most_common(1)[0][0]
@@ -1200,6 +1259,9 @@ def build_ward_data() -> dict:
         ))
         pct_cols = [c for c in cen.columns if c.endswith("_pct")]
         from collections import defaultdict as _dd
+        # Weighted numerator/denominator: uses LSOA population when present,
+        # otherwise a weight of 1.0 per LSOA (unweighted mean). This keeps the
+        # fetcher producing ward-level %s even when TS001 pop is missing.
         ward_num = _dd(lambda: _dd(float))
         ward_den = _dd(lambda: _dd(float))
         ward_pop_sum = _dd(float)
@@ -1212,11 +1274,12 @@ def build_ward_data() -> dict:
             pop = pop_by_lsoa.get(lc, 0) or 0
             if pop > 0:
                 ward_pop_sum[wd] += float(pop)
+            weight = float(pop) if pop > 0 else 1.0
             for pc in pct_cols:
                 v = row[pc]
-                if pd.notna(v) and pop > 0:
-                    ward_num[wd][pc] += float(v) * float(pop)
-                    ward_den[wd][pc] += float(pop)
+                if pd.notna(v):
+                    ward_num[wd][pc] += float(v) * weight
+                    ward_den[wd][pc] += weight
 
         for wd, w in wards.items():
             if ward_pop_sum.get(wd, 0) > 0:
@@ -1225,6 +1288,41 @@ def build_ward_data() -> dict:
                 den = ward_den[wd].get(pc, 0)
                 if den > 0:
                     w["indicators"][pc] = round(ward_num[wd][pc] / den, 2)
+
+    # --- Core20: ward is Core20 if any of its LSOAs is in IMD decile 1-2 -----
+    # NHS Core20PLUS5 framework definition.
+    imd = _read_parquet_opt(DATA_DIR / "demographics" / "imd2025.parquet")
+    if imd is not None and "imd_decile" in imd.columns:
+        # Reuse the LSOA->ward map built for census; rebuild if census was absent.
+        if "lsoa_to_ward" not in locals():
+            lookup = get_postcode_lookup()
+            from collections import Counter as _Ctr, defaultdict as _dd2
+            votes = _dd2(_Ctr)
+            for rec in lookup.values():
+                if isinstance(rec, (tuple, list)) and len(rec) >= 5:
+                    lc, wd = rec[2] or "", rec[4] or ""
+                    if lc and wd:
+                        votes[lc][wd] += 1
+            lsoa_to_ward = {lc: v.most_common(1)[0][0] for lc, v in votes.items()}
+        core20_wards: set = set()
+        n_core20_lsoas: dict = {}
+        n_ward_lsoas: dict = {}
+        for _, r in imd.iterrows():
+            d = r.get("imd_decile")
+            lc = str(r.get("LSOA21CD") or "")
+            wd = lsoa_to_ward.get(lc)
+            if not wd:
+                continue
+            n_ward_lsoas[wd] = n_ward_lsoas.get(wd, 0) + 1
+            if pd.notna(d) and int(d) in (1, 2):
+                core20_wards.add(wd)
+                n_core20_lsoas[wd] = n_core20_lsoas.get(wd, 0) + 1
+        for wd, w in wards.items():
+            w["is_core20"] = wd in core20_wards
+            if wd in n_ward_lsoas:
+                w["indicators"]["core20_lsoa_count"] = n_core20_lsoas.get(wd, 0)
+                w["indicators"]["total_lsoa_count"] = n_ward_lsoas[wd]
+        sources["core20"] = "IMD2025 deciles 1-2 per LSOA"
 
     return {
         "wards": wards,
@@ -1252,14 +1350,16 @@ def build_lsoa_data() -> dict:
                             else (None if pd.isna(v) else v))
             out[code] = rec
 
-    # Merge census 2021 LSOA-level fields onto the same dict
+    # Merge census 2021 LSOA-level fields onto the same dict. Only merge onto
+    # LSOAs that already exist (scoped to NW London by the IMD step); don't
+    # add E&W LSOAs outside our scope.
     cen = _read_parquet_opt(DATA_DIR / "demographics" / "census2021.parquet")
     if cen is not None and not cen.empty:
         for _, row in cen.iterrows():
             code = str(row["LSOA21CD"])
-            if not code:
+            if not code or code not in out:
                 continue
-            rec = out.setdefault(code, {})
+            rec = out[code]
             for col in cen.columns:
                 if col == "LSOA21CD":
                     continue

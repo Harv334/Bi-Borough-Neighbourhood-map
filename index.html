@@ -330,6 +330,18 @@
 
 
           <div id="data-vintage" style="margin-top:10px;font-size:10px;color:#aaa;line-height:1.5"></div>
+
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#333;font-weight:500">
+              <input type="checkbox" id="core20-toggle" style="cursor:pointer">
+              <span>Highlight Core20 wards</span>
+            </label>
+            <div style="font-size:10px;color:#888;margin-top:4px;line-height:1.45">
+              NHS Core20PLUS5: ward has at least 1 LSOA in IMD deciles 1-2.
+              Highlighted wards show a magenta outline.
+            </div>
+            <div id="core20-count" style="font-size:10px;color:#666;margin-top:3px"></div>
+          </div>
         </div>
       </div>
 
@@ -1011,6 +1023,28 @@ function ovColor(wn, ovKey) {
 // Track which neighbourhoods are hidden via filter checkboxes
 const hiddenNbhds = new Set();
 
+// Core20 overlay state + helper
+let showCore20Overlay = false;
+function isCore20Ward(wn) {
+  if (typeof WARD_DATA === 'undefined' || !WARD_DATA) return false;
+  const wards = WARD_DATA.wards || WARD_DATA;
+  for (const k in wards) {
+    const w = wards[k];
+    if (w && w.name === wn) return !!w.is_core20;
+  }
+  return false;
+}
+function applyCore20Outline(style, wn) {
+  if (!showCore20Overlay) return style;
+  if (!isCore20Ward(wn)) return style;
+  return Object.assign({}, style, {
+    color: '#C4003C',
+    weight: Math.max(style.weight || 0, 3.5),
+    opacity: 0.95,
+    dashArray: '6 3'
+  });
+}
+
 function wstyle(wn, ov, state) {
   const nk = nbhdOf(wn), nb = nk ? NEIGHBOURHOODS[nk] : null;
 
@@ -1027,7 +1061,7 @@ function wstyle(wn, ov, state) {
     const fo = dimmed ? 0.02 : Math.min(0.95, baseFo * fillOpacityMult);
     const w  = dimmed ? 1.0  : baseW * borderWeightMult;
     const op = dimmed ? 0.3  : 0.9;
-    return { color:stroke, weight:w, fillColor:stroke, fillOpacity:fo, opacity:op };
+    return applyCore20Outline({ color:stroke, weight:w, fillColor:stroke, fillOpacity:fo, opacity:op }, wn);
   }
   const fill = ovColor(wn, ov);
   // When overlay is active, selected ward just gets a heavier border — not a different fill opacity
@@ -1037,7 +1071,7 @@ function wstyle(wn, ov, state) {
   const fo = dimmed ? 0.05 : Math.min(0.95, baseFo * fillOpacityMult);
   const w  = dimmed ? 1.0  : baseW * borderWeightMult;
   const op = dimmed ? 0.3  : 0.85;
-  return { color:selBorder, weight:w, fillColor:fill, fillOpacity:fo, opacity:op };
+  return applyCore20Outline({ color:selBorder, weight:w, fillColor:fill, fillOpacity:fo, opacity:op }, wn);
 }
 
 function pillClass(g) {
@@ -1192,6 +1226,38 @@ window.generateWardReport = function(wn) {
     </div>`;
   };
 
+  // Core20 flag + LSOA ratio
+  const isCore20 = !!(wdata && wdata.is_core20);
+  const c20L = inds.core20_lsoa_count, totL = inds.total_lsoa_count;
+  const core20Badge = isCore20
+    ? `<div style="display:inline-block;margin-top:8px;margin-left:6px;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;background:#fde6ee;color:#8b0035;border:1px solid #f0b5cb">Core20 ward</div>`
+    : '';
+
+  // Crime-by-category section
+  const cbc = (wdata && wdata.crime_by_category) || {};
+  const cbcEntries = Object.entries(cbc).sort((a,b) => b[1] - a[1]);
+  const crimeCatRows = cbcEntries.map(([cat, n]) => {
+    const label = cat.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<tr><td>${label}</td><td class="v">${n.toLocaleString()}</td></tr>`;
+  }).join('');
+  const crimeCatSection = crimeCatRows
+    ? `<section class="cat"><h3>Crime by category</h3><table class="kv">${crimeCatRows}</table></section>`
+    : '';
+
+  // GP practices named list
+  const gps = (wdata && wdata.gp_list) || [];
+  const gpRows = gps.map(g => `<tr><td><strong>${g.name || '-'}</strong><br><span style="font-size:10px;color:#777">${g.addr || ''} ${g.postcode || ''}</span></td><td class="v" style="font-size:11px;color:#666">${g.tel || ''}</td></tr>`).join('');
+  const gpListSection = gpRows
+    ? `<section class="cat"><h3>GP practices in this ward (${gps.length})</h3><table class="kv">${gpRows}</table></section>`
+    : '';
+
+  // Pharmacies named list
+  const phs = (wdata && wdata.pharmacy_list) || [];
+  const phRows = phs.map(p => `<tr><td><strong>${p.name || '-'}</strong></td><td class="v" style="font-size:11px;color:#666">${p.addr || ''} ${p.postcode || ''}</td></tr>`).join('');
+  const pharmacyListSection = phRows
+    ? `<section class="cat"><h3>Pharmacies in this ward (${phs.length})</h3><table class="kv">${phRows}</table></section>`
+    : '';
+
   const html = `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
@@ -1247,7 +1313,7 @@ window.generateWardReport = function(wn) {
     <div class="kicker">NW London ward report · ${today}</div>
     <h1>${wdata ? wdata.name : wn}</h1>
     <div class="sub">${borough || ''}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population: ' + population : ''}</div>
-    ${nb ? `<div class="nb">${nb.label}</div>` : ''}
+    ${nb ? `<div class="nb">${nb.label}</div>` : ''}${core20Badge}
   </div>
   <div class="headline">
     ${bigStat('Life expectancy', leVal !== null ? leVal.toFixed(1) : null, 'years')}
@@ -1264,6 +1330,9 @@ window.generateWardReport = function(wn) {
   </div>
   <div class="body">
     ${noData ? '<div class="no-data"><strong>No indicator data loaded.</strong><br>Run <code>python scripts/fetch_all_data.py</code> to populate ward_data.json, then reload the map.</div>' : catRows}
+    ${crimeCatSection}
+    ${gpListSection}
+    ${pharmacyListSection}
   </div>
   <div class="footer">
     <strong>Sources:</strong> OHID Fingertips (life expectancy, mortality), ONS Census 2021 (demographics, health), DLUHC IMD 2019, DWP (claimant count), police.uk (crime), NHS Digital (GP/pharmacy/dental registers).<br>
@@ -1838,6 +1907,42 @@ async function loadData() {
 // ═══════════════════════════════════════════════════════════════════════════
 setTimeout(() => map.invalidateSize(), 200);
 loadData();
+</script>
+
+<script>
+// Core20 toggle wiring
+(function initCore20Toggle() {
+  function wire() {
+    const cb = document.getElementById("core20-toggle");
+    if (!cb) return;
+    cb.addEventListener("change", e => {
+      showCore20Overlay = !!e.target.checked;
+      if (typeof wLyr !== "undefined" && wLyr) {
+        wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+      }
+    });
+    function updateCount() {
+      if (typeof WARD_DATA === "undefined" || !WARD_DATA) {
+        setTimeout(updateCount, 500);
+        return;
+      }
+      const wards = WARD_DATA.wards || WARD_DATA;
+      let c20 = 0, total = 0;
+      for (const k in wards) {
+        total++;
+        if (wards[k] && wards[k].is_core20) c20++;
+      }
+      const el = document.getElementById("core20-count");
+      if (el) el.textContent = c20 + " of " + total + " wards are Core20";
+    }
+    updateCount();
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wire);
+  } else {
+    wire();
+  }
+})();
 </script>
 </body>
 </html>

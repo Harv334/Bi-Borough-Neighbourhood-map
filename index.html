@@ -312,7 +312,6 @@
             </optgroup>
             <optgroup label="Environment &amp; access">
               <option value="fuel_poverty_pct">Fuel poverty % (DESNZ LILEE)</option>
-              <option value="ptai_score">PTAL — average PTAI score</option>
             </optgroup>
             <optgroup label="Economy (Census)">
               <option value="census_level4_qual_pct">Level 4+ qualifications %</option>
@@ -475,7 +474,6 @@ const CATS = [
   ]},
   { key: "environment",  label: "Environment & access", ico: "🚆", fields: [
     { k: "fuel_poverty_pct",                 l: "Fuel poverty % (DESNZ LILEE)",  g: "ward" },
-    { k: "ptai_score",                       l: "PTAL — average PTAI score",     g: "ward" },
   ]},
   { key: "health",       label: "Health (Census 2021, ward-level)", ico: "♥", fields: [
     { k: "census_good_health_pct",           l: "Good/very good health (%)",     g: "ward" },
@@ -1765,7 +1763,6 @@ function showLSOA(feat) {
       { k:'census_over85_pct',         l:'85 and over (%)' },
       // Environment & access
       { k:'fuel_poverty_pct',          l:'Fuel poverty (%) (DESNZ LILEE)' },
-      { k:'ptai_score',                l:'PTAL — average PTAI score' },
     ];
     censusRows = lsoaFields.map(f => {
       const val = inds[f.k];

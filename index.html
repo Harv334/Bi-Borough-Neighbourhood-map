@@ -191,7 +191,7 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-      <div class="nbfocus-bar" id="nbfocus-bar">
+      <div class="nbfocus-bar" id="nbfocus-bar" style="display:none">
         <button class="nbfocus-btn all active" data-nbhd="all" onclick="setNbhdFocus('all')">All wards</button>
       </div>
       <div class="sb-tabs">
@@ -1704,15 +1704,6 @@ Object.entries(NEIGHBOURHOODS).forEach(([k, nb]) => {
   b.style.cssText = `background:${nb.bg};color:${nb.color};border-color:${nb.color}`;
   b.onclick = () => setNbhdFocus(focusedNbhd === k ? 'all' : k);
   nbBadgesEl.appendChild(b);
-
-  // Focus bar button
-  const fb = document.createElement('button');
-  fb.className = 'nbfocus-btn';
-  fb.dataset.nbhd = k;
-  fb.textContent = nb.short;
-  fb.style.cssText = `background:${nb.bg};color:${nb.color};border-color:${nb.color}`;
-  fb.onclick = () => setNbhdFocus(focusedNbhd === k ? 'all' : k);
-  nbFocusBar.appendChild(fb);
 
   // Sidebar filter — unchecked by default; ticking shades that neighbourhood.
   const r = document.createElement('label');

@@ -982,7 +982,9 @@ def run_police_crime(months_back: int = 12) -> pd.DataFrame:
 
     boroughs_idx = load_boundary_index("boroughs")
 
-    # Build a polygon string (subsampled) per borough
+    # Build polygon strings (subsampled) per borough. MultiPolygons iterate
+    # every sub-polygon so detached landmasses are kept (e.g. Hounslow's main
+    # body is polygon index 7; coordinates[0][0] was a 4-point island).
     polys = []
     for feat in boroughs_idx.features:
         p = feat["properties"]
@@ -992,13 +994,16 @@ def run_police_crime(months_back: int = 12) -> pd.DataFrame:
             continue
         geom = feat["geometry"]
         if geom["type"] == "MultiPolygon":
-            ring = geom["coordinates"][0][0]
+            rings = [poly[0] for poly in geom["coordinates"]]
         else:
-            ring = geom["coordinates"][0]
+            rings = [geom["coordinates"][0]]
         # Boundaries are BNG — convert, subsample (URL len cap)
-        pts = [bng_to_wgs84(pt[0], pt[1]) for pt in ring[::5]]
-        poly_str = ":".join(f"{lat:.5f},{lng:.5f}" for lat, lng in pts)
-        polys.append((name, lad, poly_str))
+        for idx, ring in enumerate(rings):
+            pts = [bng_to_wgs84(pt[0], pt[1]) for pt in ring[::5]]
+            if len(pts) < 3:
+                continue  # degenerate, skip
+            poly_str = ":".join(f"{lat:.5f},{lng:.5f}" for lat, lng in pts)
+            polys.append((name, lad, idx, len(rings), poly_str))
 
     # 12 months lagged by 2 (publication delay)
     today = pd.Timestamp.utcnow().normalize()
@@ -1006,9 +1011,14 @@ def run_police_crime(months_back: int = 12) -> pd.DataFrame:
               for i in range(2, 2 + months_back)]
 
     all_crimes: list = []
-    for name, lad, poly in polys:
+    for name, lad, idx, total_rings, poly in polys:
         for ym in months:
-            cache = cache_dir / f"{lad}__{ym}.json"
+            # Keep existing single-polygon cache layout; MultiPolygons add
+            # a __p{idx} suffix so each sub-polygon caches independently.
+            if total_rings == 1:
+                cache = cache_dir / f"{lad}__{ym}.json"
+            else:
+                cache = cache_dir / f"{lad}__p{idx}__{ym}.json"
             # Cached files <= 3 bytes are empty responses from a bad earlier fetch;
             # retry those.
             if not cache.exists() or cache.stat().st_size <= 3:
@@ -1060,6 +1070,17 @@ def run_police_crime(months_back: int = 12) -> pd.DataFrame:
         })
     out = pd.DataFrame(rows)
     out_path = DATA_DIR / "crime" / "police_uk_crime.parquet"
+    # Safeguard: never clobber a good existing parquet with an empty one
+    # (network blocked, API down, polygon regression, etc).
+    if len(out) == 0 and out_path.exists():
+        try:
+            existing = pd.read_parquet(out_path)
+            if len(existing) > 0:
+                warn(f"police_uk_crime: fetched 0 rows but {out_path.name} "
+                     f"already has {len(existing):,} — keeping existing file.")
+                return existing
+        except Exception:
+            pass
     write_parquet_atomic(out_path, out)
     ok(f"police_uk_crime: {len(out):,} crimes -> {out_path.relative_to(REPO_ROOT)}")
     return out

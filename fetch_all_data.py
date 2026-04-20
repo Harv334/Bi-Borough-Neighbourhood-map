@@ -127,7 +127,10 @@ def rule(msg: str) -> None:  print("\n" + _c("1;34", f"─── {msg} " + "─"
 def write_atomic(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
-    with open(tmp, "w", encoding="utf-8") as f:
+    # newline="" disables Windows' default CRLF translation on text-mode writes,
+    # so files keep whatever line endings the `text` already contains (LF).
+    # Without this, splice_index_html() would churn every line in git diff.
+    with open(tmp, "w", encoding="utf-8", newline="") as f:
         f.write(text)
         f.flush()
         os.fsync(f.fileno())
@@ -577,9 +580,17 @@ def run_imd2025() -> pd.DataFrame:
 CENSUS_TABLES = [
     "TS001", "TS004", "TS007A", "TS021", "TS037", "TS038", "TS039",
     "TS044", "TS045", "TS054", "TS062", "TS066", "TS067",
-    # Phase-A expansion (2026-04): religion, language, travel, household,
-    # accommodation, country-of-birth detail, year-of-arrival.
-    "TS022", "TS024", "TS025", "TS041", "TS059", "TS061", "TS068",
+    # Phase-A expansion. Only tables that ship LSOA CSV + whose contents
+    # match our intended indicators remain.
+    #   TS025 = Household language (English/Welsh) — household-level.
+    #   TS061 = Method of travel to work — matches intent.
+    # Dropped (document here):
+    #   TS022 (Religion)                — no LSOA CSV
+    #   TS024 (Language)                — no LSOA CSV
+    #   TS041 — "Number of households" count only, not composition
+    #   TS059 — Hours worked, not accommodation type
+    #   TS068 — Schoolchild/student indicator, not year of arrival
+    "TS025", "TS061",
     # Note: TS009 was previously requested but its Nomis bulk zip has no
     # LSOA-level sheet. TS007A ("Age by five-year age bands") is the
     # canonical LSOA-granularity age source.
@@ -734,9 +745,11 @@ def run_census2021() -> pd.DataFrame:
     if pop_col:
         out["census_population"] = pd.to_numeric(t001[pop_col], errors="coerce")
 
-    # Helper: compute one metric from a table and merge onto `out` by LSOA
+    # Helper: compute one metric from a table and merge onto `out` by LSOA.
+    # silent=True suppresses the "column match failed" warning — useful when
+    # the caller has an explicit fallback branch right after.
     def attach(key: str, tab: str, num_kw_list: list[tuple], den_kw=("total",),
-               den_exclude=(), num_exclude=()):
+               den_exclude=(), num_exclude=(), silent: bool = False):
         nonlocal out
         t = tables.get(tab)
         if t is None:
@@ -751,7 +764,8 @@ def run_census2021() -> pd.DataFrame:
                     num_cols.append(c)
         den_col = _cen_find(t, *den_kw, exclude=den_exclude)
         if not num_cols or not den_col:
-            warn(f"  {tab}/{key}: num={len(num_cols)} den={den_col} - column match failed")
+            if not silent:
+                warn(f"  {tab}/{key}: num={len(num_cols)} den={den_col} - column match failed")
             return
         vals = _cen_pct(t, num_cols, den_col)
         df = pd.DataFrame({
@@ -791,8 +805,11 @@ def run_census2021() -> pd.DataFrame:
         out["census_working_age_pct"] = wa
 
     # TS004 country of birth ---------------------------------------------
+    # First attempt matches a "Not born in the UK" column directly; if that
+    # column doesn't exist we fall through to the 1 - UK derivation below,
+    # so suppress the column-match warning on the first pass.
     attach("census_born_outside_uk_pct", "TS004",
-           [("not born in the uk",)])
+           [("not born in the uk",)], silent=True)
     if "census_born_outside_uk_pct" not in out.columns:
         # Fallback: 1 - UK
         t = tables.get("TS004")
@@ -936,9 +953,13 @@ def run_census2021() -> pd.DataFrame:
            [("l7 ",), ("l8 ",), ("routine occupations",), ("semi-routine",)])
 
     # TS066 economic activity -------------------------------------------
+    # First attempt scopes the denominator to "economically active"; if the
+    # column schema doesn't match we fall through to the "all categories"
+    # total. Suppress the first-pass warning since the fallback is expected.
     attach("census_unemployed_pct", "TS066",
            [("unemployed",)],
-           den_kw=("economically active", "total"), den_exclude=())
+           den_kw=("economically active", "total"), den_exclude=(),
+           silent=True)
     if "census_unemployed_pct" not in out.columns:
         # Fallback: use "all categories" total
         attach("census_unemployed_pct", "TS066",
@@ -950,64 +971,35 @@ def run_census2021() -> pd.DataFrame:
     attach("census_level4_qual_pct", "TS067",
            [("level 4 qualifications",)])
 
-    # TS022 religion (one-line top-level categories) --------------------
-    # Categories: Christian / Buddhist / Hindu / Jewish / Muslim / Sikh /
-    # Other religion / No religion / Not answered. Parent rows are
-    # "Religion: <label>"; attach the five that matter for outreach.
-    attach("census_christian_pct",  "TS022", [("christian",)],
-           num_exclude=("no",))
-    attach("census_muslim_pct",     "TS022", [("muslim",)])
-    attach("census_hindu_pct",      "TS022", [("hindu",)])
-    attach("census_jewish_pct",     "TS022", [("jewish",)])
-    attach("census_no_religion_pct","TS022", [("no religion",)])
+    # Note on dropped Phase-A tables (documented for future revisit):
+    #   TS022 (Religion)    — Nomis bulk zip has no LSOA CSV sheet.
+    #   TS024 (Language)    — Nomis bulk zip has no LSOA CSV sheet.
+    #   TS041               — LSOA CSV only carries "Number of households"
+    #                         (total count), not one-person/lone-parent
+    #                         breakdown. Sub-category needs a different TS.
+    #   TS059               — LSOA CSV is hours worked, not accommodation
+    #                         type; accommodation table isn't shipped at LSOA.
+    #   TS068               — LSOA CSV is schoolchild/student indicator,
+    #                         not year-of-arrival. Migration-arrival tables
+    #                         aren't shipped at LSOA in the bulk zips.
+    # If Nomis re-ships these at LSOA in future, restore the attach() calls.
 
-    # TS024 main language ------------------------------------------------
-    # Top-level: English / Main language is not English. Sub-levels give
-    # South Asian / European / African / Arabic / Chinese / other groups
-    # and specific languages. We pull the "not English" umbrella and
-    # specific high-volume community languages for NW London outreach.
-    attach("census_english_main_pct",  "TS024",
-           [("main language is english",)],
-           num_exclude=("not",))
-    attach("census_non_english_main_pct","TS024",
-           [("main language is not english",)])
-    # Individual languages use the NOMIS hierarchy "Main language is not
-    # English: ... : Arabic" etc. The _cen_findall parent/child dedup
-    # picks the leaf if present; if not, match by terminal keyword.
-    attach("census_arabic_main_pct",   "TS024", [("arabic",)])
-    attach("census_bengali_main_pct",  "TS024", [("bengali",)])
-    attach("census_polish_main_pct",   "TS024", [("polish",)])
-    attach("census_portuguese_main_pct","TS024", [("portuguese",)])
-    attach("census_somali_main_pct",   "TS024", [("somali",)])
-    attach("census_urdu_main_pct",     "TS024", [("urdu",)])
-
-    # TS025 proficiency in English --------------------------------------
-    # Categories: Main language is English / Can speak English very well /
-    # ...well / ...not well / Cannot speak English. Low-proficiency sum
-    # is the most actionable outreach metric.
-    attach("census_english_not_well_pct",  "TS025",
-           [("cannot speak english",), ("does not speak english well",),
-            ("cannot speak english well",)])
-    attach("census_english_main_or_well_pct","TS025",
-           [("main language is english",), ("can speak english well",)],
-           num_exclude=("not",))
-
-    # TS041 household composition ---------------------------------------
-    # We want: one-person households, lone-parent households with
-    # dependent children, and one-person aged 66+ (proxy for "older
-    # people living alone").
-    attach("census_one_person_hh_pct", "TS041",
-           [("one person household",)])
-    attach("census_one_person_66plus_pct", "TS041",
-           [("one person household", "aged 66"), ("one person household: aged 66",)])
-    attach("census_lone_parent_hh_pct", "TS041",
-           [("lone parent",)])
-
-    # TS059 accommodation type ------------------------------------------
-    attach("census_flat_pct",         "TS059",
-           [("flat",)])
-    attach("census_whole_house_pct",  "TS059",
-           [("whole house or bungalow",)])
+    # TS025 household language (English/Welsh) --------------------------
+    # Despite the TS025 code (which in the Nomis catalogue is labelled
+    # "Proficiency in English"), the bulk LSOA zip actually ships
+    # household-language rows:
+    #   * "All adults in household have English/Welsh as a main language"
+    #   * "At least one but not all adults..."
+    #   * "No adults in household, but at least one person aged 3-15..."
+    #   * "No people in household have English/Welsh as a main language"
+    # We expose the top and bottom bands — "all adults English" and
+    # "no people English" — as outreach/low-proficiency indicators.
+    attach("census_english_hh_all_pct",  "TS025",
+           [("all adults in household",)],
+           den_kw=("total", "all households"))
+    attach("census_english_hh_none_pct", "TS025",
+           [("no people in household",)],
+           den_kw=("total", "all households"))
 
     # TS061 method of travel to work ------------------------------------
     # Active travel = walking + bicycle. Car = driving car/van +
@@ -1018,12 +1010,6 @@ def run_census2021() -> pd.DataFrame:
            [("driving a car",), ("passenger in a car",)])
     attach("census_public_transport_pct","TS061",
            [("underground",), ("train",), ("bus",), ("taxi",)])
-
-    # TS068 year of arrival in UK ---------------------------------------
-    # "Arrived 2011 or later" is the best proxy for recent arrivals that
-    # the MSDS / inclusion-health team cares about.
-    attach("census_arrived_2011plus_pct", "TS068",
-           [("arrived in the uk: 2011",), ("2011 to 2020",), ("2021 onwards",)])
 
     # Clean up + save ----------------------------------------------------
     out = out.dropna(subset=["LSOA21CD"]).drop_duplicates(subset=["LSOA21CD"])
@@ -2791,14 +2777,4 @@ def main() -> int:
                 SOURCES[s]()
             except Exception as e:
                 err(f"{s} failed: {type(e).__name__}: {e}")
-                # Keep going — we'd rather have partial outputs than zero.
-        info(f"Fetch phase done in {time.time() - start:.1f}s")
-
-    export_all()
-    print()
-    ok("All done. Refresh index.html in your browser.")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+                # Keep going — we'd rather 

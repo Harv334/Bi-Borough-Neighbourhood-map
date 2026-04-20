@@ -1137,6 +1137,305 @@ def run_claimant_count() -> pd.DataFrame:
 
 
 # ============================================================================
+# SOURCE 3b: DWP benefits (PIP / UC / ESA / Carer's Allowance / Pension Credit)
+# ----------------------------------------------------------------------------
+# NOMIS mirrors the headline DWP Stat-Xplore datasets at LSOA 2021 (TYPE298).
+# Pull the latest period per dataset, filter to NW London, merge into one
+# parquet with count + derived per-working-age rate columns.
+# ============================================================================
+DWP_DATASETS = [
+    # (nomis_id,     short_name,          human label)
+    ("NM_208_1",     "pip_cases",         "PIP: cases in payment"),
+    ("NM_210_1",     "uc_households",     "Universal Credit households on UC"),
+    ("NM_209_1",     "esa_claimants",     "ESA claimants"),
+    ("NM_189_1",     "carers_allowance",  "Carer's Allowance recipients"),
+    ("NM_193_1",     "pension_credit",    "Pension Credit claimants (65+)"),
+]
+
+def _nomis_discover_dims(dataset_id: str, cache_dir: "Path") -> list[str]:
+    """Return the list of dimension names for a NOMIS dataset, excluding
+    the mandatory 'geography' / 'date' / 'measures' axes. Result is cached
+    under cache_dir/<id>.dims.txt so we only hit the metadata endpoint once.
+    """
+    cache = cache_dir / f"{dataset_id}.dims.txt"
+    if cache.exists() and cache.stat().st_size > 0:
+        return [l for l in cache.read_text().splitlines() if l.strip()]
+    url = f"https://www.nomisweb.co.uk/api/v01/dataset/{dataset_id}.def.sdmx.json"
+    try:
+        r = requests.get(url, timeout=60)
+        r.raise_for_status()
+        j = r.json()
+    except Exception as e:
+        warn(f"  {dataset_id}: dim discovery failed ({e})")
+        return []
+    # The SDMX JSON nests: Structure -> KeyFamilies -> KeyFamily -> Components
+    #   -> Dimension -> @conceptRef (one per dim)
+    dims: list[str] = []
+    try:
+        kfs = j["structure"]["keyfamilies"]["keyfamily"]
+        if isinstance(kfs, list):
+            kfs = kfs[0]
+        comp = kfs["components"]["dimension"]
+        if isinstance(comp, dict):
+            comp = [comp]
+        for d in comp:
+            nm = (d.get("conceptref") or d.get("@conceptRef") or
+                  d.get("conceptRef")  or "").lower()
+            if nm and nm not in ("geography", "date", "measures"):
+                dims.append(nm)
+    except Exception as e:
+        warn(f"  {dataset_id}: couldn't parse dim list ({e})")
+        return []
+    cache.write_text("\n".join(dims) + "\n")
+    info(f"  {dataset_id}: dims = {dims}")
+    return dims
+
+
+def run_dwp_benefits() -> pd.DataFrame:
+    rule("NOMIS DWP benefits (PIP / UC / ESA / Carer's / Pension Credit, LSOA)")
+    cache_dir = CACHE_DIR / "dwp"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    merged: pd.DataFrame | None = None
+    periods: dict[str, str] = {}
+
+    for ds_id, short, _human in DWP_DATASETS:
+        cache = cache_dir / f"{ds_id}.csv"
+        # Discover this dataset's dimensions so we can pin each to "0" (Total).
+        dims = _nomis_discover_dims(ds_id, cache_dir)
+        dim_part = "".join(f"&{d}=0" for d in dims)
+
+        if not cache.exists() or cache.stat().st_size < 4096:
+            # Hit a LAD-level fallback if LSOA path fails or returns empty.
+            tried = []
+            for geo in ("TYPE298", "TYPE432"):  # LSOA2021, then LAD2022
+                url = (
+                    f"https://www.nomisweb.co.uk/api/v01/dataset/{ds_id}.data.csv"
+                    f"?geography={geo}&date=latest{dim_part}&measures=20100"
+                )
+                tried.append(url)
+                try:
+                    r = requests.get(url, timeout=180)
+                    r.raise_for_status()
+                    body = r.content
+                    info(f"  {short} ({geo}): {len(body)/1e6:.2f} MB")
+                    if len(body) > 4096:
+                        cache.write_bytes(body)
+                        break
+                except Exception as e:
+                    warn(f"  {short} ({geo}): fetch failed ({e})")
+                    continue
+                time.sleep(0.4)
+            if not cache.exists() or cache.stat().st_size < 4096:
+                warn(f"  {short}: both LSOA and LAD came back empty")
+                for u in tried:
+                    warn(f"    tried: {u}")
+                continue
+        try:
+            df = pd.read_csv(cache, dtype=str, low_memory=False)
+        except pd.errors.EmptyDataError:
+            warn(f"  {short}: cached CSV empty - skipping")
+            continue
+
+        need = {"GEOGRAPHY_CODE", "DATE", "OBS_VALUE"}
+        if not need.issubset(df.columns):
+            warn(f"  {short}: unexpected columns {list(df.columns)[:6]} - skipping")
+            continue
+
+        df["OBS_VALUE"] = pd.to_numeric(df["OBS_VALUE"], errors="coerce")
+        dates = sorted(df["DATE"].dropna().unique())
+        if not dates:
+            warn(f"  {short}: no dates in response - skipping")
+            continue
+        latest = dates[-1]
+        periods[short] = latest
+
+        # If we fell back to LAD, rows will use LAD25CD codes. Infer which axis.
+        sample_geo = str(df["GEOGRAPHY_CODE"].iloc[0]) if len(df) else ""
+        is_lsoa = sample_geo.startswith("E0") and len(sample_geo) == 9
+        geo_col = "LSOA21CD" if is_lsoa else "LAD25CD"
+
+        cut = (df[df["DATE"] == latest]
+                 .groupby("GEOGRAPHY_CODE", as_index=False)["OBS_VALUE"].sum()
+                 .rename(columns={"GEOGRAPHY_CODE": geo_col, "OBS_VALUE": short}))
+
+        if is_lsoa:
+            nwl_codes = globals().get("_NWL_LSOA_SET")
+            if isinstance(nwl_codes, set) and nwl_codes:
+                cut = cut[cut[geo_col].isin(nwl_codes)].copy()
+
+        info(f"  {short}: {len(cut):,} rows at {geo_col} level (period={latest})")
+
+        if merged is None:
+            merged = cut
+        elif geo_col in merged.columns:
+            merged = merged.merge(cut, on=geo_col, how="outer")
+        else:
+            # First merge was LSOA, this one is LAD (or vice versa) - skip.
+            warn(f"  {short}: geography mismatch with earlier dataset - skipping merge")
+            continue
+
+    if merged is None or merged.empty:
+        warn("dwp: no datasets returned any data - skipping write")
+        return pd.DataFrame()
+
+    # Derive per-working-age-pop rates if we landed at LSOA and have census.
+    if "LSOA21CD" in merged.columns:
+        cen_path = DATA_DIR / "demographics" / "census2021.parquet"
+        if cen_path.exists():
+            try:
+                cen = pd.read_parquet(cen_path)
+                wapop_col = None
+                if "census_working_age_pop" in cen.columns:
+                    wapop_col = "census_working_age_pop"
+                elif all(c in cen.columns for c in
+                         ("census_population", "census_age_under18_pct", "census_age_65plus_pct")):
+                    cen = cen.copy()
+                    cen["_wapop"] = (cen["census_population"] *
+                                     (100.0
+                                      - cen["census_age_under18_pct"].fillna(0)
+                                      - cen["census_age_65plus_pct"].fillna(0)) / 100.0)
+                    wapop_col = "_wapop"
+                if wapop_col:
+                    merged = merged.merge(
+                        cen[["LSOA21CD", wapop_col]].rename(columns={wapop_col: "_wapop"}),
+                        on="LSOA21CD", how="left")
+                    for short in ("pip_cases", "uc_households", "esa_claimants",
+                                  "carers_allowance"):
+                        if short in merged.columns:
+                            merged[f"{short}_rate_pct"] = (
+                                merged[short] / merged["_wapop"].replace(0, pd.NA) * 100
+                            ).round(2)
+                    merged = merged.drop(columns=["_wapop"])
+            except Exception as e:
+                warn(f"  rate calc skipped ({e})")
+
+    if periods:
+        merged["dwp_period"] = max(periods.values())
+
+    out_path = DATA_DIR / "economy" / "dwp_benefits.parquet"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    write_parquet_atomic(out_path, merged)
+    ok(f"dwp benefits: {len(merged):,} rows across {len(periods)} datasets "
+       f"-> {out_path.relative_to(REPO_ROOT)}")
+    return merged
+
+
+
+
+# ============================================================================
+# SOURCE 3c: QOF (Quality and Outcomes Framework) - practice-level prevalence
+# ----------------------------------------------------------------------------
+# NHS Digital publishes a practice-level prevalence CSV each year at
+#   https://files.digital.nhs.uk/.../PREVALENCE_<YY><YY>.csv
+# Columns (as of 2022-23): PRACTICE_CODE, INDICATOR_CODE, REGISTER, LIST_SIZE,
+# PREVALENCE. We pull a curated indicator list, pivot wide, filter to NW
+# London practices, and write one row per GP practice.
+# ============================================================================
+# ---------------------------------------------------------------------------
+# Fingertips practice-level QOF prevalence.
+# child_area_type_id=7  -> GP practice. We filter to NW London practices
+# after the fact by matching ODS codes against gp_practices.parquet.
+# Indicator IDs below are the OHID Fingertips IDs for QOF prevalence
+# indicators; values are GP-practice-level percentages.
+# ---------------------------------------------------------------------------
+QOF_INDICATORS = [
+    # (fingertips_id, short_name,              human label)
+    (   241,           "qof_hypertension_pct",  "Hypertension: QOF prevalence"),
+    (   848,           "qof_depression_pct",    "Depression: QOF prevalence (18+)"),
+    ( 90813,           "qof_smi_pct",           "Severe mental illness: QOF prevalence"),
+    (   253,           "qof_diabetes_pct",      "Diabetes: QOF prevalence (17+)"),
+    (   273,           "qof_copd_pct",          "COPD: QOF prevalence"),
+    (   258,           "qof_asthma_pct",        "Asthma: QOF prevalence"),
+    (   263,           "qof_chd_pct",           "CHD: QOF prevalence"),
+    (   268,           "qof_ckd_pct",           "CKD: QOF prevalence (18+)"),
+    (   282,           "qof_dementia_pct",      "Dementia: QOF prevalence (aged 65+)"),
+    (   349,           "qof_af_pct",            "Atrial fibrillation: QOF prevalence"),
+    (   219,           "qof_smoking_pct",       "Smoking: QOF prevalence (15+)"),
+    (   324,           "qof_obesity_pct",       "Obesity: QOF prevalence (18+)"),
+    (   265,           "qof_stroke_tia_pct",    "Stroke/TIA: QOF prevalence"),
+    (   295,           "qof_heart_failure_pct", "Heart failure: QOF prevalence"),
+    (   262,           "qof_cancer_pct",        "Cancer: QOF prevalence"),
+    (   266,           "qof_ld_pct",            "Learning disability: QOF prevalence"),
+]
+
+def run_qof() -> pd.DataFrame:
+    rule("OHID Fingertips QOF (GP-practice prevalence)")
+    cache_dir = CACHE_DIR / "qof_fingertips"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    AREA_TYPE_PRACTICE = 7  # GP practice
+
+    rows: list[dict] = []
+    for ind_id, short, _desc in QOF_INDICATORS:
+        cache = cache_dir / f"ind_{ind_id}_practice.csv"
+        if not cache.exists() or cache.stat().st_size < 1024:
+            url = (
+                f"https://fingertips.phe.org.uk/api/all_data/csv/by_indicator_id"
+                f"?indicator_ids={ind_id}"
+                f"&child_area_type_id={AREA_TYPE_PRACTICE}"
+            )
+            try:
+                r = requests.get(url, timeout=180)
+                r.raise_for_status()
+                if len(r.content) < 1024:
+                    warn(f"  {short} ({ind_id}): response only {len(r.content)}B - skipping")
+                    continue
+                cache.write_bytes(r.content)
+                info(f"  {short}: {len(r.content)/1e6:.1f} MB")
+                time.sleep(1.0)
+            except Exception as e:
+                warn(f"  {short} ({ind_id}): fetch failed ({e})")
+                continue
+        try:
+            df = pd.read_csv(cache, dtype=str, low_memory=False)
+        except pd.errors.EmptyDataError:
+            continue
+        if df.empty or "Area Code" not in df.columns:
+            continue
+        # Keep latest period per practice
+        if "Time period Sortable" in df.columns:
+            df = df.sort_values("Time period Sortable")
+        df = df.groupby("Area Code", as_index=False).tail(1)
+        for _, row in df.iterrows():
+            v = _tofloat(row.get("Value"))
+            if v is None:
+                continue
+            rows.append({"code": row["Area Code"], "short": short,
+                         "value": v, "period": row.get("Time period", "")})
+
+    if not rows:
+        warn("qof: no Fingertips practice-level rows returned - skipping write")
+        return pd.DataFrame()
+
+    raw = pd.DataFrame(rows)
+    wide = (raw.pivot_table(index="code", columns="short",
+                            values="value", aggfunc="first")
+               .reset_index())
+    wide.columns.name = None
+
+    # Filter to NW London practice ODS codes
+    gps_path = DATA_DIR / "healthcare" / "gp_practices.parquet"
+    if gps_path.exists():
+        try:
+            gps = pd.read_parquet(gps_path)
+            if "code" in gps.columns:
+                nwl_codes = set(gps["code"].dropna().astype(str).str.upper())
+                wide["code"] = wide["code"].astype(str).str.upper()
+                wide = wide[wide["code"].isin(nwl_codes)].copy()
+        except Exception as e:
+            warn(f"  practice filter skipped ({e})")
+
+    out_path = DATA_DIR / "healthcare" / "qof_prevalence.parquet"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    write_parquet_atomic(out_path, wide)
+    ok(f"qof: {len(wide):,} NWL practices x {len(QOF_INDICATORS)} indicators "
+       f"-> {out_path.relative_to(REPO_ROOT)}")
+    return wide
+
+
+
+
+# ============================================================================
 # SOURCE 4: OHID Fingertips  (public health outcomes per LAD)
 # ============================================================================
 FINGERTIPS_INDICATORS = [
@@ -2164,6 +2463,33 @@ def build_ward_data() -> dict:
         if wards_mo:
             sources["_claimant_month"] = wards_mo
 
+    # --- DWP benefits: counts SUM, rates pop-weighted MEAN ------------------
+    dwp = _read_parquet_opt(DATA_DIR / "economy" / "dwp_benefits.parquet")
+    if dwp is not None and not dwp.empty:
+        try:
+            dwp_period = str(dwp["dwp_period"].dropna().iloc[0])
+        except Exception:
+            dwp_period = ""
+        sources["dwp"] = f"NOMIS DWP benefits (PIP/UC/ESA/CA/PC, {dwp_period})"
+        count_cols = [c for c in ("pip_cases", "uc_households", "esa_claimants",
+                                   "carers_allowance", "pension_credit")
+                      if c in dwp.columns]
+        for raw_col in count_cols:
+            agg = {}
+            for _, row in dwp.iterrows():
+                lc = str(row["LSOA21CD"])
+                wd = lsoa_to_ward.get(lc)
+                v = row.get(raw_col)
+                if not wd or pd.isna(v):
+                    continue
+                agg[wd] = agg.get(wd, 0) + int(v)
+            for wd, w in wards.items():
+                if wd in agg:
+                    w["indicators"][raw_col] = int(agg[wd])
+        rate_cols = [c for c in dwp.columns if c.endswith("_rate_pct")]
+        for raw_col in rate_cols:
+            _agg_to_wards(dwp, raw_col, raw_col)
+
     # --- Core20: ward is Core20 if any of its LSOAs is in IMD decile 1-2 -----
     # NHS Core20PLUS5 framework definition.
     imd = _read_parquet_opt(DATA_DIR / "demographics" / "imd2025.parquet")
@@ -2263,6 +2589,43 @@ def build_lsoa_data() -> dict:
             v = row.get("ptai_score")
             if code in out and pd.notna(v):
                 out[code]["ptai_score"] = round(float(v), 2)
+
+    # Claimant count (NOMIS CLA01)
+    cl = _read_parquet_opt(DATA_DIR / "economy" / "claimant_count.parquet")
+    if cl is not None and not cl.empty:
+        cl_cols = [c for c in ("claimant_count", "claimant_rate_pct",
+                               "claimant_yoy_change", "claimant_yoy_pct")
+                   if c in cl.columns]
+        for _, row in cl.iterrows():
+            code = str(row["LSOA21CD"])
+            if code not in out:
+                continue
+            for c in cl_cols:
+                v = row.get(c)
+                if pd.isna(v):
+                    continue
+                out[code][c] = (int(v) if c in ("claimant_count", "claimant_yoy_change")
+                                else round(float(v), 2))
+
+    # DWP benefits (PIP / UC / ESA / CA / PC)
+    dwp = _read_parquet_opt(DATA_DIR / "economy" / "dwp_benefits.parquet")
+    if dwp is not None and not dwp.empty:
+        carry_int   = [c for c in ("pip_cases", "uc_households", "esa_claimants",
+                                    "carers_allowance", "pension_credit")
+                       if c in dwp.columns]
+        carry_float = [c for c in dwp.columns if c.endswith("_rate_pct")]
+        for _, row in dwp.iterrows():
+            code = str(row["LSOA21CD"])
+            if code not in out:
+                continue
+            for c in carry_int:
+                v = row.get(c)
+                if pd.notna(v):
+                    out[code][c] = int(v)
+            for c in carry_float:
+                v = row.get(c)
+                if pd.notna(v):
+                    out[code][c] = round(float(v), 2)
     return out
 
 def build_vcse_json():
@@ -2317,12 +2680,34 @@ def splice_index_html() -> None:
     gps = _read_parquet_opt(DATA_DIR / "healthcare" / "gp_practices.parquet")
     if gps is not None:
         cols = [c for c in ["name", "addr", "lat", "lng", "postcode", "code",
-                            "ward", "lad", "tel"] if c in gps.columns]
-        js = "const GPS = " + json.dumps(
-            gps[cols].rename(columns={"name": "n", "addr": "a", "postcode": "pc"})
-                     .to_dict(orient="records"),
-            ensure_ascii=False,
-        ) + ";"
+                            "ward", "lad", "tel", "patients"] if c in gps.columns]
+        gp_records = (gps[cols]
+                      .rename(columns={"name": "n", "addr": "a", "postcode": "pc"})
+                      .to_dict(orient="records"))
+
+        # Splice QOF prevalence onto each practice as a compact `qof` dict.
+        qof = _read_parquet_opt(DATA_DIR / "healthcare" / "qof_prevalence.parquet")
+        if qof is not None and not qof.empty and "code" in qof.columns:
+            qof_cols = [c for c in qof.columns
+                        if c.startswith("qof_") and c.endswith("_pct")]
+            qof_by_code: dict[str, dict] = {}
+            for _, row in qof.iterrows():
+                code = str(row["code"]).upper().strip()
+                d: dict[str, float] = {}
+                for c in qof_cols:
+                    v = row.get(c)
+                    if pd.notna(v):
+                        short = c[4:-4]  # strip 'qof_' and '_pct'
+                        d[short] = round(float(v), 2)
+                if d:
+                    qof_by_code[code] = d
+            for rec in gp_records:
+                c = str(rec.get("code") or "").upper().strip()
+                if c in qof_by_code:
+                    rec["qof"] = qof_by_code[c]
+            ok(f"spliced QOF onto {sum(1 for r in gp_records if 'qof' in r):,} practices")
+
+        js = "const GPS = " + json.dumps(gp_records, ensure_ascii=False) + ";"
         html = re.sub(r"const GPS = \[(?:\{[^\n]*\},?\s*)+\];", js, html, count=1)
 
     hosp = _read_parquet_opt(DATA_DIR / "healthcare" / "hospitals.parquet")
@@ -2366,6 +2751,9 @@ SOURCES = {
     "pharmacies":  run_pharmacies,
     "imd":         run_imd2025,
     "census":      run_census2021,
+    "claimant":    run_claimant_count,
+    "dwp":         run_dwp_benefits,
+    "qof":         run_qof,
     "fingertips":  run_fingertips,
     "fuel_poverty": run_fuel_poverty,
     "ptal":        run_ptal,

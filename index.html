@@ -78,8 +78,9 @@
   .sv.sample { color: #888; font-style: italic; }
   .gpill { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; font-weight: 500; }
   .gpill-ward { background: #e8f4e8; color: #1a5c2e; }
+  .gpill-lsoa { background: #fdebd0; color: #b8600c; }
   .gpill-msoa { background: #e3edf9; color: #0c447c; }
-  .gpill-la   { background: #fef3e2; color: #7a4a00; }
+  .gpill-la   { background: #f3eaf7; color: #6a1b7a; }
   .data-note { margin-top: 10px; padding: 7px 10px; background: #f8f8f4; border-left: 3px solid #ddd; font-size: 10px; color: #888; line-height: 1.5; border-radius: 0 5px 5px 0; }
   .data-note a { color: #185FA5; text-decoration: none; }
 
@@ -340,6 +341,53 @@
               <option value="census_level4_qual_pct">Level 4+ qualifications %</option>
               <option value="census_higher_managerial_pct">Higher managerial/professional %</option>
               <option value="census_routine_semi_routine_pct">Routine/semi-routine %</option>
+              <option value="claimant_rate_pct">Claimant count rate % (NOMIS CLA01)</option>
+            </optgroup>
+            <optgroup label="IMD 2025 domains (LSOA-level)">
+              <option value="imd_score">IMD score (composite)</option>
+              <option value="imd_decile">IMD decile (1 = most deprived)</option>
+              <option value="income_score">Income deprivation score</option>
+              <option value="employment_score">Employment deprivation score</option>
+              <option value="education_score">Education, skills &amp; training score</option>
+              <option value="health_score">Health deprivation &amp; disability score</option>
+              <option value="crime_score">Crime deprivation score</option>
+              <option value="barriers_score">Barriers to housing &amp; services score</option>
+              <option value="environment_score">Living environment score</option>
+            </optgroup>
+            <optgroup label="Religion (Census 2021, TS022)">
+              <option value="census_christian_pct">Christian %</option>
+              <option value="census_muslim_pct">Muslim %</option>
+              <option value="census_hindu_pct">Hindu %</option>
+              <option value="census_jewish_pct">Jewish %</option>
+              <option value="census_no_religion_pct">No religion %</option>
+            </optgroup>
+            <optgroup label="Language &amp; English (Census 2021, TS024/TS025)">
+              <option value="census_english_main_pct">English as main language %</option>
+              <option value="census_non_english_main_pct">Non-English main language %</option>
+              <option value="census_english_not_well_pct">Speaks English not well/at all %</option>
+              <option value="census_arabic_main_pct">Arabic main %</option>
+              <option value="census_bengali_main_pct">Bengali main %</option>
+              <option value="census_polish_main_pct">Polish main %</option>
+              <option value="census_portuguese_main_pct">Portuguese main %</option>
+              <option value="census_somali_main_pct">Somali main %</option>
+              <option value="census_urdu_main_pct">Urdu main %</option>
+            </optgroup>
+            <optgroup label="Household composition (Census 2021, TS041)">
+              <option value="census_one_person_hh_pct">One-person households %</option>
+              <option value="census_one_person_66plus_pct">One-person, aged 66+ %</option>
+              <option value="census_lone_parent_hh_pct">Lone-parent households %</option>
+            </optgroup>
+            <optgroup label="Accommodation (Census 2021, TS059)">
+              <option value="census_flat_pct">Flats/apartments %</option>
+              <option value="census_whole_house_pct">Whole house/bungalow %</option>
+            </optgroup>
+            <optgroup label="Travel to work (Census 2021, TS061)">
+              <option value="census_active_travel_pct">Walk/cycle to work %</option>
+              <option value="census_public_transport_pct">Public transport to work %</option>
+              <option value="census_car_to_work_pct">Car/van to work %</option>
+            </optgroup>
+            <optgroup label="Migration (Census 2021, TS068)">
+              <option value="census_arrived_2011plus_pct">Arrived in UK 2011 or later %</option>
             </optgroup>
           </select>
 
@@ -534,6 +582,54 @@ const OV_CFG = {
   // PTAI = better transport access, so we invert with hiIsWorse:false via wh:false.
   fuel_poverty_pct:                { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
   ptai_score:                      { lo:"Lower", hi:"Higher", wh:false, min:2,    max:25   },
+  // IMD 2025 domain scores (LSOA-level). Higher score = more deprived, so wh:true
+  // for every score column. imd_decile is inverted (1 = most deprived), so wh:false
+  // and the legend reads "more deprived -> less deprived".
+  imd_score:                       { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:60   },
+  imd_decile:                      { lo:"More deprived", hi:"Less deprived", wh:false, min:1, max:10 },
+  income_score:                    { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:0.5  },
+  employment_score:                { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:0.4  },
+  education_score:                 { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:60   },
+  health_score:                    { lo:"Lower", hi:"Higher", wh:true,  min:-2,   max:2    },
+  crime_score:                     { lo:"Lower", hi:"Higher", wh:true,  min:-2,   max:2    },
+  barriers_score:                  { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:60   },
+  environment_score:               { lo:"Lower", hi:"Higher", wh:true,  min:-2,   max:2    },
+  // Claimant count (NOMIS CLA01). Rate is claimants per working-age resident.
+  claimant_rate_pct:               { lo:"Lower", hi:"Higher", wh:true,  min:1,    max:10   },
+  claimant_count:                  { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:300  },
+  // Religion (Census 2021, TS022). Descriptive — wh:false.
+  census_christian_pct:            { lo:"Lower", hi:"Higher", wh:false, min:5,    max:60   },
+  census_muslim_pct:               { lo:"Lower", hi:"Higher", wh:false, min:2,    max:70   },
+  census_hindu_pct:                { lo:"Lower", hi:"Higher", wh:false, min:0,    max:30   },
+  census_jewish_pct:               { lo:"Lower", hi:"Higher", wh:false, min:0,    max:25   },
+  census_no_religion_pct:          { lo:"Lower", hi:"Higher", wh:false, min:10,   max:60   },
+  // Language (Census 2021, TS024). Non-English / low-proficiency read as access risk
+  // for health services, so wh:true on the "not well" and "non-English main" variants.
+  census_english_main_pct:         { lo:"Lower", hi:"Higher", wh:false, min:40,   max:95   },
+  census_non_english_main_pct:     { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:60   },
+  census_arabic_main_pct:          { lo:"Lower", hi:"Higher", wh:false, min:0,    max:15   },
+  census_bengali_main_pct:         { lo:"Lower", hi:"Higher", wh:false, min:0,    max:15   },
+  census_polish_main_pct:          { lo:"Lower", hi:"Higher", wh:false, min:0,    max:10   },
+  census_portuguese_main_pct:      { lo:"Lower", hi:"Higher", wh:false, min:0,    max:10   },
+  census_somali_main_pct:          { lo:"Lower", hi:"Higher", wh:false, min:0,    max:10   },
+  census_urdu_main_pct:            { lo:"Lower", hi:"Higher", wh:false, min:0,    max:10   },
+  // English proficiency (Census 2021, TS025).
+  census_english_not_well_pct:     { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:15   },
+  census_english_main_or_well_pct: { lo:"Lower", hi:"Higher", wh:false, min:70,   max:100  },
+  // Household composition (Census 2021, TS041). Lone-parent often read as risk — wh:true.
+  census_one_person_hh_pct:        { lo:"Lower", hi:"Higher", wh:false, min:15,   max:50   },
+  census_one_person_66plus_pct:    { lo:"Lower", hi:"Higher", wh:true,  min:2,    max:20   },
+  census_lone_parent_hh_pct:       { lo:"Lower", hi:"Higher", wh:true,  min:2,    max:20   },
+  // Accommodation type (Census 2021, TS059). Descriptive.
+  census_flat_pct:                 { lo:"Lower", hi:"Higher", wh:false, min:10,   max:90   },
+  census_whole_house_pct:          { lo:"Lower", hi:"Higher", wh:false, min:10,   max:90   },
+  // Travel to work (Census 2021, TS061). Active travel = health positive (wh:false);
+  // car to work = negative (wh:true) at ward level for air-quality framing.
+  census_active_travel_pct:        { lo:"Lower", hi:"Higher", wh:false, min:5,    max:40   },
+  census_car_to_work_pct:          { lo:"Lower", hi:"Higher", wh:true,  min:10,   max:70   },
+  census_public_transport_pct:     { lo:"Lower", hi:"Higher", wh:false, min:10,   max:60   },
+  // Migration (Census 2021, TS068). Descriptive — wh:false.
+  census_arrived_2011plus_pct:     { lo:"Lower", hi:"Higher", wh:false, min:5,    max:45   },
 };
 
 // Transparency state — controlled by sliders
@@ -590,6 +686,55 @@ const CATS = [
     { k: "census_social_rented_pct",         l: "Social rented (%)",             g: "ward" },
     { k: "census_private_rented_pct",        l: "Private rented (%)",            g: "ward" },
     { k: "census_no_car_pct",                l: "No car/van (%)",                g: "ward" },
+    { k: "census_flat_pct",                  l: "Flats/apartments (%)",          g: "ward" },
+    { k: "census_whole_house_pct",           l: "Whole house/bungalow (%)",      g: "ward" },
+  ]},
+  { key: "imd2025",      label: "IMD 2025 domains",    ico: "⚖", fields: [
+    { k: "imd_score",                        l: "IMD composite score",           g: "lsoa" },
+    { k: "imd_decile",                       l: "IMD decile (1 = most deprived)",g: "lsoa" },
+    { k: "income_score",                     l: "Income deprivation",            g: "lsoa" },
+    { k: "employment_score",                 l: "Employment deprivation",        g: "lsoa" },
+    { k: "education_score",                  l: "Education, skills & training",  g: "lsoa" },
+    { k: "health_score",                     l: "Health deprivation & disability", g: "lsoa" },
+    { k: "crime_score",                      l: "Crime",                         g: "lsoa" },
+    { k: "barriers_score",                   l: "Barriers to housing & services", g: "lsoa" },
+    { k: "environment_score",                l: "Living environment",            g: "lsoa" },
+  ]},
+  { key: "benefits",     label: "Benefits & claimants", ico: "£", fields: [
+    { k: "claimant_count",                   l: "Claimant count (NOMIS CLA01)",  g: "lsoa" },
+    { k: "claimant_rate_pct",                l: "Claimant rate, working-age (%)", g: "lsoa" },
+  ]},
+  { key: "religion",     label: "Religion (Census 2021, TS022)", ico: "☸", fields: [
+    { k: "census_christian_pct",             l: "Christian (%)",                 g: "ward" },
+    { k: "census_muslim_pct",                l: "Muslim (%)",                    g: "ward" },
+    { k: "census_hindu_pct",                 l: "Hindu (%)",                     g: "ward" },
+    { k: "census_jewish_pct",                l: "Jewish (%)",                    g: "ward" },
+    { k: "census_no_religion_pct",           l: "No religion (%)",               g: "ward" },
+  ]},
+  { key: "language",     label: "Language & English (Census 2021, TS024/TS025)", ico: "🗣", fields: [
+    { k: "census_english_main_pct",          l: "English as main language (%)",  g: "ward" },
+    { k: "census_non_english_main_pct",      l: "Non-English main language (%)", g: "ward" },
+    { k: "census_english_not_well_pct",      l: "Speaks English not well/at all (%)", g: "ward" },
+    { k: "census_english_main_or_well_pct",  l: "English main OR speaks well (%)", g: "ward" },
+    { k: "census_arabic_main_pct",           l: "Arabic main (%)",               g: "ward" },
+    { k: "census_bengali_main_pct",          l: "Bengali main (%)",              g: "ward" },
+    { k: "census_polish_main_pct",           l: "Polish main (%)",               g: "ward" },
+    { k: "census_portuguese_main_pct",       l: "Portuguese main (%)",           g: "ward" },
+    { k: "census_somali_main_pct",           l: "Somali main (%)",               g: "ward" },
+    { k: "census_urdu_main_pct",             l: "Urdu main (%)",                 g: "ward" },
+  ]},
+  { key: "household",    label: "Household composition (Census 2021, TS041)", ico: "🏡", fields: [
+    { k: "census_one_person_hh_pct",         l: "One-person households (%)",     g: "ward" },
+    { k: "census_one_person_66plus_pct",     l: "One-person, aged 66+ (%)",      g: "ward" },
+    { k: "census_lone_parent_hh_pct",        l: "Lone-parent households (%)",    g: "ward" },
+  ]},
+  { key: "travel",       label: "Travel to work (Census 2021, TS061)", ico: "🚇", fields: [
+    { k: "census_active_travel_pct",         l: "Walk/cycle to work (%)",        g: "ward" },
+    { k: "census_public_transport_pct",      l: "Public transport to work (%)",  g: "ward" },
+    { k: "census_car_to_work_pct",           l: "Car/van to work (%)",           g: "ward" },
+  ]},
+  { key: "migration",    label: "Migration (Census 2021, TS068)", ico: "✈", fields: [
+    { k: "census_arrived_2011plus_pct",      l: "Arrived in UK 2011 or later (%)", g: "ward" },
   ]},
 ];
 
@@ -1378,7 +1523,10 @@ function wstyle(wn, ov, state) {
 }
 
 function pillClass(g) {
-  return g==='ward' ? 'gpill gpill-ward' : g==='msoa' ? 'gpill gpill-msoa' : 'gpill gpill-la';
+  if (g === 'ward') return 'gpill gpill-ward';
+  if (g === 'lsoa') return 'gpill gpill-lsoa';
+  if (g === 'msoa') return 'gpill gpill-msoa';
+  return 'gpill gpill-la';
 }
 
 // Horizontal stacked bar: parts = [{k, l, v, c}, ...]. Returns '' if nothing
@@ -1727,8 +1875,9 @@ window.generateWardReport = function(wn) {
   table.kv td.v { font-weight:500; color:#1a1a1a; text-align:right; font-variant-numeric: tabular-nums; }
   .g { display:inline-block; font-size:9px; padding:1px 5px; border-radius:3px; margin-left:4px; vertical-align:middle; font-weight:500; }
   .g-ward { background:#e8f4e8; color:#1a5c2e; }
+  .g-lsoa { background:#fdebd0; color:#b8600c; }
   .g-msoa { background:#e3edf9; color:#0c447c; }
-  .g-la   { background:#fef3e2; color:#7a4a00; }
+  .g-la   { background:#f3eaf7; color:#6a1b7a; }
   .no-data { padding:20px; background:#fef8e7; border-left:3px solid #E89B1B; margin:20px 0; font-size:12px; color:#7a4a00; border-radius:0 6px 6px 0; }
   .footer { padding: 16px 32px 22px; background:#fafaf6; border-top:1px solid #eee; font-size:11px; color:#666; }
   .footer strong { color:#333; }
@@ -3110,4 +3259,3 @@ loadData();
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                  

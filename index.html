@@ -868,7 +868,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Static layers
 // GP layer: circleMarkers sized by registered-patients list size.
 // Bands: <3k micro, 3-7k small, 7-12k medium, 12-20k large, 20k+ very large.
-function gpRadius(p) {
+function gpRadius_UNUSED(p) {
   if (!p) return 7;
   if (p < 3000)  return 4;
   if (p < 7000)  return 7;
@@ -876,7 +876,6 @@ function gpRadius(p) {
   if (p < 20000) return 13;
   return 16;
 }
-const gpRenderer = L.canvas({ padding: 0.5 });
 const gpL = L.layerGroup(GPS.map(d => {
   const rows = {};
   if (d.pc) rows['Postcode'] = d.pc;
@@ -885,15 +884,10 @@ const gpL = L.layerGroup(GPS.map(d => {
   if (d.code) rows['ODS'] = d.code;
   if (d.patients) rows['Patients'] = d.patients.toLocaleString();
   const popup = mkpop('#185FA5', d.n, d.a, rows);
-  return L.circleMarker([d.lat, d.lng], {
-    renderer:    gpRenderer,
-    radius:      gpRadius(d.patients),
-    color:       '#185FA5',
-    weight:      1,
-    fillColor:   '#185FA5',
-    fillOpacity: 0.72,
-    stroke:      true
-  }).bindPopup(popup);
+  const tip = d.patients ? `${d.n} · ${d.patients.toLocaleString()} pts` : d.n;
+  return L.marker([d.lat, d.lng], { icon: mkicon('#185FA5', 'G') })
+    .bindPopup(popup)
+    .bindTooltip(tip, { direction: 'top', className: 'marker-tip' });
 }));
 
 // Enrich GP markers from ward_data.json once loaded
@@ -1997,20 +1991,25 @@ const IMD_DECILE_COLORS = {
 
 function imdStyle(feat, state) {
   const d = feat.properties.imd_decile;
+  // Navy blue palette — sits cleanly alongside the black ward outlines so
+  // users can tell ward (black) and LSOA (navy) borders apart at a glance.
   const base = {
-    color: '#D4740E', weight: 1.2,
+    color: '#1E4B8E', weight: 1.2,
     fillColor: (lsoaIMDColour && d) ? (IMD_DECILE_COLORS[d] || '#ccc') : '#ccc',
-    fillOpacity: lsoaIMDColour ? 0.45 : 0.05, opacity: 0.7,
+    fillOpacity: lsoaIMDColour ? 0.45 : 0.05, opacity: 0.75,
   };
   if (state === 'hover') {
-    base.weight = 2.2;
-    base.fillOpacity = lsoaIMDColour ? 0.6 : 0.2;
-    base.color = '#c0392b';
+    // Border-only highlight: thicker + deeper navy, but leave fillOpacity
+    // alone so any active overlay/IMD fill stays stable under the cursor.
+    base.weight = 2.6;
+    base.color = '#0F2D5C';
+    base.opacity = 1.0;
   }
   if (state === 'selected') {
-    base.weight = 3;
+    base.weight = 3.2;
     base.fillOpacity = lsoaIMDColour ? 0.7 : 0.3;
-    base.color = '#d35400';
+    base.color = '#081A3C';
+    base.opacity = 1.0;
   }
   // If an overlay is active, blend with overlay colour
   if (curOv !== 'none') {
@@ -2438,20 +2437,17 @@ function buildEmbeddedLSOALayer() {
         showLSOA(feat);
       });
       lyr.on('mouseover', e => {
-        // When a ward overlay is active (univariate or bivariate), don't repaint
-        // LSOAs on hover — the user wants to see the ward choropleth, not have
-        // it punched through by stray LSOA hover fills. Tooltip still fires.
-        const ovActive = (typeof curOv !== 'undefined' && curOv !== 'none') ||
-                         (typeof curOv2 !== 'undefined' && curOv2 !== 'none');
-        if (p.code !== selLSOA && !ovActive) lyr.setStyle(imdStyle(feat, 'hover'));
+        // Always highlight the navy border on hover — it's the primary visual
+        // feedback in LSOA mode. Fill is preserved by imdStyle (hover only
+        // thickens/darkens the navy stroke), so ward overlay choropleth stays
+        // visually intact beneath.
+        if (p.code !== selLSOA) { lyr.setStyle(imdStyle(feat, 'hover')); lyr.bringToFront(); }
         const decStr = p.imd_decile ? `IMD decile ${p.imd_decile}` : '';
         const ovRows = ovTooltipRows(k => lsoaOvValue(p.code, k));
         lyr.bindTooltip(`<b style="font-size:11px">${p.name}</b><br><span style="font-size:10px;color:#888">${p.ward}</span>${decStr ? '<br><span style="font-size:10px">'+decStr+'</span>' : ''}${ovRows}`, {sticky:true, opacity:.94}).openTooltip(e.latlng);
       });
       lyr.on('mouseout', () => {
-        const ovActive = (typeof curOv !== 'undefined' && curOv !== 'none') ||
-                         (typeof curOv2 !== 'undefined' && curOv2 !== 'none');
-        if (p.code !== selLSOA && !ovActive) lyr.setStyle(imdStyle(feat, 'default'));
+        if (p.code !== selLSOA) lyr.setStyle(imdStyle(feat, 'default'));
       });
     }
   });
@@ -3114,4 +3110,4 @@ loadData();
 </script>
 </body>
 </html>
-                                                                                                                                                                                             
+                                                                                                                                                                                                                                  

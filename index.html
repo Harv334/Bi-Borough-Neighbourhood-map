@@ -885,8 +885,6 @@ const gpL = L.layerGroup(GPS.map(d => {
   if (d.code) rows['ODS'] = d.code;
   if (d.patients) rows['Patients'] = d.patients.toLocaleString();
   const popup = mkpop('#185FA5', d.n, d.a, rows);
-  const tipParts = [d.n];
-  if (d.patients) tipParts.push(d.patients.toLocaleString() + ' pts');
   return L.circleMarker([d.lat, d.lng], {
     renderer:    gpRenderer,
     radius:      gpRadius(d.patients),
@@ -895,8 +893,7 @@ const gpL = L.layerGroup(GPS.map(d => {
     fillColor:   '#185FA5',
     fillOpacity: 0.72,
     stroke:      true
-  }).bindPopup(popup)
-    .bindTooltip(tipParts.join(' · '), { direction: 'top', sticky: true, className: 'marker-tip' });
+  }).bindPopup(popup);
 }));
 
 // Enrich GP markers from ward_data.json once loaded
@@ -3116,3 +3113,5 @@ loadData();
 })();
 </script>
 </body>
+</html>
+                                                                                                                                                                                             

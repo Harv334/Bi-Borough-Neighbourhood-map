@@ -1036,33 +1036,70 @@ def run_claimant_count() -> pd.DataFrame:
     rule("NOMIS claimant count (CLA01 / NM_162, LSOA monthly)")
     cache_dir = CACHE_DIR / "claimant"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    # _v2: previous fetch hit NOMIS' default RECORDLIMIT=25,000 and returned
-    # only ~6,250 alphabetically-first LSOAs (all suppressed). Bump filename
-    # so old bad caches don't keep that data around.
-    cache = cache_dir / "claimant_nwl_latest_v2.csv"
+    # _v3: bulk queries against NOMIS TYPE298 silently cap at 25,000 rows
+    # regardless of RecordLimit= for unregistered users. Switch to explicit
+    # NWL LSOA lists, chunked into ~500-code requests.
+    cache = cache_dir / "claimant_nwl_latest_v3.csv"
 
-    # NOMIS geography TYPE298 returns all E&W LSOA 2021 rows. NOMIS' default
-    # record cap is 25,000; for ~33k LSOAs x 2 dates we need RecordLimit bumped.
-    # Claimant rate per working-age resident isn't a built-in NOMIS "measure" at
-    # LSOA level — only MEASURES=20100 (Value = raw count) is published. Request
-    # just that and derive the rate downstream using census working-age pop.
+    # Build the NW London LSOA set from ONSPD (LAD25CDs for the 9 boroughs).
+    NWL_LAD_CODES = {
+        "E09000005", "E09000007", "E09000009", "E09000013", "E09000015",
+        "E09000017", "E09000018", "E09000020", "E09000033",
+    }
+    try:
+        pc_lookup = get_postcode_lookup()
+    except Exception as e:
+        warn(f"claimant count: ONSPD unavailable ({e}); cannot scope to NWL")
+        return pd.DataFrame()
+    nwl_lsoas: set[str] = set()
+    for _, (_lat, _lng, lsoa, lad, _wd) in pc_lookup.items():
+        if lad in NWL_LAD_CODES and lsoa:
+            nwl_lsoas.add(lsoa)
+    info(f"  NWL LSOA set: {len(nwl_lsoas):,} codes")
+    if not nwl_lsoas:
+        warn("claimant count: empty NWL LSOA set; nothing to fetch")
+        return pd.DataFrame()
+
+    # NOMIS accepts an explicit comma-separated geography list. Per-request cap
+    # (~25k rows unregistered) easily covers 500 LSOAs x 2 months. URL caps at
+    # ~8kB so 500 codes * 10 chars = 5000 chars fits comfortably.
+    BASE = (
+        "https://www.nomisweb.co.uk/api/v01/dataset/NM_162_1.data.csv"
+        "?date=latest,latestMINUS12"
+        "&gender=0&age=0"
+        "&measures=20100"
+    )
+    CHUNK = 500
     if not cache.exists() or cache.stat().st_size < 4096:
-        url = (
-            "https://www.nomisweb.co.uk/api/v01/dataset/NM_162_1.data.csv"
-            "?geography=TYPE298"
-            "&date=latest,latestMINUS12"
-            "&gender=0&age=0"
-            "&measures=20100"
-            "&RecordLimit=500000"
-        )
-        try:
-            r = requests.get(url, timeout=300)
-            r.raise_for_status()
-            cache.write_bytes(r.content)
-            info(f"  downloaded {len(r.content)/1e6:.1f} MB")
-        except Exception as e:
-            warn(f"claimant count: fetch failed ({e})")
+        codes = sorted(nwl_lsoas)
+        parts: list[bytes] = []
+        header: bytes | None = None
+        for i in range(0, len(codes), CHUNK):
+            batch = codes[i : i + CHUNK]
+            url = BASE + "&geography=" + ",".join(batch)
+            try:
+                r = requests.get(url, timeout=180)
+                r.raise_for_status()
+                body = r.content
+            except Exception as e:
+                warn(f"claimant count: chunk {i//CHUNK+1} fetch failed ({e})")
+                return pd.DataFrame()
+            # Strip header on subsequent chunks so we concatenate cleanly.
+            nl = body.find(b"\n")
+            if nl < 0:
+                continue
+            if header is None:
+                header = body[: nl + 1]
+                parts.append(body)
+            else:
+                parts.append(body[nl + 1 :])
+            info(f"  chunk {i//CHUNK+1}/{(len(codes)+CHUNK-1)//CHUNK}: "
+                 f"{len(batch)} codes, {len(body)/1e3:.1f} kB")
+        if not parts:
+            warn("claimant count: no data from NOMIS")
             return pd.DataFrame()
+        cache.write_bytes(b"".join(parts))
+        info(f"  total cached: {cache.stat().st_size/1e6:.2f} MB")
 
     try:
         df = pd.read_csv(cache, dtype=str, low_memory=False)

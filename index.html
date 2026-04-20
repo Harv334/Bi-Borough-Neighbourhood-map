@@ -917,11 +917,19 @@ const wardBoundaryLyr = L.geoJSON(GJ, {
 // Default mappable cut = explicit NWL borough tick AND geocoded HQ in NWL.
 // London-wide / HQ-outside-NWL / no-geocode are kept in VCSE_ALL for future
 // sidebar filters, not pinned by default.
-// Shared canvas renderer: all VCSE pins draw on a single canvas for
-// smooth pan/zoom at 2,600+ markers. Clustering disabled by design -
-// the map is already zoom-bounded to NWL so total pin count is capped.
-const vcseRenderer = L.canvas({ padding: 0.5 });
-const vcseCluster = L.layerGroup();
+const vcseCluster = L.markerClusterGroup({
+  maxClusterRadius: 40,
+  showCoverageOnHover: false,
+  zoomToBoundsOnClick: true,
+  iconCreateFunction: cluster => {
+    const c = cluster.getChildCount();
+    const sz = c > 50 ? 36 : c > 20 ? 30 : 26;
+    return L.divIcon({
+      html:`<div style="background:rgba(60,60,55,.78);width:${sz}px;height:${sz}px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:${sz>32?13:12}px;box-shadow:0 2px 6px rgba(0,0,0,.2)">${c}</div>`,
+      className: 'vcse-cluster', iconSize: [sz, sz]
+    });
+  }
+});
 
 let VCSE_ALL = [];
 let VCSE_PINNED = [];
@@ -934,21 +942,9 @@ function wireVCSE(records) {
   vcseCluster.clearLayers();
   vcseData.length = 0;
   VCSE_PINNED.forEach(r => {
-    const r_px = vcseMarkerRadius(r);
-    const color = vcseMarkerColor(r);
-    const hollow = (r.ib === 'zero');
-    const marker = L.circleMarker([r.lat, r.lng], {
-      renderer:    vcseRenderer,
-      radius:      r_px,
-      color:       color,               // border colour
-      weight:      hollow ? 2 : 1,
-      fillColor:   color,
-      fillOpacity: hollow ? 0 : 0.75,
-      stroke:      true,
-      pane:        'markerPane'
-    });
+    const marker = L.marker([r.lat, r.lng], { icon: mkVCSEIcon(r) });
     marker.bindPopup(vcsePopupHtml(r), { maxWidth: 300 });
-    marker.addTo(vcseCluster);
+    vcseCluster.addLayer(marker);
     vcseData.push({ name: r.n, addr: r.a, lat: r.lat, lng: r.lng, marker, record: r });
   });
   const n = VCSE_PINNED.length;

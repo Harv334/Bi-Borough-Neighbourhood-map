@@ -577,6 +577,9 @@ def run_imd2025() -> pd.DataFrame:
 CENSUS_TABLES = [
     "TS001", "TS004", "TS007A", "TS021", "TS037", "TS038", "TS039",
     "TS044", "TS045", "TS054", "TS062", "TS066", "TS067",
+    # Phase-A expansion (2026-04): religion, language, travel, household,
+    # accommodation, country-of-birth detail, year-of-arrival.
+    "TS022", "TS024", "TS025", "TS041", "TS059", "TS061", "TS068",
     # Note: TS009 was previously requested but its Nomis bulk zip has no
     # LSOA-level sheet. TS007A ("Age by five-year age bands") is the
     # canonical LSOA-granularity age source.
@@ -947,6 +950,81 @@ def run_census2021() -> pd.DataFrame:
     attach("census_level4_qual_pct", "TS067",
            [("level 4 qualifications",)])
 
+    # TS022 religion (one-line top-level categories) --------------------
+    # Categories: Christian / Buddhist / Hindu / Jewish / Muslim / Sikh /
+    # Other religion / No religion / Not answered. Parent rows are
+    # "Religion: <label>"; attach the five that matter for outreach.
+    attach("census_christian_pct",  "TS022", [("christian",)],
+           num_exclude=("no",))
+    attach("census_muslim_pct",     "TS022", [("muslim",)])
+    attach("census_hindu_pct",      "TS022", [("hindu",)])
+    attach("census_jewish_pct",     "TS022", [("jewish",)])
+    attach("census_no_religion_pct","TS022", [("no religion",)])
+
+    # TS024 main language ------------------------------------------------
+    # Top-level: English / Main language is not English. Sub-levels give
+    # South Asian / European / African / Arabic / Chinese / other groups
+    # and specific languages. We pull the "not English" umbrella and
+    # specific high-volume community languages for NW London outreach.
+    attach("census_english_main_pct",  "TS024",
+           [("main language is english",)],
+           num_exclude=("not",))
+    attach("census_non_english_main_pct","TS024",
+           [("main language is not english",)])
+    # Individual languages use the NOMIS hierarchy "Main language is not
+    # English: ... : Arabic" etc. The _cen_findall parent/child dedup
+    # picks the leaf if present; if not, match by terminal keyword.
+    attach("census_arabic_main_pct",   "TS024", [("arabic",)])
+    attach("census_bengali_main_pct",  "TS024", [("bengali",)])
+    attach("census_polish_main_pct",   "TS024", [("polish",)])
+    attach("census_portuguese_main_pct","TS024", [("portuguese",)])
+    attach("census_somali_main_pct",   "TS024", [("somali",)])
+    attach("census_urdu_main_pct",     "TS024", [("urdu",)])
+
+    # TS025 proficiency in English --------------------------------------
+    # Categories: Main language is English / Can speak English very well /
+    # ...well / ...not well / Cannot speak English. Low-proficiency sum
+    # is the most actionable outreach metric.
+    attach("census_english_not_well_pct",  "TS025",
+           [("cannot speak english",), ("does not speak english well",),
+            ("cannot speak english well",)])
+    attach("census_english_main_or_well_pct","TS025",
+           [("main language is english",), ("can speak english well",)],
+           num_exclude=("not",))
+
+    # TS041 household composition ---------------------------------------
+    # We want: one-person households, lone-parent households with
+    # dependent children, and one-person aged 66+ (proxy for "older
+    # people living alone").
+    attach("census_one_person_hh_pct", "TS041",
+           [("one person household",)])
+    attach("census_one_person_66plus_pct", "TS041",
+           [("one person household", "aged 66"), ("one person household: aged 66",)])
+    attach("census_lone_parent_hh_pct", "TS041",
+           [("lone parent",)])
+
+    # TS059 accommodation type ------------------------------------------
+    attach("census_flat_pct",         "TS059",
+           [("flat",)])
+    attach("census_whole_house_pct",  "TS059",
+           [("whole house or bungalow",)])
+
+    # TS061 method of travel to work ------------------------------------
+    # Active travel = walking + bicycle. Car = driving car/van +
+    # passenger in car/van.
+    attach("census_active_travel_pct", "TS061",
+           [("on foot",), ("bicycle",)])
+    attach("census_car_to_work_pct",   "TS061",
+           [("driving a car",), ("passenger in a car",)])
+    attach("census_public_transport_pct","TS061",
+           [("underground",), ("train",), ("bus",), ("taxi",)])
+
+    # TS068 year of arrival in UK ---------------------------------------
+    # "Arrived 2011 or later" is the best proxy for recent arrivals that
+    # the MSDS / inclusion-health team cares about.
+    attach("census_arrived_2011plus_pct", "TS068",
+           [("arrived in the uk: 2011",), ("2011 to 2020",), ("2021 onwards",)])
+
     # Clean up + save ----------------------------------------------------
     out = out.dropna(subset=["LSOA21CD"]).drop_duplicates(subset=["LSOA21CD"])
 
@@ -960,6 +1038,101 @@ def run_census2021() -> pd.DataFrame:
     out_path = DATA_DIR / "demographics" / "census2021.parquet"
     write_parquet_atomic(out_path, out)
     ok(f"census2021: {len(out):,} LSOAs x {len(out.columns)-1} indicators -> {out_path.relative_to(REPO_ROOT)}")
+    return out
+
+
+# ============================================================================
+# SOURCE 3b: NOMIS claimant count (CLA01, NM_162) - monthly LSOA labour-market
+# ============================================================================
+# UC + legacy JSA combined count. Latest month + 12-month change. Pulled via
+# NOMIS API (not bulk zip) because the file refreshes monthly. LSOA-level.
+def run_claimant_count() -> pd.DataFrame:
+    rule("NOMIS claimant count (CLA01 / NM_162, LSOA monthly)")
+    cache_dir = CACHE_DIR / "claimant"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache = cache_dir / "claimant_nwl_latest.csv"
+
+    # NW London LSOAs via geography TYPE 298 (LSOA 2021), filtered by the
+    # 8-borough parent area. Simpler: ask for ALL London LSOAs (TYPE 297,
+    # "2021 super output areas - lower layer for London") and filter our
+    # NW London set downstream. Pull latest month (MEASURES=20100 is the
+    # raw count; 20200 is the claimant rate per 100 residents aged 16-64).
+    if not cache.exists() or cache.stat().st_size < 1024:
+        # geography code 2013265921...TYPE298 returns *all* England LSOAs;
+        # that's oversized but the LSOA join at merge time handles it.
+        url = (
+            "https://www.nomisweb.co.uk/api/v01/dataset/NM_162_1.data.csv"
+            "?geography=TYPE298"
+            "&date=latestMINUS0,latestMINUS12"
+            "&gender=0&age=0"
+            "&measures=20100,20200"
+        )
+        try:
+            r = requests.get(url, timeout=180)
+            r.raise_for_status()
+            cache.write_bytes(r.content)
+            info(f"  downloaded {len(r.content)/1e6:.1f} MB")
+        except Exception as e:
+            warn(f"claimant count: fetch failed ({e})")
+            return pd.DataFrame()
+
+    try:
+        df = pd.read_csv(cache, dtype=str, low_memory=False)
+    except pd.errors.EmptyDataError:
+        warn("claimant count: cached CSV empty")
+        return pd.DataFrame()
+
+    # Column names we need (NOMIS API naming is stable):
+    # GEOGRAPHY_CODE, DATE (e.g. "2026-03"), MEASURES_NAME, OBS_VALUE
+    need = {"GEOGRAPHY_CODE", "DATE", "MEASURES_NAME", "OBS_VALUE"}
+    if not need.issubset(df.columns):
+        warn(f"claimant count: unexpected columns {list(df.columns)[:6]}")
+        return pd.DataFrame()
+
+    df["OBS_VALUE"] = pd.to_numeric(df["OBS_VALUE"], errors="coerce")
+    dates = sorted(df["DATE"].dropna().unique())
+    if len(dates) < 1:
+        warn("claimant count: no dates in response")
+        return pd.DataFrame()
+    latest = dates[-1]
+    prev   = dates[0] if len(dates) >= 2 else latest
+    info(f"  latest={latest}  prev={prev}")
+
+    def slice_month(date: str, measure_name_contains: str) -> pd.DataFrame:
+        m = df[(df["DATE"] == date) &
+               df["MEASURES_NAME"].str.contains(measure_name_contains,
+                                                case=False, na=False)]
+        return (m.groupby("GEOGRAPHY_CODE", as_index=False)["OBS_VALUE"]
+                  .first())
+
+    cnt_latest = slice_month(latest, "value").rename(
+        columns={"GEOGRAPHY_CODE": "LSOA21CD", "OBS_VALUE": "claimant_count"})
+    rate_latest = slice_month(latest, "rate").rename(
+        columns={"GEOGRAPHY_CODE": "LSOA21CD", "OBS_VALUE": "claimant_rate_pct"})
+    cnt_prev = slice_month(prev, "value").rename(
+        columns={"GEOGRAPHY_CODE": "LSOA21CD", "OBS_VALUE": "claimant_count_yearAgo"})
+
+    out = (cnt_latest.merge(rate_latest, on="LSOA21CD", how="outer")
+                      .merge(cnt_prev,   on="LSOA21CD", how="left"))
+    out["claimant_yoy_change"] = out["claimant_count"] - out["claimant_count_yearAgo"]
+    out["claimant_yoy_pct"]    = (
+        (out["claimant_count"] - out["claimant_count_yearAgo"]) /
+        out["claimant_count_yearAgo"].replace(0, pd.NA) * 100
+    ).round(1)
+    out["claimant_month"] = latest
+    out = out.drop(columns=["claimant_count_yearAgo"])
+
+    # Keep only NW London LSOAs (prefix match via the LAD list used elsewhere).
+    # If NWL_LSOAS is defined (injected by run_imd), filter to that; else keep all.
+    nwl_codes = globals().get("_NWL_LSOA_SET")
+    if isinstance(nwl_codes, set) and nwl_codes:
+        out = out[out["LSOA21CD"].isin(nwl_codes)].copy()
+
+    out_path = DATA_DIR / "economy" / "claimant_count.parquet"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    write_parquet_atomic(out_path, out)
+    ok(f"claimant count: {len(out):,} LSOAs  month={latest}  "
+       f"-> {out_path.relative_to(REPO_ROOT)}")
     return out
 
 
@@ -1961,6 +2134,35 @@ def build_ward_data() -> dict:
     _agg_to_wards(pt, "ptai_score", "ptai_score")
     if pt is not None:
         sources["ptal"] = "GLA LSOA Atlas (average PTAI score)"
+
+    # --- Claimant count: counts SUM, rates pop-weighted MEAN ----------------
+    cl = _read_parquet_opt(DATA_DIR / "economy" / "claimant_count.parquet")
+    if cl is not None and not cl.empty:
+        sources["claimant"] = f"NOMIS CLA01 (UC + JSA, {cl['claimant_month'].iloc[0]})"
+        # raw count + YoY change → straight sum
+        for raw_col, ward_key in [("claimant_count", "claimant_count"),
+                                   ("claimant_yoy_change", "claimant_yoy_change")]:
+            agg = {}
+            for _, row in cl.iterrows():
+                lc = str(row["LSOA21CD"])
+                wd = lsoa_to_ward.get(lc)
+                v = row.get(raw_col)
+                if not wd or pd.isna(v):
+                    continue
+                agg[wd] = agg.get(wd, 0) + int(v)
+            for wd, w in wards.items():
+                if wd in agg:
+                    w["indicators"][ward_key] = int(agg[wd])
+        # rate / yoy pct → pop-weighted mean
+        _agg_to_wards(cl, "claimant_rate_pct", "claimant_rate_pct")
+        _agg_to_wards(cl, "claimant_yoy_pct",  "claimant_yoy_pct")
+        # also push the month label through metadata
+        try:
+            wards_mo = str(cl["claimant_month"].dropna().iloc[0])
+        except Exception:
+            wards_mo = ""
+        if wards_mo:
+            sources["_claimant_month"] = wards_mo
 
     # --- Core20: ward is Core20 if any of its LSOAs is in IMD decile 1-2 -----
     # NHS Core20PLUS5 framework definition.

@@ -750,7 +750,6 @@ const VCSE_BUCKET_LABELS = {
   community_faith:     'Community & faith',
   other:               'Other',
 };
-// Priority order: first WHAT tag match wins
 const VCSE_BUCKET_RULES = [
   ['health_disability',   ['health','disability']],
   ['social_determinants', ['poverty','housing','community_economic']],
@@ -3005,3 +3004,76 @@ async function loadData() {
     buildWardLayer();
     enrichGPFromWardData(wards);
     injectWardIMD();
+
+    // Load optional LSOA census data (enriches LSOA detail panel)
+    fetch('lsoa_data.json?v=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)
+      .then(ld => { if (ld) LSOA_DATA = ld; });
+
+    // Now ward layer exists — init VCSE filters
+    setTimeout(initVCSEFilters, 100);
+    ldr.classList.add('hidden');
+
+  } catch (err) {
+    // ward_data.json missing or not yet generated — show map with sample data
+    console.warn('ward_data.json not found or invalid:', err.message);
+    document.getElementById('src-lbl').textContent =
+      'ward_data.json not found — map running with boundaries only. Run fetch_all_data.py to populate data.';
+    document.getElementById('ldr-txt').textContent = 'Loading boundaries...';
+    document.getElementById('ldr-sub').textContent = 'ward_data.json not found — click wards to see structure';
+    buildWardLayer();
+    injectWardIMD();
+    setTimeout(initVCSEFilters, 100);
+    ldr.classList.add('hidden');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+setTimeout(() => map.invalidateSize(), 200);
+loadData();
+</script>
+
+<script>
+// Core20 toggle wiring (highlights Core20 LSOAs — deciles 1-2)
+(function initCore20Toggle() {
+  function wire() {
+    const cb = document.getElementById("core20-toggle");
+    if (!cb) return;
+    cb.addEventListener("change", e => {
+      showCore20Overlay = !!e.target.checked;
+      if (showCore20Overlay) {
+        buildCore20LsoaLayer();
+        if (core20LsoaLyr) {
+          core20LsoaLyr.addTo(map);
+          core20LsoaLyr.bringToFront();
+          if (boroughL && boroughL._map) boroughL.bringToFront();
+        }
+      } else if (core20LsoaLyr && core20LsoaLyr._map) {
+        map.removeLayer(core20LsoaLyr);
+      }
+    });
+    function updateCount() {
+      if (typeof LSOA_IMD === "undefined" || !LSOA_IMD || !LSOA_IMD.features) {
+        setTimeout(updateCount, 500);
+        return;
+      }
+      const total = LSOA_IMD.features.length;
+      const c20 = LSOA_IMD.features.filter(f => {
+        const d = f.properties && f.properties.imd_decile;
+        return d === 1 || d === 2;
+      }).length;
+      const el = document.getElementById("core20-count");
+      if (el) el.textContent = c20 + " of " + total + " LSOAs in deciles 1-2";
+    }
+    updateCount();
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wire);
+  } else {
+    wire();
+  }
+})();
+</script>
+</body>
+</html>

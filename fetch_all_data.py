@@ -1433,6 +1433,332 @@ def run_hospitals() -> pd.DataFrame | None:
     ok(f"hospitals: {len(out):,} rows -> {out_path.relative_to(REPO_ROOT)}")
     return out
 
+
+# ============================================================================
+# SOURCE 7: VCSE - Charity Commission for England & Wales (bulk extract)
+# ============================================================================
+CCEW_URLS = {
+    "charity": [
+        "https://ccewuksprdoneregsadata1.blob.core.windows.net/data/json/publicextract.charity.zip",
+    ],
+    "classification": [
+        "https://ccewuksprdoneregsadata1.blob.core.windows.net/data/json/publicextract.charity_classification.zip",
+    ],
+    "area_of_operation": [
+        "https://ccewuksprdoneregsadata1.blob.core.windows.net/data/json/publicextract.charity_area_of_operation.zip",
+    ],
+}
+
+# Classification codes confirmed against the April 2026 bulk extract:
+# 17 'What' codes (101-117), 10 'How' codes (301-310), 7 'Who' codes (201-207).
+CCEW_WHAT_GROUPS = {
+    101: "general_purposes",
+    102: "education",
+    103: "health",
+    104: "disability",
+    105: "poverty",
+    106: "overseas_aid",
+    107: "housing",
+    108: "religion",
+    109: "arts_culture",
+    110: "amateur_sport",
+    111: "animals",
+    112: "environment",
+    113: "community_economic",
+    114: "armed_forces",
+    115: "human_rights",
+    116: "recreation",
+    117: "other_charitable",
+}
+CCEW_HOW_GROUPS = {
+    301: "grants_individuals",
+    302: "grants_organisations",
+    303: "other_finance",
+    304: "human_resources",
+    305: "buildings_facilities",
+    306: "services",
+    307: "advocacy_info",
+    308: "research",
+    309: "umbrella_body",
+    310: "other_activities",
+}
+CCEW_WHO_GROUPS = {
+    201: "children_youth",
+    202: "older_people",
+    203: "disability",
+    204: "ethnic_racial_origin",
+    205: "other_charities",
+    206: "other_defined_groups",
+    207: "general_public",
+}
+
+
+def _ccew_zip(kind):
+    cache = CACHE_DIR / "ccew"
+    cache.mkdir(parents=True, exist_ok=True)
+    for z in cache.glob("publicextract.charity*.zip"):
+        nm = z.name.lower()
+        if kind == "charity" and "classif" not in nm and "area" not in nm:
+            return z
+        if kind == "classification" and "classif" in nm:
+            return z
+        if kind == "area_of_operation" and ("area_of_operation" in nm or "area-of-operation" in nm):
+            return z
+    for z in cache.glob("*.zip"):
+        nm = z.name.lower()
+        if kind == "charity" and "charity" in nm and "classif" not in nm and "area" not in nm:
+            return z
+        if kind == "classification" and "classif" in nm:
+            return z
+        if kind == "area_of_operation" and ("area_of_operation" in nm or "area-of-operation" in nm):
+            return z
+    for url in CCEW_URLS.get(kind, []):
+        try:
+            sess = browser_session(referer="https://register-of-charities.charitycommission.gov.uk/")
+            info(f"CCEW: fetching {kind} <- {url}")
+            r = sess.get(url, timeout=180, stream=True)
+            r.raise_for_status()
+            dst = cache / Path(url).name
+            with open(dst, "wb") as f:
+                for chunk in r.iter_content(65536):
+                    if chunk:
+                        f.write(chunk)
+            if dst.stat().st_size > 100_000:
+                ok(f"CCEW: saved {dst.name} ({dst.stat().st_size/1e6:.1f} MB)")
+                return dst
+        except Exception as e:
+            warn(f"CCEW auto-download failed for {kind}: {type(e).__name__}: {e}")
+    return None
+
+
+def _ccew_read_json(zpath):
+    """Read the single JSON file inside a CCEW bulk-extract zip.
+    CCEW extracts have a UTF-8 BOM, so decode with utf-8-sig."""
+    with zipfile.ZipFile(zpath) as z:
+        members = [m for m in z.namelist() if m.lower().endswith(".json")]
+        if not members:
+            raise RuntimeError(f"no .json inside {zpath.name}")
+        with z.open(members[0]) as raw:
+            return json.load(io.TextIOWrapper(raw, encoding="utf-8-sig"))
+
+
+def _ccew_income_band(inc):
+    try:
+        v = float(inc)
+    except (TypeError, ValueError):
+        return "unknown"
+    if v <= 0:        return "zero"
+    if v < 10_000:    return "micro"
+    if v < 100_000:   return "small"
+    if v < 1_000_000: return "medium"
+    return "large"
+
+
+# Map of lowercase AOO area names -> NWL LAD25CD. Keys cover the exact strings
+# that appear in the Charity Commission area_of_operation table.
+NWL_AOO_NAMES = {
+    "brent":                  "E09000005",
+    "camden":                 "E09000007",
+    "ealing":                 "E09000009",
+    "hammersmith and fulham": "E09000013",
+    "hammersmith & fulham":   "E09000013",
+    "harrow":                 "E09000015",
+    "hillingdon":             "E09000017",
+    "hounslow":                "E09000018",
+    "kensington and chelsea": "E09000020",
+    "kensington & chelsea":   "E09000020",
+    "city of westminster":    "E09000033",
+    "westminster":            "E09000033",
+}
+LONDON_WIDE_AOO = {"throughout london", "london", "greater london"}
+
+
+def run_charities():
+    """Place-based VCSE fetch.
+
+    Filter rule: a charity is kept iff its declared area of operation covers
+    one or more NWL boroughs, OR it declares London-wide operation (Greater
+    London Region row). HQ postcode is used for map-pin placement only, not
+    for gating. Charities HQ'd outside NWL are kept (no pin, but listed in
+    the ward/LSOA panel as a service provider).
+    """
+    rule("VCSE (Charity Commission bulk extract)")
+    main_zip  = _ccew_zip("charity")
+    class_zip = _ccew_zip("classification")
+    area_zip  = _ccew_zip("area_of_operation")
+    if main_zip is None:
+        warn("No CCEW charity extract found. Download the JSON bulk extract zips from "
+             "https://register-of-charities.charitycommission.gov.uk/register/full-register-download "
+             "and drop them into .cache/ccew/")
+        return None
+
+    # ---- Pass 1: read area-of-operation, compute `covers` per org number ----
+    if area_zip is None:
+        err("CCEW: missing area-of-operation extract — cannot filter by coverage")
+        return None
+    info(f"CCEW: reading area-of-operation extract {area_zip.name}")
+    area_rows = _ccew_read_json(area_zip)
+    info(f"CCEW: {len(area_rows):,} area-of-operation rows")
+
+    ALL_NWL_LADS = sorted(set(NWL_AOO_NAMES.values()))
+    covers_map: dict[int, set[str]] = {}
+    areas_map:  dict[int, list[dict]] = {}
+    scope_map:  dict[int, str] = {}   # "explicit" | "london_wide"
+    for r in area_rows:
+        try:
+            num = int(r.get("organisation_number") or 0)
+        except (TypeError, ValueError):
+            continue
+        if not num:
+            continue
+        desc  = (r.get("geographic_area_description") or "").strip()
+        gtype = (r.get("geographic_area_type") or "").strip()
+        if desc:
+            areas_map.setdefault(num, []).append({"type": gtype, "area": desc})
+        key = desc.lower()
+        hit_local = NWL_AOO_NAMES.get(key)
+        if hit_local:
+            covers_map.setdefault(num, set()).add(hit_local)
+            scope_map[num] = "explicit"
+            continue
+        if gtype.lower() == "region" and key in LONDON_WIDE_AOO:
+            # London-wide declarations cover all 9 NWL boroughs
+            covers_map.setdefault(num, set()).update(ALL_NWL_LADS)
+            if scope_map.get(num) != "explicit":
+                scope_map[num] = "london_wide"
+
+    info(f"CCEW: {len(covers_map):,} charities cover at least one NWL borough "
+         f"(explicit: {sum(1 for v in scope_map.values() if v == 'explicit'):,}, "
+         f"london_wide only: {sum(1 for v in scope_map.values() if v == 'london_wide'):,})")
+
+    # ---- Pass 2: read main extract, keep only charities in covers_map ----
+    info(f"CCEW: reading main extract {main_zip.name}")
+    main_rows = _ccew_read_json(main_zip)
+    info(f"CCEW: {len(main_rows):,} charity rows in extract")
+
+    lookup = get_postcode_lookup()
+    charities: dict[int, dict] = {}
+    skipped_removed = skipped_linked = skipped_no_coverage = 0
+    no_geocode = hq_outside_nwl = 0
+    for r in main_rows:
+        status = (r.get("charity_registration_status") or "").lower()
+        if status != "registered":
+            skipped_removed += 1
+            continue
+        try:
+            linked = int(r.get("linked_charity_number") or 0)
+        except (TypeError, ValueError):
+            linked = 0
+        if linked > 0:
+            skipped_linked += 1
+            continue
+        try:
+            num = int(r.get("organisation_number") or r.get("registered_charity_number") or 0)
+        except (TypeError, ValueError):
+            continue
+        if not num:
+            continue
+        if num not in covers_map:
+            skipped_no_coverage += 1
+            continue
+
+        pc = normalise_postcode(r.get("charity_contact_postcode") or "")
+        lat = lng = lsoa = lad = wd = None
+        if pc:
+            hit = lookup.get(pc)
+            if hit:
+                lat, lng, lsoa, lad, wd = hit
+                if lad not in NW_LADS:
+                    hq_outside_nwl += 1
+            else:
+                no_geocode += 1
+        else:
+            no_geocode += 1
+
+        addr_parts = []
+        for i in range(1, 6):
+            v = (r.get(f"charity_contact_address{i}") or "").strip()
+            if v:
+                addr_parts.append(v)
+        addr = ", ".join(addr_parts)
+        charities[num] = {
+            "num": num,
+            "name": (r.get("charity_name") or "").strip(),
+            "addr": addr, "postcode": pc or "",
+            "lat": lat, "lng": lng,
+            "LSOA21CD": lsoa, "WD25CD": wd, "LAD25CD": lad,
+            "hq_in_nwl": bool(lad and lad in NW_LADS),
+            "income": r.get("latest_income"),
+            "income_band": _ccew_income_band(r.get("latest_income")),
+            "website": (r.get("charity_contact_web") or "").strip(),
+            "activities": (r.get("charity_activities") or "").strip()[:500],
+            "registered": (r.get("date_of_registration") or "")[:10],
+            "covers": sorted(covers_map[num]),
+            "scope":  scope_map.get(num, "explicit"),
+            "areas":  areas_map.get(num, []),
+            "what_codes": [], "what_tags": [], "what_desc": [],
+            "how_codes":  [], "how_tags":  [], "how_desc":  [],
+            "who_codes":  [], "who_tags":  [], "who_desc":  [],
+        }
+
+    pinned = sum(1 for c in charities.values() if c["lat"] is not None and c["hq_in_nwl"])
+    info(
+        f"CCEW: kept {len(charities):,} NWL-serving charities "
+        f"(skipped: {skipped_removed:,} removed, {skipped_linked:,} subsidiary, "
+        f"{skipped_no_coverage:,} no NWL coverage) "
+        f"— pinnable on map: {pinned:,}, HQ outside NWL: {hq_outside_nwl:,}, no geocode: {no_geocode:,}"
+    )
+
+    # ---- Pass 3: attach classification rows ----
+    if class_zip is not None:
+        info(f"CCEW: reading classification extract {class_zip.name}")
+        cls_rows = _ccew_read_json(class_zip)
+        attached = 0
+        for r in cls_rows:
+            try:
+                num = int(r.get("organisation_number") or 0)
+            except (TypeError, ValueError):
+                continue
+            ch = charities.get(num)
+            if not ch:
+                continue
+            try:
+                code = int(r.get("classification_code") or 0)
+            except (TypeError, ValueError):
+                code = 0
+            ctype = (r.get("classification_type") or "").lower()
+            desc  = (r.get("classification_description") or "").strip()
+            if "what" in ctype:
+                ch["what_codes"].append(code); ch["what_desc"].append(desc)
+                tag = CCEW_WHAT_GROUPS.get(code)
+                if tag and tag not in ch["what_tags"]:
+                    ch["what_tags"].append(tag)
+            elif "how" in ctype:
+                ch["how_codes"].append(code); ch["how_desc"].append(desc)
+                tag = CCEW_HOW_GROUPS.get(code)
+                if tag and tag not in ch["how_tags"]:
+                    ch["how_tags"].append(tag)
+            elif "who" in ctype:
+                ch["who_codes"].append(code); ch["who_desc"].append(desc)
+                tag = CCEW_WHO_GROUPS.get(code)
+                if tag and tag not in ch["who_tags"]:
+                    ch["who_tags"].append(tag)
+            attached += 1
+        ok(f"CCEW: attached {attached:,} classification rows")
+
+    rows = list(charities.values())
+    for r in rows:
+        for k in ("what_codes","what_tags","what_desc","how_codes","how_tags",
+                  "how_desc","who_codes","who_tags","who_desc","areas","covers"):
+            r[k] = json.dumps(r[k], ensure_ascii=False) if r.get(k) else "[]"
+    out = pd.DataFrame(rows)
+    out_path = DATA_DIR / "vcse" / "charities.parquet"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    write_parquet_atomic(out_path, out)
+    ok(f"vcse: {len(out):,} rows -> {out_path.relative_to(REPO_ROOT)}")
+    return out
+
+
 # ============================================================================
 # EXPORT: build the 3 JSON files the map consumes
 # ============================================================================
@@ -1737,6 +2063,34 @@ def build_lsoa_data() -> dict:
                 out[code]["ptai_score"] = round(float(v), 2)
     return out
 
+def build_vcse_json():
+    df = _read_parquet_opt(DATA_DIR / "vcse" / "charities.parquet")
+    if df is None:
+        return []
+    list_cols = ["what_codes","what_tags","what_desc","how_codes","how_tags",
+                 "how_desc","who_codes","who_tags","who_desc","areas","covers"]
+    for c in list_cols:
+        if c in df.columns:
+            df[c] = df[c].apply(lambda v: json.loads(v) if isinstance(v, str) and v else [])
+    keep = ["num","name","addr","postcode","lat","lng","LAD25CD","LSOA21CD","WD25CD",
+            "hq_in_nwl","covers","scope",
+            "income","income_band","website","activities","registered",
+            "what_tags","what_desc","how_tags","how_desc","who_tags","who_desc","areas"]
+    cols = [c for c in keep if c in df.columns]
+    out = df[cols].rename(columns={
+        "name": "n", "addr": "a", "postcode": "pc",
+        "LAD25CD": "lad", "LSOA21CD": "lsoa", "WD25CD": "ward",
+        "hq_in_nwl": "hq", "covers": "cv", "scope": "sc",
+        "income": "inc", "income_band": "ib",
+        "website": "w", "activities": "act", "registered": "reg",
+        "what_tags": "wt", "what_desc": "wd",
+        "how_tags":  "ht", "how_desc":  "hd",
+        "who_tags":  "ot", "who_desc":  "od",
+        "areas": "ar",
+    })
+    return out.to_dict(orient="records")
+
+
 def build_pharmacies_json() -> list:
     pharm = _read_parquet_opt(DATA_DIR / "healthcare" / "pharmacies.parquet")
     if pharm is None:
@@ -1789,13 +2143,16 @@ def export_all() -> None:
     ward_data  = build_ward_data()
     lsoa_data  = build_lsoa_data()
     pharm_data = build_pharmacies_json()
+    vcse_data  = build_vcse_json()
 
     write_json_atomic(REPO_ROOT / "ward_data.json",  ward_data)
     write_json_atomic(REPO_ROOT / "lsoa_data.json",  lsoa_data)
     write_json_atomic(REPO_ROOT / "pharmacies.json", pharm_data)
+    write_json_atomic(REPO_ROOT / "vcse_data.json",  vcse_data)
     ok(f"ward_data.json:  {len(ward_data.get('wards', {})):,} wards")
     ok(f"lsoa_data.json:  {len(lsoa_data):,} LSOAs")
     ok(f"pharmacies.json: {len(pharm_data):,} rows")
+    ok(f"vcse_data.json:  {len(vcse_data):,} charities")
 
     splice_index_html()
 
@@ -1812,6 +2169,7 @@ SOURCES = {
     "ptal":        run_ptal,
     "crime":       run_police_crime,
     "hospitals":   run_hospitals,
+    "charities":   run_charities,
 }
 
 def main() -> int:

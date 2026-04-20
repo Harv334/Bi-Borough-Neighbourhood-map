@@ -170,6 +170,20 @@
     .sidebar { width: 220px; }
     .nbadges { display: none; }
   }
+
+/* Hover tooltips on map markers */
+.leaflet-tooltip.marker-tip {
+  background: rgba(30, 30, 28, 0.92);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 7px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.leaflet-tooltip.marker-tip::before { display: none; }
 </style>
 </head>
 <body>
@@ -871,6 +885,8 @@ const gpL = L.layerGroup(GPS.map(d => {
   if (d.code) rows['ODS'] = d.code;
   if (d.patients) rows['Patients'] = d.patients.toLocaleString();
   const popup = mkpop('#185FA5', d.n, d.a, rows);
+  const tipParts = [d.n];
+  if (d.patients) tipParts.push(d.patients.toLocaleString() + ' pts');
   return L.circleMarker([d.lat, d.lng], {
     renderer:    gpRenderer,
     radius:      gpRadius(d.patients),
@@ -879,7 +895,8 @@ const gpL = L.layerGroup(GPS.map(d => {
     fillColor:   '#185FA5',
     fillOpacity: 0.72,
     stroke:      true
-  }).bindPopup(popup);
+  }).bindPopup(popup)
+    .bindTooltip(tipParts.join(' · '), { direction: 'top', sticky: true, className: 'marker-tip' });
 }));
 
 // Enrich GP markers from ward_data.json once loaded
@@ -896,8 +913,8 @@ function enrichGPFromWardData(wardData) {
   if (allPractices.length === 0) return;
   console.log(`Loaded ${allPractices.length} GP practices from ward_data.json`);
 }
-const hL  = L.layerGroup(HOSP.map(d => L.marker([d.lat,d.lng],{icon:mkicon('#A32D2D','H')}).bindPopup(mkpop('#A32D2D',d.n,d.a,{Type:d.t, Trust:d.trust||''}))));
-const grL = L.layerGroup(GRN.map(d  => L.marker([d.lat,d.lng],{icon:mkicon('#0F6E56','P')}).bindPopup(mkpop('#0F6E56',d.n,d.a,{Size:d.sz}))));
+const hL  = L.layerGroup(HOSP.map(d => L.marker([d.lat,d.lng],{icon:mkicon('#A32D2D','H')}).bindPopup(mkpop('#A32D2D',d.n,d.a,{Type:d.t, Trust:d.trust||''})).bindTooltip(d.n, { direction: 'top', className: 'marker-tip' })));
+const grL = L.layerGroup(GRN.map(d  => L.marker([d.lat,d.lng],{icon:mkicon('#0F6E56','P')}).bindPopup(mkpop('#0F6E56',d.n,d.a,{Size:d.sz})).bindTooltip(d.n, { direction: 'top', className: 'marker-tip' })));
 // gpL/hL/grL not added by default — toggle on via sidebar
 
 // ── Borough boundary layer ───────────────────────────────────────────────────
@@ -963,6 +980,8 @@ function wireVCSE(records) {
   VCSE_PINNED.forEach(r => {
     const marker = L.marker([r.lat, r.lng], { icon: mkVCSEIcon(r) });
     marker.bindPopup(vcsePopupHtml(r), { maxWidth: 300 });
+    const bucketLbl = VCSE_BUCKET_LABELS[vcseCauseBucket(r)] || '';
+    marker.bindTooltip(bucketLbl ? `${r.n} · ${bucketLbl}` : r.n, { direction: 'top', className: 'marker-tip' });
     vcseCluster.addLayer(marker);
     vcseData.push({ name: r.n, addr: r.a, lat: r.lat, lng: r.lng, marker, record: r });
   });
@@ -1009,6 +1028,7 @@ function loadDentalLayer(practices) {
     const marker = L.marker([p.lat, p.lng], {icon: mkDentalIcon()});
     const imdBadge = p.imd_decile ? `<div class="pop-row"><span class="pop-key">IMD</span><span>Decile ${p.imd_decile}</span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#7B2D8E">${p.name||p.n}</div><div class="pop-body"><div class="pop-addr">${p.postcode||p.pc||'—'}</div>${imdBadge}</div>`);
+    marker.bindTooltip((p.name||p.n) + ' · Dental', { direction: 'top', className: 'marker-tip' });
     dentalCluster.addLayer(marker);
     dentalData.push({ name: p.name||p.n, postcode: p.postcode||p.pc, lat: p.lat, lng: p.lng, marker });
   });
@@ -1045,6 +1065,7 @@ function loadPharmacyLayer(practices) {
     const marker = L.marker([p.lat, p.lng], {icon: mkPharmacyIcon()});
     const telRow = p.tel ? `<div class="pop-row"><span class="pop-key">Tel</span><span>${p.tel}</span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#E89B1B">${p.n}</div><div class="pop-body"><div class="pop-addr">${p.a||''}${p.pc?'<br>'+p.pc:''}</div>${telRow}</div>`);
+    marker.bindTooltip(p.n + ' · Pharmacy', { direction: 'top', className: 'marker-tip' });
     pharmCluster.addLayer(marker);
     pharmData.push({ name: p.n, postcode: p.pc, lat: p.lat, lng: p.lng, marker });
   });
@@ -3095,4 +3116,3 @@ loadData();
 })();
 </script>
 </body>
-</html>

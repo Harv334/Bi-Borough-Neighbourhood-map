@@ -1036,25 +1036,27 @@ def run_claimant_count() -> pd.DataFrame:
     rule("NOMIS claimant count (CLA01 / NM_162, LSOA monthly)")
     cache_dir = CACHE_DIR / "claimant"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    cache = cache_dir / "claimant_nwl_latest.csv"
+    # _v2: previous fetch hit NOMIS' default RECORDLIMIT=25,000 and returned
+    # only ~6,250 alphabetically-first LSOAs (all suppressed). Bump filename
+    # so old bad caches don't keep that data around.
+    cache = cache_dir / "claimant_nwl_latest_v2.csv"
 
-    # NW London LSOAs via geography TYPE 298 (LSOA 2021), filtered by the
-    # 8-borough parent area. Simpler: ask for ALL London LSOAs (TYPE 297,
-    # "2021 super output areas - lower layer for London") and filter our
-    # NW London set downstream. Pull latest month (MEASURES=20100 is the
-    # raw count; 20200 is the claimant rate per 100 residents aged 16-64).
-    if not cache.exists() or cache.stat().st_size < 1024:
-        # geography code 2013265921...TYPE298 returns *all* England LSOAs;
-        # that's oversized but the LSOA join at merge time handles it.
+    # NOMIS geography TYPE298 returns all E&W LSOA 2021 rows. NOMIS' default
+    # record cap is 25,000; for ~33k LSOAs x 2 dates we need RecordLimit bumped.
+    # Claimant rate per working-age resident isn't a built-in NOMIS "measure" at
+    # LSOA level — only MEASURES=20100 (Value = raw count) is published. Request
+    # just that and derive the rate downstream using census working-age pop.
+    if not cache.exists() or cache.stat().st_size < 4096:
         url = (
             "https://www.nomisweb.co.uk/api/v01/dataset/NM_162_1.data.csv"
             "?geography=TYPE298"
-            "&date=latestMINUS0,latestMINUS12"
+            "&date=latest,latestMINUS12"
             "&gender=0&age=0"
-            "&measures=20100,20200"
+            "&measures=20100"
+            "&RecordLimit=500000"
         )
         try:
-            r = requests.get(url, timeout=180)
+            r = requests.get(url, timeout=300)
             r.raise_for_status()
             cache.write_bytes(r.content)
             info(f"  downloaded {len(r.content)/1e6:.1f} MB")
@@ -1068,9 +1070,7 @@ def run_claimant_count() -> pd.DataFrame:
         warn("claimant count: cached CSV empty")
         return pd.DataFrame()
 
-    # Column names we need (NOMIS API naming is stable):
-    # GEOGRAPHY_CODE, DATE (e.g. "2026-03"), MEASURES_NAME, OBS_VALUE
-    need = {"GEOGRAPHY_CODE", "DATE", "MEASURES_NAME", "OBS_VALUE"}
+    need = {"GEOGRAPHY_CODE", "DATE", "OBS_VALUE"}
     if not need.issubset(df.columns):
         warn(f"claimant count: unexpected columns {list(df.columns)[:6]}")
         return pd.DataFrame()
@@ -1082,29 +1082,54 @@ def run_claimant_count() -> pd.DataFrame:
         return pd.DataFrame()
     latest = dates[-1]
     prev   = dates[0] if len(dates) >= 2 else latest
-    info(f"  latest={latest}  prev={prev}")
+    non_null = int(df["OBS_VALUE"].notna().sum())
+    info(f"  latest={latest}  prev={prev}  non-null obs={non_null:,}/{len(df):,}")
 
-    def slice_month(date: str, measure_name_contains: str) -> pd.DataFrame:
-        m = df[(df["DATE"] == date) &
-               df["MEASURES_NAME"].str.contains(measure_name_contains,
-                                                case=False, na=False)]
+    def slice_month(date: str) -> pd.DataFrame:
+        # Only MEASURES=20100 (Value) is published at LSOA — take it directly.
+        m = df[df["DATE"] == date]
         return (m.groupby("GEOGRAPHY_CODE", as_index=False)["OBS_VALUE"]
                   .first())
 
-    cnt_latest = slice_month(latest, "value").rename(
+    cnt_latest = slice_month(latest).rename(
         columns={"GEOGRAPHY_CODE": "LSOA21CD", "OBS_VALUE": "claimant_count"})
-    rate_latest = slice_month(latest, "rate").rename(
-        columns={"GEOGRAPHY_CODE": "LSOA21CD", "OBS_VALUE": "claimant_rate_pct"})
-    cnt_prev = slice_month(prev, "value").rename(
+    cnt_prev = slice_month(prev).rename(
         columns={"GEOGRAPHY_CODE": "LSOA21CD", "OBS_VALUE": "claimant_count_yearAgo"})
 
-    out = (cnt_latest.merge(rate_latest, on="LSOA21CD", how="outer")
-                      .merge(cnt_prev,   on="LSOA21CD", how="left"))
+    out = cnt_latest.merge(cnt_prev, on="LSOA21CD", how="outer")
     out["claimant_yoy_change"] = out["claimant_count"] - out["claimant_count_yearAgo"]
     out["claimant_yoy_pct"]    = (
         (out["claimant_count"] - out["claimant_count_yearAgo"]) /
         out["claimant_count_yearAgo"].replace(0, pd.NA) * 100
     ).round(1)
+
+    # NOMIS doesn't publish "claimant rate" at LSOA. Derive it ourselves using
+    # the census 2021 working-age population we already fetched.
+    cen_path = DATA_DIR / "demographics" / "census2021.parquet"
+    if cen_path.exists():
+        try:
+            cen = pd.read_parquet(cen_path)
+            if {"LSOA21CD", "census_population", "census_working_age_pct"}.issubset(cen.columns):
+                wa = pd.DataFrame({
+                    "LSOA21CD": cen["LSOA21CD"],
+                    "_working_age": (pd.to_numeric(cen["census_population"], errors="coerce")
+                                     * pd.to_numeric(cen["census_working_age_pct"], errors="coerce")
+                                     / 100.0),
+                })
+                out = out.merge(wa, on="LSOA21CD", how="left")
+                out["claimant_rate_pct"] = (
+                    pd.to_numeric(out["claimant_count"], errors="coerce")
+                    / out["_working_age"].replace(0, pd.NA) * 100
+                ).round(2)
+                out = out.drop(columns=["_working_age"])
+            else:
+                out["claimant_rate_pct"] = pd.NA
+        except Exception as e:
+            warn(f"claimant rate: census denom unavailable ({e})")
+            out["claimant_rate_pct"] = pd.NA
+    else:
+        out["claimant_rate_pct"] = pd.NA
+
     out["claimant_month"] = latest
     out = out.drop(columns=["claimant_count_yearAgo"])
 
@@ -1560,10 +1585,15 @@ def run_fuel_poverty() -> pd.DataFrame | None:
     info(f"fuel_poverty: reading {src.name}")
     xl = pd.ExcelFile(src)
 
-    # Find the LSOA sheet (header rows vary year to year — DESNZ tabs are
-    # usually called "Table 3", "LSOA", or "Table 3 LSOA").
-    lsoa_sheets = [s for s in xl.sheet_names
-                   if "lsoa" in s.lower() or s.lower().startswith("table 3")]
+    # Find the LSOA sheet. DESNZ re-labels these every release — in the
+    # 2023 data (Feb 2025) Table 4 is LSOA; earlier releases had Table 3.
+    # Try hinted sheets first, then fall back to every "Table N" sheet and
+    # pick the first one whose header row contains an "LSOA Code" column.
+    hinted = [s for s in xl.sheet_names
+              if "lsoa" in s.lower() or s.lower().startswith("table 3")]
+    all_tables = [s for s in xl.sheet_names if s.lower().startswith("table")]
+    # Order: hinted first, then every remaining table sheet.
+    lsoa_sheets = hinted + [s for s in all_tables if s not in hinted]
     if not lsoa_sheets:
         warn(f"fuel_poverty: no LSOA-looking sheet in {xl.sheet_names}")
         return None
@@ -2777,4 +2807,14 @@ def main() -> int:
                 SOURCES[s]()
             except Exception as e:
                 err(f"{s} failed: {type(e).__name__}: {e}")
-                # Keep going — we'd rather 
+                # Keep going — we'd rather have partial outputs than zero.
+        info(f"Fetch phase done in {time.time() - start:.1f}s")
+
+    export_all()
+    print()
+    ok("All done. Refresh index.html in your browser.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

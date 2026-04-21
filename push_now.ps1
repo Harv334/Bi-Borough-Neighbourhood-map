@@ -9,28 +9,48 @@ Set-Location $PSScriptRoot
 Remove-Item -Force -ErrorAction SilentlyContinue .git\index.lock
 Remove-Item -Force -ErrorAction SilentlyContinue .git\HEAD.lock
 
+# Write commit message to a temp file to avoid PowerShell / git arg parsing
+# issues with multi-line -m strings (e.g. tokens like --foo in the body get
+# mis-parsed as flags).
+$msgPath = Join-Path $env:TEMP "nwl_commit_msg.txt"
+$msg = @'
+fix(ui): harden outer layout with CSS grid so tabs can't disappear
+
+Tabs (Layers/VCSE/Overlay/Nbhds/Wards) were intermittently pushed
+behind the viewing strip + sidebar footer when a ward was deselected
+- the entire UI slid upward leaving grey space under the map
+controls. Regression traced to the interaction between the new
+search/Reset/CB/PNG toolbar, collapsible sidebar sections, and the
+old flex-based outer layout: flex children of .app / .main / .map-wrap
+could be pushed out of their slots when viewing-strip display toggled
+between none and flex.
+
+Fix: convert all outer containers to rigid CSS grid with
+minmax(0, 1fr) + overflow:hidden + min-height:0 so children can
+never overflow their slots.
+
+- .app: grid-template-rows auto minmax(0,1fr) auto (header / main /
+  status) with height 100vh and overflow hidden.
+- .main: grid-template-columns auto minmax(0,1fr) (sidebar / map).
+- .map-wrap: grid-template-rows auto minmax(0,1fr) (strip / map).
+- .sidebar: grid-template-rows auto auto minmax(0,1fr) auto with
+  grid-template-areas focus/tabs/pane/footer; tabs and footer now
+  live in rigid grid cells, pane auto-shrinks.
+- Tab-pane toggles display none/flex via .active; min-height 0.
+- Remove wireSidebarFooterMeasure IIFE and the sidebar-footer-h CSS
+  var (obsolete with grid).
+- Revert earlier relocation: Reset / CB safe / PNG / CSV + search
+  are back in the top header toolbar (.hdr) where they were.
+- Strip trailing virtiofs padding (null bytes + whitespace) from
+  index.html tail.
+
+Confirmed fix: ward deselect no longer pushes UI upward, tabs stay
+pinned at all times.
+'@
+Set-Content -Path $msgPath -Value $msg -Encoding UTF8
+
 git add -A
-git commit -m "fix(ui): remove top toolbar; relocate actions to sidebar footer
-
-- Delete the heavy .hdr bar; replace with a thin logo strip so the
-  sidebar tabs (Layers/VCSE/Overlay) have nothing above them that can
-  overlap or visually push them off-screen.
-- Move Reset / CB safe / PNG / CSV buttons into a 2x2 grid at the top
-  of the sidebar footer (sb-sec), above the Fill/Border/Zoom sliders.
-- Move the global search input into the sidebar footer. Make its
-  results dropdown open UPWARD (bottom:100%) so it isn't clipped.
-- Sidebar layout unchanged otherwise: absolute-positioned tabs + footer
-  with ResizeObserver re-measuring footer height into the
-  --sidebar-footer-h CSS var, so the tab-pane auto-shrinks to fit the
-  new (taller) footer and tabs stay pinned.
-- PNG export: _buildWhiteMask() now respects focusedBorough with name
-  normalisation (City of Westminster vs Westminster). Borough-solo
-  mode paints everything outside the chosen borough white for clean
-  PowerPoint exports.
-- Remove the Copy-link button + handler (can be re-wired later if
-  shareable URLs are needed).
-- Zoom + Border sliders on a 1-10 scale (zoom -> Leaflet 10-19,
-  border -> 0.5-5.0 px stroke).
-- Legend: drop Neighbourhoods section + (247) VCSE count; add LSOA row."
-
+git commit -F $msgPath
 git push origin main
+
+Remove-Item -Force -ErrorAction SilentlyContinue $msgPath

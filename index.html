@@ -13,11 +13,13 @@
   html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a1a; }
 
   /* ── Layout ── */
-  .app { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; }
-  /* Compact title strip replacing the old heavy header. No toolbar here — tabs are now the top interactive element in the sidebar. */
-  .hdr-logo-strip { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 6px 14px; display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
-  .hdr-logo { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-  .hdr-sub { font-size: 11px; color: #666; }
+  /* Root layout uses CSS grid (not flex) — grid rows are mathematically rigid so the header/main/status bar cannot be pushed out of their slots. */
+  .app { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100vh; max-height: 100vh; overflow: hidden; }
+  .hdr { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .hdr-left { display: flex; align-items: center; gap: 12px; }
+  .hdr-logo { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .hdr-sub { font-size: 12px; color: #666; margin-top: 1px; }
+  .hdr-right { display: flex; align-items: center; gap: 8px; }
 
   /* ── Header toolbar (Reset / Copy link / PNG / CSV) ── */
   .tb-btn { background: #fff; border: 1px solid #d4d4d4; border-radius: 6px; padding: 5px 10px; font-size: 11.5px; color: #333; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: 500; transition: background .12s, border-color .12s; }
@@ -76,15 +78,15 @@
   .nb { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; cursor: pointer; opacity: .45; border: 1.5px solid transparent; white-space: nowrap; transition: opacity .15s, transform .1s; }
   .nb:hover { transform: translateY(-1px); }
   .nb.on { opacity: 1; }
-  .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+  .main { display: grid; grid-template-columns: auto minmax(0, 1fr); overflow: hidden; min-height: 0; min-width: 0; }
 
-  /* ── Sidebar ── Absolute-positioned: tabs pinned top, footer pinned bottom, active tab-pane fills the gap. Guarantees tabs never move regardless of content.  */
-  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; flex-shrink: 0; background: #fff; position: relative; overflow: hidden; height: 100%; --sidebar-footer-h: 150px; }
-  .sidebar > .nbfocus-bar { position: absolute; top: 0; left: 0; right: 0; z-index: 4; }
-  .sidebar > .sb-tabs     { position: absolute; top: 0; left: 0; right: 0; z-index: 3; }
-  .sidebar > .tab-pane    { position: absolute; top: 37px; bottom: var(--sidebar-footer-h); left: 0; right: 0; display: none; flex-direction: column; overflow: hidden; }
+  /* ── Sidebar ── CSS Grid: native layout guarantees [focus] [tabs] [flexible pane] [footer] stack. No JS measurement needed. */
+  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; flex-shrink: 0; background: #fff; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: "focus" "tabs" "pane" "footer"; height: 100%; min-height: 0; overflow: hidden; }
+  .sidebar > .nbfocus-bar { grid-area: focus; }
+  .sidebar > .sb-tabs     { grid-area: tabs; }
+  .sidebar > .tab-pane    { grid-area: pane; display: none; min-height: 0; overflow: hidden; flex-direction: column; }
   .sidebar > .tab-pane.active { display: flex; }
-  .sidebar > .sb-sec      { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; background: #fafaf6; }
+  .sidebar > .sb-sec      { grid-area: footer; background: #fafaf6; }
   .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; background: #fafaf7; min-height: 36px; }
   .sb-tab { flex: 1 1 0; min-width: 0; padding: 9px 2px; font-size: 11px; font-weight: 600; color: #666; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, background .12s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sb-tab:hover { color: #185FA5; background: #fff; }
@@ -190,7 +192,7 @@
   .rank-val { color: #666; font-variant-numeric: tabular-nums; flex-shrink: 0; font-size: 9.5px; }
 
   /* ── Map ── */
-  .map-wrap { flex: 1; position: relative; min-height: 0; min-width: 0; }
+  .map-wrap { position: relative; min-height: 0; min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
   #map { width: 100%; height: 100%; }
   .loading-overlay { position: absolute; inset: 0; background: rgba(255,255,255,.92); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; z-index: 2000; }
   .loading-overlay.hidden { display: none; }
@@ -292,10 +294,25 @@
 
 <div class="app">
 
-  <!-- Header removed — toolbar + search now live in the sidebar footer. -->
-  <div class="hdr-logo-strip">
-    <span class="hdr-logo">Westminster Neighbourhood Map</span>
-    <span class="hdr-sub" id="hdr-sub-inline">9 boroughs · 188 wards · loading VCSE organisations...</span>
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <div>
+        <div class="hdr-logo">Westminster Neighbourhood Map</div>
+        <div class="hdr-sub">9 boroughs · 188 wards · loading VCSE organisations...</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-search">
+        <input type="text" id="hdr-search-input" placeholder="Search ward, LSOA, GP, charity…" autocomplete="off" />
+        <div class="hdr-search-results" id="hdr-search-results"></div>
+      </div>
+      <div class="tb-sep"></div>
+      <button type="button" class="tb-btn" id="tb-reset" title="Clear all filters and return to default view">↺ Reset</button>
+      <button type="button" class="tb-btn" id="tb-cb" title="Switch to a colour-blind safe palette (deuteranopia/protanopia friendly)" aria-pressed="false">◐ CB safe</button>
+      <button type="button" class="tb-btn" id="tb-png" title="Download the current map as a PNG image">⤓ PNG</button>
+      <button type="button" class="tb-btn" id="tb-csv" title="Download the ward/LSOA data behind the current overlay">⤓ CSV</button>
+    </div>
   </div>
 
   <div class="main">
@@ -637,18 +654,7 @@
       </div>
       <!-- Shared slider footer — visible on every tab -->
       <div class="sb-sec" style="flex-shrink:0;border-top:1px solid #e5e5e0;background:#fafaf6">
-        <!-- Relocated toolbar (previously in the top header bar) -->
-        <div class="sb-footer-search">
-          <input type="text" id="hdr-search-input" placeholder="Search ward, LSOA, GP, charity…" autocomplete="off" />
-          <div class="hdr-search-results sb-footer-results" id="hdr-search-results"></div>
-        </div>
-        <div class="sb-footer-btns">
-          <button type="button" class="tb-btn" id="tb-reset" title="Clear all filters and return to default view">↺ Reset</button>
-          <button type="button" class="tb-btn" id="tb-cb" title="Switch to a colour-blind safe palette (deuteranopia/protanopia friendly)" aria-pressed="false">◐ CB safe</button>
-          <button type="button" class="tb-btn" id="tb-png" title="Download the current map as a PNG image">⤓ PNG</button>
-          <button type="button" class="tb-btn" id="tb-csv" title="Download the ward/LSOA data behind the current overlay">⤓ CSV</button>
-        </div>
-        <div class="sb-lbl" style="margin-top:10px">Map controls</div>
+        <div class="sb-lbl">Map controls</div>
         <div class="opacity-row">
           <label>Fill</label>
           <input type="range" id="fill-opacity" min="0" max="100" value="40">
@@ -4532,25 +4538,8 @@ function _restyleAll() {
 })();
 
 // ── Sidebar layout helper ──────────────────────────────────────────────────
-// Sidebar uses absolute positioning (tabs pinned top, footer pinned bottom,
-// active tab-pane fills the gap). Measure the footer height and publish it
-// as a CSS variable so the tab-pane always sits flush above it — even if
-// the footer's content or the sliders change height.
-(function wireSidebarFooterMeasure() {
-  const sb = document.querySelector('.sidebar');
-  const footer = sb && sb.querySelector(':scope > .sb-sec');
-  if (!sb || !footer) return;
-  const measure = () => {
-    const h = footer.getBoundingClientRect().height;
-    if (h > 0) sb.style.setProperty('--sidebar-footer-h', h + 'px');
-  };
-  measure();
-  // Re-measure on window resize + when the footer's own box changes.
-  window.addEventListener('resize', measure);
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(measure).observe(footer);
-  }
-})();
+// Sidebar footer measurement IIFE removed — sidebar now uses CSS grid, which
+// natively stacks [focus] [tabs] [1fr pane] [footer] without any JS.
 
 // ═══════════════════════════════════════════════════════════════════════════
 // BIVARIATE CHOROPLETH — two-indicator 3x3 brown/green palette

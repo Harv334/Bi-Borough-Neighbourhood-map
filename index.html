@@ -2620,17 +2620,17 @@ function buildEmbeddedLSOALayer() {
         showLSOA(feat);
       });
       lyr.on('mouseover', e => {
-        // Always highlight the navy border on hover — it's the primary visual
-        // feedback in LSOA mode. Fill is preserved by imdStyle (hover only
-        // thickens/darkens the navy stroke), so ward overlay choropleth stays
-        // visually intact beneath.
-        if (p.code !== selLSOA) { lyr.setStyle(imdStyle(feat, 'hover')); lyr.bringToFront(); }
+        // Tooltip-only hover. Restyling the polygon on every mousemove causes
+        // the fill to re-tint and flash as the cursor crosses LSOA edges —
+        // distracting when panning/scrolling. Keep the tooltip but leave the
+        // fill/border untouched. The selected LSOA still keeps its selected
+        // style from imdStyle(..., 'selected').
         const decStr = p.imd_decile ? `IMD decile ${p.imd_decile}` : '';
         const ovRows = ovTooltipRows(k => lsoaOvValue(p.code, k));
         lyr.bindTooltip(`<b style="font-size:11px">${p.name}</b><br><span style="font-size:10px;color:#888">${p.ward}</span>${decStr ? '<br><span style="font-size:10px">'+decStr+'</span>' : ''}${ovRows}`, {sticky:true, opacity:.94}).openTooltip(e.latlng);
       });
       lyr.on('mouseout', () => {
-        if (p.code !== selLSOA) lyr.setStyle(imdStyle(feat, 'default'));
+        // No restyling on mouseout — nothing changed on mouseover.
       });
     }
   });
@@ -2782,12 +2782,30 @@ function renderTopBottom() {
   const pool = useLsoa ? (typeof LSOA_DATA !== 'undefined' ? LSOA_DATA : {})
                        : (WARD_DATA || {});
 
+  // Restrict the LSOA pool to codes actually rendered on the map.
+  // lsoa_data.json carries all 33k+ English LSOAs, but LSOA_IMD only has the
+  // ~1,313 NW London polygons. Without this filter the rankings are dominated
+  // by LSOAs the user can never see or click on.
+  let mapCodes = null;
+  let mapNames = null;
+  if (useLsoa && typeof LSOA_IMD !== 'undefined' && LSOA_IMD && LSOA_IMD.features) {
+    mapCodes = new Set();
+    mapNames = {};
+    for (const f of LSOA_IMD.features) {
+      if (f && f.properties && f.properties.code) {
+        mapCodes.add(f.properties.code);
+        mapNames[f.properties.code] = f.properties.name || f.properties.code;
+      }
+    }
+  }
+
   // Build [id, name, value] tuples. Skip rows with no value for curOv.
   const rows = [];
   for (const [id, row] of Object.entries(pool)) {
+    if (useLsoa && mapCodes && !mapCodes.has(id)) continue;
     const v = (row.indicators || row || {})[curOv];
     if (v == null || v === '' || isNaN(parseFloat(v))) continue;
-    const name = useLsoa ? (row.name || row.lsoa_name || row.LSOA21NM || id)
+    const name = useLsoa ? ((mapNames && mapNames[id]) || row.name || row.lsoa_name || row.LSOA21NM || id)
                          : (row.name || id);
     rows.push({ id, name, v: parseFloat(v) });
   }

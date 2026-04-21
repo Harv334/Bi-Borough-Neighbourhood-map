@@ -231,7 +231,20 @@
           <div class="sb-lbl">Point layers</div>
           <label class="lrow"><div class="ldot" style="background:#185FA5"></div><span class="lname">GP practices</span><input type="checkbox" id="tg"></label>
           <label class="lrow"><div class="ldot" style="background:#A32D2D"></div><span class="lname">Hospitals &amp; clinics</span><input type="checkbox" id="th"></label>
-          <label class="lrow"><div class="ldot" style="background:#0F6E56"></div><span class="lname">Green spaces</span><input type="checkbox" id="tgr"></label>
+          <label class="lrow"><div class="ldot" style="background:#2E7D32"></div><span class="lname">Parks &amp; greenspaces</span><input type="checkbox" id="tgr"></label>
+          <div id="greenspace-legend" style="display:none;margin:2px 0 6px 18px;padding:4px 6px;background:#f7f9f7;border-radius:4px">
+            <div style="font-size:10px;color:#666;margin-bottom:3px">OS Open Greenspace categories</div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 6px;font-size:10px;line-height:1.2">
+              <div style="width:10px;height:10px;background:#2E7D32;border-radius:2px;align-self:center"></div><span>Public park or garden</span>
+              <div style="width:10px;height:10px;background:#66BB6A;border-radius:2px;align-self:center"></div><span>Play space</span>
+              <div style="width:10px;height:10px;background:#558B2F;border-radius:2px;align-self:center"></div><span>Playing field</span>
+              <div style="width:10px;height:10px;background:#C5A64A;border-radius:2px;align-self:center"></div><span>Allotments</span>
+              <div style="width:10px;height:10px;background:#8D9B7E;border-radius:2px;align-self:center"></div><span>Cemetery</span>
+              <div style="width:10px;height:10px;background:#A1887F;border-radius:2px;align-self:center"></div><span>Religious grounds</span>
+              <div style="width:10px;height:10px;background:#7CB342;border-radius:2px;align-self:center"></div><span>Golf course</span>
+              <div style="width:10px;height:10px;background:#00897B;border-radius:2px;align-self:center"></div><span>Other sports facility</span>
+            </div>
+          </div>
           <label class="lrow"><div class="ldot" style="background:#854F0B"></div><span class="lname">VCSE organisations <span class="lcount">...</span></span><input type="checkbox" id="tv"></label>
           <label class="lrow"><div class="ldot" style="background:#7B2D8E"></div><span class="lname">Dental practices <span class="lcount" id="dental-count">0</span></span><input type="checkbox" id="td"></label>
           <label class="lrow"><div class="ldot" style="background:#E89B1B"></div><span class="lname">Pharmacies <span class="lcount" id="pharm-count">0</span></span><input type="checkbox" id="tph"></label>
@@ -1038,7 +1051,55 @@ function enrichGPFromWardData(wardData) {
   console.log(`Loaded ${allPractices.length} GP practices from ward_data.json`);
 }
 const hL  = L.layerGroup(HOSP.map(d => L.marker([d.lat,d.lng],{icon:mkicon('#A32D2D','H')}).bindPopup(mkpop('#A32D2D',d.n,d.a,{Type:d.t, Trust:d.trust||''})).bindTooltip(d.n, { direction: 'top', className: 'marker-tip' })));
-const grL = L.layerGroup(GRN.map(d  => L.marker([d.lat,d.lng],{icon:mkicon('#0F6E56','P')}).bindPopup(mkpop('#0F6E56',d.n,d.a,{Size:d.sz})).bindTooltip(d.n, { direction: 'top', className: 'marker-tip' })));
+// ── Greenspace polygon layer (OS Open Greenspace, NW London clip) ─────────
+// Palette keyed on OS 'function' — ranked roughly from highest to lowest
+// "recreational greenness": public parks on top, car-park-y sports courts
+// lower, cemetery/religious grounds a muted grey-tan.
+const GREENSPACE_COLORS = {
+  "Public Park Or Garden":                  "#2E7D32",
+  "Play Space":                             "#66BB6A",
+  "Playing Field":                          "#558B2F",
+  "Allotments Or Community Growing Spaces": "#C5A64A",
+  "Cemetery":                               "#8D9B7E",
+  "Religious Grounds":                      "#A1887F",
+  "Golf Course":                            "#7CB342",
+  "Other Sports Facility":                  "#00897B",
+};
+const GREENSPACE_DEFAULT_COLOR = "#4CAF50";
+
+// Lazy-loaded. The geojson is ~3.7MB — don't fetch it until the user ticks
+// the toggle. Kept on the `grL` name so legacy references don't break.
+let grL = null;
+let _grLLoading = null;
+function _ensureGreenspaceLayer() {
+  if (grL) return Promise.resolve(grL);
+  if (_grLLoading) return _grLLoading;
+  _grLLoading = fetch('greenspaces.geojson?v=' + Date.now(), { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(gj => {
+      if (!gj) { _grLLoading = null; return null; }
+      grL = L.geoJSON(gj, {
+        interactive: true,
+        style: f => {
+          const c = GREENSPACE_COLORS[f.properties.function] || GREENSPACE_DEFAULT_COLOR;
+          return { color: c, weight: 0.6, fillColor: c, fillOpacity: 0.55, opacity: 0.9 };
+        },
+        onEachFeature: (feat, lyr) => {
+          const p = feat.properties || {};
+          const name = p.name || ('Unnamed ' + (p.function || 'greenspace'));
+          const cat  = p.function || '';
+          const ali  = p.aliases ? `<br><span style="font-size:10px;color:#888">Also: ${p.aliases}</span>` : '';
+          lyr.bindTooltip(
+            `<b style="font-size:11px">${name}</b><br><span style="font-size:10px;color:#2E7D32">${cat}</span>${ali}`,
+            { sticky: true, opacity: 0.94 }
+          );
+        },
+      });
+      return grL;
+    })
+    .catch(() => { _grLLoading = null; return null; });
+  return _grLLoading;
+}
 // gpL/hL/grL not added by default — toggle on via sidebar
 
 // ── Borough boundary layer ───────────────────────────────────────────────────
@@ -2015,7 +2076,8 @@ function refreshPointVisibility() {
   // their layer is toggled on. Kept as a stub so existing callers don't break.
   if (typeof gpL !== 'undefined' && gpL) gpL.eachLayer(m => m.setOpacity(1));
   if (typeof hL  !== 'undefined' && hL)  hL.eachLayer(m  => m.setOpacity(1));
-  if (typeof grL !== 'undefined' && grL) grL.eachLayer(m => m.setOpacity(1));
+  // grL is now a polygon L.geoJSON (lazy-loaded), not a marker layerGroup.
+  // Polygons don't need setOpacity here — the layer's own style handles it.
   if (typeof vcseData !== 'undefined') vcseData.forEach(o => {
     if (vcseCluster && !vcseCluster.hasLayer(o.marker)) vcseCluster.addLayer(o.marker);
   });
@@ -2122,7 +2184,24 @@ if (document.getElementById('tnw').checked) {
 }
 document.getElementById('tg').addEventListener('change',  e => e.target.checked ? gpL.addTo(map) : map.removeLayer(gpL));
 document.getElementById('th').addEventListener('change',  e => e.target.checked ? hL.addTo(map)  : map.removeLayer(hL));
-document.getElementById('tgr').addEventListener('change', e => e.target.checked ? grL.addTo(map) : map.removeLayer(grL));
+document.getElementById('tgr').addEventListener('change', e => {
+  const leg = document.getElementById('greenspace-legend');
+  if (leg) leg.style.display = e.target.checked ? 'block' : 'none';
+  if (e.target.checked) {
+    _ensureGreenspaceLayer().then(lyr => {
+      // User may have toggled off again while the geojson was still fetching.
+      if (lyr && document.getElementById('tgr').checked) {
+        lyr.addTo(map);
+        // Keep LSOA/ward strokes and markers on top of the park fills.
+        if (lyr.bringToBack) lyr.bringToBack();
+        if (boroughL && boroughL._map) boroughL.bringToFront();
+        if (wLyr && wLyr._map) wLyr.bringToFront();
+      }
+    });
+  } else if (grL) {
+    map.removeLayer(grL);
+  }
+});
 document.getElementById('tv').addEventListener('change',  e => e.target.checked ? vcseCluster.addTo(map) : map.removeLayer(vcseCluster));
 document.getElementById('td').addEventListener('change',  e => e.target.checked ? dentalCluster.addTo(map) : map.removeLayer(dentalCluster));
 document.getElementById('tph').addEventListener('change', e => e.target.checked ? pharmCluster.addTo(map) : map.removeLayer(pharmCluster));

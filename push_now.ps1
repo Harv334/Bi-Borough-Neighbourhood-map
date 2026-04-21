@@ -43,14 +43,14 @@ never overflow their slots.
   are back in the top header toolbar (.hdr) where they were.
 - Strip trailing virtiofs padding (null bytes + whitespace) from
   index.html tail.
-- Fix white-screen-on-ward-click regression caused by the grid
-  conversion: showWard / deselectWard / deselectLSOA / showLSOA /
-  sidebar-tab-switch all toggle #viewing-strip display, which now
-  collapses/expands the .map-wrap grid row. Call
-  map.invalidateSize() on the next animation frame after each toggle
-  so Leaflet repaints tiles into the newly-exposed area (was
-  previously rendering blank white because Leaflet's cached
-  container size was stale).
+- Fix white-screen-on-ward-click regression: the viewing-strip was
+  being hidden/shown on ward & LSOA click, which changed the
+  .map-wrap grid row height and caused Leaflet to paint tiles at
+  stale dimensions (resulting in a blank white map). Fix: leave the
+  viewing-strip visible at all times and just swap its digest text
+  to "Ward: X" / "LSOA: X" / "All of NW London". Map-wrap grid
+  geometry now never changes, so the map never needs to repaint on
+  selection change.
 
 Confirmed fix: ward deselect no longer pushes UI upward, tabs stay
 pinned at all times.

@@ -2134,13 +2134,11 @@ function showWard(wn) {
   // Switch to ward tab
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='ward'));
   document.querySelectorAll('.tab-pane').forEach(t => t.classList.toggle('active', t.id==='tab-ward'));
-  // Hide the viewing-strip description — the ward profile replaces it.
-  // Toggling its display changes the .map-wrap grid geometry, so tell Leaflet
-  // to recompute its container size on the next frame or the newly-exposed
-  // area renders as blank white tiles (bug: whole map goes white on click).
-  const _vs = document.getElementById('viewing-strip');
-  if (_vs) _vs.style.display = 'none';
-  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
+  // Keep the viewing-strip visible but swap its digest to the ward name so
+  // the .map-wrap grid geometry never changes on click (toggling display
+  // was causing the map to repaint as a blank white rectangle).
+  const _vsd = document.getElementById('vs-digest');
+  if (_vsd) _vsd.textContent = 'Ward: ' + wn;
 
   // Auto-filter LSOA layer to this ward if active
   if (lsoaActive && lsoaLyr) {
@@ -2237,18 +2235,16 @@ window.deselectWard = function() {
   if (typeof _restyleAll === 'function') _restyleAll();
   const p = document.getElementById('wpanel');
   if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
-  const vs = document.getElementById('viewing-strip');
-  if (vs) vs.style.display = '';
-  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
+  const vsd = document.getElementById('vs-digest');
+  if (vsd) vsd.textContent = 'All of NW London';
 };
 window.deselectLSOA = function() {
   selLSOA = null;
   if (typeof _restyleAll === 'function') _restyleAll();
   const p = document.getElementById('wpanel');
   if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
-  const vs = document.getElementById('viewing-strip');
-  if (vs) vs.style.display = '';
-  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
+  const vsd = document.getElementById('vs-digest');
+  if (vsd) vsd.textContent = 'All of NW London';
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2935,12 +2931,10 @@ function showLSOA(feat) {
 
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='ward'));
   document.querySelectorAll('.tab-pane').forEach(t => t.classList.toggle('active', t.id==='tab-ward'));
-  // Hide the viewing-strip description — the LSOA profile replaces it.
-  // Invalidate map size after the grid row collapses (otherwise the newly-
-  // exposed map area paints blank white).
-  const _vs2 = document.getElementById('viewing-strip');
-  if (_vs2) _vs2.style.display = 'none';
-  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
+  // Keep viewing-strip visible; update its digest to the LSOA code so the
+  // .map-wrap grid row height doesn't change on LSOA click.
+  const _vsd2 = document.getElementById('vs-digest');
+  if (_vsd2) _vsd2.textContent = 'LSOA: ' + (props.lsoa_name || props.code || '');
 
   // IMD data from embedded properties
   const decile = props.imd_decile || '—';
@@ -4368,15 +4362,9 @@ document.querySelectorAll('.sb-tab').forEach(t => {
     document.querySelectorAll('.sb-tab').forEach(x => x.classList.toggle('active', x===t));
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='tab-'+t.dataset.tab));
     if (t.dataset.tab === 'nbhd') renderNbhdTable();
-    // Restore viewing-strip unless the Ward tab is showing an actual selection.
-    const vs = document.getElementById('viewing-strip');
-    if (vs) {
-      const hasSel = (typeof selW !== 'undefined' && selW) || (typeof selLSOA !== 'undefined' && selLSOA);
-      vs.style.display = (t.dataset.tab === 'ward' && hasSel) ? 'none' : '';
-    }
-    // Tab switch can collapse/expand the viewing-strip grid row, so refresh
-    // the Leaflet map size (otherwise revealed area paints white).
-    if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
+    // Viewing-strip stays visible at all times now; the digest text is
+    // kept in sync by showWard/showLSOA/deselectWard/deselectLSOA so the
+    // map-wrap grid geometry never changes (prevents white-screen bug).
   });
 });
 

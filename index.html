@@ -16,8 +16,55 @@
   .app { display: flex; flex-direction: column; height: 100vh; }
   .hdr { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
   .hdr-left { display: flex; align-items: center; gap: 12px; }
-  .hdr-logo { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-  .hdr-sub { font-size: 11px; color: #666; margin-top: 1px; }
+  .hdr-logo { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .hdr-sub { font-size: 12px; color: #666; margin-top: 1px; }
+  .hdr-right { display: flex; align-items: center; gap: 8px; }
+
+  /* ── Header toolbar (Reset / Copy link / PNG / CSV) ── */
+  .tb-btn { background: #fff; border: 1px solid #d4d4d4; border-radius: 6px; padding: 5px 10px; font-size: 11.5px; color: #333; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: 500; transition: background .12s, border-color .12s; }
+  .tb-btn:hover { background: #f5f5f5; border-color: #185FA5; color: #185FA5; }
+  .tb-btn.active { background: #185FA5; border-color: #185FA5; color: #fff; }
+  .tb-btn.active:hover { background: #0f4a82; border-color: #0f4a82; color: #fff; }
+  .tb-btn:active { background: #ebebeb; }
+  .tb-btn.primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .tb-btn.primary:hover { background: #0f4b85; color: #fff; }
+  .tb-btn.danger:hover { background: #fef2f2; border-color: #A32D2D; color: #A32D2D; }
+  .tb-sep { width: 1px; height: 20px; background: #ddd; }
+
+  /* ── Header search ── */
+  .hdr-search { position: relative; }
+  .hdr-search input { width: 200px; padding: 5px 10px 5px 28px; border: 1px solid #d4d4d4; border-radius: 6px; font-size: 12px; color: #333; background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.35-4.35'/></svg>") no-repeat 8px center; outline: none; transition: border-color .12s, box-shadow .12s; }
+  .hdr-search input:focus { border-color: #185FA5; box-shadow: 0 0 0 3px rgba(24,95,165,.12); }
+  .hdr-search-results { position: absolute; top: 100%; left: 0; margin-top: 4px; width: 320px; max-height: 360px; overflow-y: auto; background: #fff; border: 1px solid #d4d4d4; border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.15); display: none; z-index: 3000; }
+  .hdr-search-results.show { display: block; }
+  .sr-row { padding: 7px 10px; font-size: 12px; color: #333; cursor: pointer; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f0f0ec; }
+  .sr-row:hover, .sr-row.active { background: #f5f8fc; }
+  .sr-row:last-child { border-bottom: 0; }
+  .sr-row .sr-type { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #888; font-weight: 600; min-width: 54px; }
+  .sr-row .sr-name { flex: 1; color: #222; }
+  .sr-row .sr-sub { font-size: 10.5px; color: #888; }
+  .sr-empty { padding: 12px; font-size: 11.5px; color: #999; text-align: center; }
+  .sr-grp { padding: 4px 10px; font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; color: #aaa; background: #fafafa; font-weight: 600; border-bottom: 1px solid #eee; }
+  .hsr-group { font-size: 9.5px; text-transform: uppercase; letter-spacing: .05em; color: #888; padding: 6px 10px 3px; background: #fafafa; border-bottom: 1px solid #eee; }
+  .hsr-item { display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; font-size: 12px; color: #333; cursor: pointer; border-bottom: 1px solid #f4f4f4; }
+  .hsr-item:hover { background: #f0f6ff; }
+  .hsr-type { font-size: 9.5px; color: #888; padding: 1px 5px; border-radius: 3px; background: #eee; flex-shrink: 0; text-transform: uppercase; letter-spacing: .04em; }
+  .hsr-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hsr-meta { font-size: 10.5px; color: #999; flex-shrink: 0; }
+  .hsr-empty { padding: 14px 10px; font-size: 11.5px; color: #888; text-align: center; }
+
+  /* ── "Currently viewing" strip + filter chips (above the map) ── */
+  .viewing-strip { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 6px 12px; font-size: 11.5px; color: #555; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 34px; flex-shrink: 0; }
+  .vs-label { font-weight: 600; color: #888; letter-spacing: .05em; text-transform: uppercase; font-size: 9.5px; flex-shrink: 0; }
+  .vs-digest { color: #333; font-weight: 500; }
+  .vs-digest b { color: #185FA5; font-weight: 600; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; background: #eaf2fb; color: #185FA5; border: 1px solid #c9dcf2; border-radius: 12px; padding: 3px 4px 3px 9px; font-size: 11px; font-weight: 500; line-height: 1.4; }
+  .chip.core20 { background: #fef2f2; color: #A32D2D; border-color: #f5c2c2; }
+  .chip.overlay { background: #f2ecdf; color: #854F0B; border-color: #e3d3ae; }
+  .chip.vcse { background: #f6eaf8; color: #7B2D8E; border-color: #e4c8ea; }
+  .chip-x { background: transparent; border: none; color: inherit; opacity: .6; cursor: pointer; font-size: 13px; line-height: 1; padding: 0 4px; border-radius: 8px; }
+  .chip-x:hover { opacity: 1; background: rgba(0,0,0,.06); }
   .nbadges { display: flex; gap: 5px; flex-wrap: wrap; }
   .nb { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; cursor: pointer; opacity: .45; border: 1.5px solid transparent; white-space: nowrap; transition: opacity .15s, transform .1s; }
   .nb:hover { transform: translateY(-1px); }
@@ -35,11 +82,17 @@
   .sb-sec { padding: 11px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
   .deselect-btn { border: 1px solid #c9c9c4; background: #fff; color: #555; font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 5px; cursor: pointer; line-height: 1.2; white-space: nowrap; flex-shrink: 0; }
   .deselect-btn:hover { background: #f2f2ec; border-color: #999; color: #222; }
-  .sb-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 8px; }
+  .sb-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-bottom: 8px; }
+  .sb-lbl.collapsible { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
+  .sb-lbl.collapsible::before { content: "▾"; font-size: 9px; color: #bbb; transition: transform .15s; transform-origin: center; display: inline-block; }
+  .sb-sec.collapsed .sb-lbl.collapsible::before { transform: rotate(-90deg); }
+  .sb-sec.collapsed > *:not(.sb-lbl) { display: none !important; }
   .lrow { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: default; }
   .ldot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .lname { font-size: 12px; color: #333; flex: 1; }
-  .lcount { font-size: 11px; color: #999; }
+  .lname { font-size: 13px; color: #333; flex: 1; }
+  .lcount { font-size: 12px; color: #999; }
+  .lhelp { display: inline-block; margin-left: 4px; width: 13px; height: 13px; line-height: 13px; text-align: center; border-radius: 50%; background: #eee; color: #888; font-size: 9.5px; font-weight: 700; cursor: help; user-select: none; }
+  .lhelp:hover { background: #185FA5; color: #fff; }
   input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; accent-color: #185FA5; }
   select { width: 100%; padding: 6px 9px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; color: #333; background: #fff; cursor: pointer; outline: none; }
   select:focus { border-color: #185FA5; }
@@ -133,6 +186,18 @@
   .loading-txt { font-size: 13px; color: #666; }
   .loading-sub { font-size: 11px; color: #aaa; }
 
+  /* ── Data-level badge (floating overlay, top-right of map) ── */
+  .dl-badge { position: absolute; top: 12px; right: 12px; z-index: 1001; background: rgba(255,255,255,0.96); border: 1px solid #d4d4d4; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 6px 8px; display: flex; align-items: center; gap: 8px; user-select: none; }
+  .dl-badge-label { font-weight: 600; color: #555; letter-spacing: 0.04em; text-transform: uppercase; font-size: 9px; }
+  .dl-seg { display: flex; background: #f2f2f0; border-radius: 6px; padding: 2px; gap: 2px; }
+  .dl-seg button { background: transparent; border: none; padding: 4px 10px; font-size: 11px; color: #666; border-radius: 4px; cursor: pointer; font-weight: 500; transition: background .12s, color .12s; }
+  .dl-seg button:hover { color: #185FA5; }
+  .dl-seg button.active { background: #185FA5; color: #fff; box-shadow: 0 1px 3px rgba(24,95,165,.3); }
+  .dl-seg button.disabled { color: #aaa; cursor: help; font-style: italic; }
+  .dl-seg button.disabled:hover { color: #888; background: transparent; }
+  .dl-hint { position: absolute; top: 100%; right: 0; margin-top: 4px; background: #333; color: #fff; font-size: 10.5px; padding: 6px 9px; border-radius: 5px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+  .dl-hint.show { opacity: 1; }
+
   /* ── Status bar ── */
   .sbar { background: #fff; border-top: 1px solid #e5e5e0; padding: 4px 14px; font-size: 10px; color: #aaa; display: flex; justify-content: space-between; flex-shrink: 0; }
 
@@ -222,7 +287,19 @@
         <div class="hdr-sub">9 boroughs · 188 wards · loading VCSE organisations...</div>
       </div>
     </div>
-    <div class="nbadges" id="nbadges"></div>
+    <div class="hdr-right">
+      <div class="hdr-search">
+        <input type="text" id="hdr-search-input" placeholder="Search ward, LSOA, GP, charity…" autocomplete="off" />
+        <div class="hdr-search-results" id="hdr-search-results"></div>
+      </div>
+      <div class="tb-sep"></div>
+      <button type="button" class="tb-btn" id="tb-reset" title="Clear all filters and return to default view">↺ Reset</button>
+      <button type="button" class="tb-btn" id="tb-cb" title="Switch to a colour-blind safe palette (deuteranopia/protanopia friendly)" aria-pressed="false">◐ CB safe</button>
+      <button type="button" class="tb-btn" id="tb-copy" title="Copy shareable URL of this view">🔗 Copy link</button>
+      <button type="button" class="tb-btn" id="tb-png" title="Download the current map as a PNG image">⤓ PNG</button>
+      <button type="button" class="tb-btn" id="tb-csv" title="Download the ward/LSOA data behind the current overlay">⤓ CSV</button>
+      <div class="nbadges" id="nbadges"></div>
+    </div>
   </div>
 
   <div class="main">
@@ -244,9 +321,9 @@
       <div class="tab-pane active" id="tab-layers">
         <div class="sb-sec">
           <div class="sb-lbl">Point layers</div>
-          <label class="lrow"><div class="ldot" style="background:#185FA5"></div><span class="lname">GP practices</span><input type="checkbox" id="tg"></label>
-          <label class="lrow"><div class="ldot" style="background:#A32D2D"></div><span class="lname">Hospitals &amp; clinics</span><input type="checkbox" id="th"></label>
-          <label class="lrow"><div class="ldot" style="background:#2E7D32"></div><span class="lname">Parks &amp; greenspaces</span><input type="checkbox" id="tgr"></label>
+          <label class="lrow"><div class="ldot" style="background:#185FA5"></div><span class="lname">GP practices <span class="lcount" id="gp-count">0</span></span><input type="checkbox" id="tg"></label>
+          <label class="lrow"><div class="ldot" style="background:#A32D2D"></div><span class="lname">Hospitals &amp; clinics <span class="lcount" id="hosp-count">0</span></span><input type="checkbox" id="th"></label>
+          <label class="lrow"><div class="ldot" style="background:#2E7D32"></div><span class="lname">Parks &amp; greenspaces <span class="lcount" id="greenspace-count">0</span></span><input type="checkbox" id="tgr"></label>
           <div id="greenspace-legend" style="display:none;margin:2px 0 6px 18px;padding:4px 6px;background:#f7f9f7;border-radius:4px">
             <div style="font-size:10px;color:#666;margin-bottom:3px">OS Open Greenspace categories</div>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 6px;font-size:10px;line-height:1.2">
@@ -273,8 +350,8 @@
               <option value="all">All NW London</option>
             </select>
           </div>
-          <label class="lrow"><div style="width:9px;height:9px;border:1.5px solid #000;border-radius:2px;flex-shrink:0"></div><span class="lname">Ward boundaries <span class="lcount">188</span></span><input type="checkbox" id="tnw" checked></label>
-          <label class="lrow"><div style="width:9px;height:9px;border:1.5px dashed #e67e22;border-radius:2px;flex-shrink:0"></div><span class="lname">LSOA boundaries <span class="lcount">123</span></span><input type="checkbox" id="tlsoa"></label>
+          <label class="lrow"><div style="width:9px;height:9px;border:1.5px solid #000;border-radius:2px;flex-shrink:0"></div><span class="lname">Ward boundaries <span class="lcount" id="ward-count">188</span></span><input type="checkbox" id="tnw" checked></label>
+          <label class="lrow"><div style="width:9px;height:9px;border:1.5px dashed #e67e22;border-radius:2px;flex-shrink:0"></div><span class="lname">LSOA<span class="lhelp" title="Lower-layer Super Output Area — small census geography of ~1,500 residents or ~650 households. There are ~1,200 across NW London.">?</span> boundaries <span class="lcount" id="lsoa-count">0</span></span><input type="checkbox" id="tlsoa"></label>
           <label id="lsoa-imd-row" class="lrow" style="display:none;margin-left:18px;padding:3px 0 0"><div style="width:9px;height:9px;background:linear-gradient(90deg,#67000d,#cb181d,#fb6a4a,#a1d99b,#006d2c);border-radius:2px;flex-shrink:0"></div><span class="lname" style="font-size:11px">Colour by IMD decile</span><input type="checkbox" id="tlsoa-imd"></label>
           <div id="lsoa-filter-row" style="display:none;margin:4px 0 0 18px">
             <select id="lsoa-scope" style="width:100%;padding:4px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
@@ -367,7 +444,11 @@
       <!-- Overlay tab -->
       <div class="tab-pane" id="tab-overlay">
         <div class="sb-sec" style="flex:1;border-bottom:none;overflow-y:auto">
-          <div class="sb-lbl">Choropleth overlay</div>
+          <div class="sb-lbl" style="display:flex;align-items:center;gap:6px">
+            <span>Choropleth overlay</span>
+            <span id="ov-info" class="lhelp" title="About the current indicator" style="display:none">i</span>
+          </div>
+          <div id="ov-info-panel" style="display:none;background:#fafafa;border:1px solid #eee;border-radius:5px;padding:7px 9px;margin:0 0 8px;font-size:11px;color:#555;line-height:1.5"></div>
           <select id="ov">
             <option value="none">— none (neighbourhood colours) —</option>
             <optgroup label="Health (Census 2021, ward-level)">
@@ -445,9 +526,10 @@
           </select>
 
           <div class="scale-bar" id="scale">
-            <div class="scale-labels"><span id="sc-lo">Low</span><span id="sc-hi">High</span></div>
+            <div class="scale-labels"><span id="sc-lo">Low</span><span id="sc-mid" style="color:#aaa;font-variant-numeric:tabular-nums"></span><span id="sc-hi">High</span></div>
             <!-- Gradient must match ramp() in JS exactly: rgb(15,110,86) → rgb(239,159,39) → rgb(163,45,39) -->
             <div class="scale-grad" id="sc-grad" style="background:linear-gradient(to right, rgb(15,110,86) 0%, rgb(239,159,39) 50%, rgb(163,45,39) 100%)"></div>
+            <div id="sc-meta" style="margin-top:5px;font-size:10.5px;color:#888;line-height:1.4"></div>
           </div>
 
           <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">
@@ -517,7 +599,7 @@
           <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#333;font-weight:500">
               <input type="checkbox" id="core20-toggle" style="cursor:pointer">
-              <span>Highlight Core20 LSOAs</span>
+              <span>Highlight Core20<span class="lhelp" title="Core20 = the 20% most deprived neighbourhoods nationally (IMD deciles 1–2). NHS England's Core20PLUS5 framework prioritises them for targeted health action.">?</span> LSOAs</span>
             </label>
             <div style="font-size:10px;color:#888;margin-top:4px;line-height:1.45">
               NHS Core20PLUS5: LSOAs in IMD deciles 1-2 (most deprived 20% nationally).
@@ -574,13 +656,27 @@
     </div>
 
     <!-- Map -->
-    <div class="map-wrap">
+    <div class="map-wrap" id="map-wrap">
+      <div class="viewing-strip" id="viewing-strip">
+        <span class="vs-label">Viewing</span>
+        <span class="vs-digest" id="vs-digest">All of NW London</span>
+        <span class="chips" id="filter-chips"></span>
+      </div>
       <div class="loading-overlay" id="ldr">
         <div class="spin"></div>
         <div class="loading-txt" id="ldr-txt">Loading ward data...</div>
         <div class="loading-sub" id="ldr-sub">Fetching ward_data.json</div>
       </div>
       <div id="map"></div>
+      <div class="dl-badge" id="dl-badge" role="group" aria-label="Data level filter">
+        <span class="dl-badge-label">Viewing</span>
+        <div class="dl-seg" id="dl-seg">
+          <button type="button" data-dl="ward" class="active" title="Ward-level data (188 wards)">Ward</button>
+          <button type="button" data-dl="lsoa" title="LSOA-level data (~1,200 areas, more granular)">LSOA</button>
+          <button type="button" data-dl="nbhd" class="disabled" title="Neighbourhood mode — in development">Neighbourhood</button>
+        </div>
+        <div class="dl-hint" id="dl-hint"></div>
+      </div>
     </div>
 
   </div>
@@ -594,6 +690,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
@@ -788,6 +885,69 @@ const LSOA_ONLY_OVS = new Set(
 );
 function isLsoaOnlyOv(k) { return LSOA_ONLY_OVS.has(k); }
 
+// Metadata shown in the scale-bar footer and the overlay-info popover.
+// src = data source · yr = reference year · g = geography · u = unit
+const OV_META = {
+  // Census (TS tables) — all ward-level via NOMIS
+  census_population:              { src: "Census 2021 (TS001)",  yr: "2021", g: "Ward", u: "people",  desc: "Usual resident population." },
+  census_good_health_pct:         { src: "Census 2021 (TS037)",  yr: "2021", g: "Ward", u: "%",       desc: "Self-reported 'Good' or 'Very good' general health." },
+  census_bad_health_pct:          { src: "Census 2021 (TS037)",  yr: "2021", g: "Ward", u: "%",       desc: "Self-reported 'Bad' or 'Very bad' general health." },
+  census_disability_any_pct:      { src: "Census 2021 (TS038)",  yr: "2021", g: "Ward", u: "%",       desc: "Activities limited a little or a lot under the Equality Act." },
+  census_disability_lot_pct:      { src: "Census 2021 (TS038)",  yr: "2021", g: "Ward", u: "%",       desc: "Activities limited a lot under the Equality Act." },
+  census_provides_unpaid_care_pct:{ src: "Census 2021 (TS039)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents providing any unpaid care." },
+  census_unemployed_pct:          { src: "Census 2021 (TS066)",  yr: "2021", g: "Ward", u: "%",       desc: "Unemployed as a share of economically active residents aged 16+." },
+  census_no_qual_pct:             { src: "Census 2021 (TS067)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents aged 16+ with no formal qualifications." },
+  census_level4_qual_pct:         { src: "Census 2021 (TS067)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents aged 16+ with Level 4 or higher qualifications." },
+  census_no_car_pct:              { src: "Census 2021 (TS045)",  yr: "2021", g: "Ward", u: "%",       desc: "Households with no car or van." },
+  census_social_rented_pct:       { src: "Census 2021 (TS054)",  yr: "2021", g: "Ward", u: "%",       desc: "Households in social rented accommodation (council + housing association)." },
+  census_private_rented_pct:      { src: "Census 2021 (TS054)",  yr: "2021", g: "Ward", u: "%",       desc: "Households renting privately." },
+  census_owned_pct:               { src: "Census 2021 (TS054)",  yr: "2021", g: "Ward", u: "%",       desc: "Owner-occupied households (outright + with mortgage)." },
+  census_non_white_pct:           { src: "Census 2021 (TS021)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents identifying as an ethnicity other than White." },
+  census_born_outside_uk_pct:     { src: "Census 2021 (TS004)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents born outside the UK." },
+  census_white_pct:               { src: "Census 2021 (TS021)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents identifying as White (high-level category)." },
+  census_asian_pct:               { src: "Census 2021 (TS021)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents identifying as Asian / Asian British." },
+  census_black_pct:               { src: "Census 2021 (TS021)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents identifying as Black / Black British." },
+  census_mixed_pct:               { src: "Census 2021 (TS021)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents identifying as Mixed / Multiple ethnicity." },
+  census_other_ethnic_pct:        { src: "Census 2021 (TS021)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents identifying as Other ethnic group." },
+  census_under16_pct:             { src: "Census 2021 (TS007A)", yr: "2021", g: "Ward", u: "%",       desc: "Residents aged under 16." },
+  census_working_age_pct:         { src: "Census 2021 (TS007A)", yr: "2021", g: "Ward", u: "%",       desc: "Residents aged 16–64." },
+  census_over65_pct:              { src: "Census 2021 (TS007A)", yr: "2021", g: "Ward", u: "%",       desc: "Residents aged 65 and over." },
+  census_over85_pct:              { src: "Census 2021 (TS007A)", yr: "2021", g: "Ward", u: "%",       desc: "Residents aged 85 and over." },
+  census_higher_managerial_pct:   { src: "Census 2021 (TS062)",  yr: "2021", g: "Ward", u: "%",       desc: "NS-SeC higher managerial / professional occupations." },
+  census_routine_semi_routine_pct:{ src: "Census 2021 (TS062)",  yr: "2021", g: "Ward", u: "%",       desc: "NS-SeC semi-routine or routine occupations." },
+  census_english_hh_all_pct:      { src: "Census 2021 (TS025)",  yr: "2021", g: "Ward", u: "%",       desc: "Households where all adults have English as a main language." },
+  census_english_hh_none_pct:     { src: "Census 2021 (TS025)",  yr: "2021", g: "Ward", u: "%",       desc: "Households where no adults have English as a main language." },
+  census_active_travel_pct:       { src: "Census 2021 (TS061)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents commuting on foot or by bicycle." },
+  census_public_transport_pct:    { src: "Census 2021 (TS061)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents commuting by bus, rail, tube or other public transport." },
+  census_car_to_work_pct:         { src: "Census 2021 (TS061)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents commuting by car or van." },
+
+  // Crime + deprivation flags
+  crime_total:                    { src: "data.police.uk",       yr: "Rolling 12 mo.", g: "Ward", u: "crimes", desc: "Total reported crimes in the last 12 months of data." },
+  core20_lsoa_count:              { src: "NHSE Core20PLUS5",     yr: "2024", g: "Ward", u: "LSOAs",  desc: "Count of LSOAs in the ward falling in the national IMD-decile 1–2 (Core20)." },
+  claimant_rate_pct:              { src: "NOMIS CLA01",          yr: "Latest", g: "Ward/LSOA", u: "%", desc: "Claimant count rate (UC + JSA) as % of working-age population." },
+
+  // Environment + access
+  fuel_poverty_pct:               { src: "DESNZ LILEE",          yr: "2022", g: "LSOA", u: "%",       desc: "Households in fuel poverty under the Low Income Low Energy Efficiency (LILEE) metric." },
+  gb_commitment_pct:              { src: "Defra Green/Blue Spaces",          yr: "2023", g: "LSOA", u: "%", desc: "Addresses within 15 min walk of green OR blue space meeting ANGSt." },
+  green_commitment_pct:           { src: "Defra Green/Blue Spaces",          yr: "2023", g: "LSOA", u: "%", desc: "Addresses within 15 min walk of qualifying green space." },
+  green_doorstep_pct:             { src: "Defra Green/Blue Spaces",          yr: "2023", g: "LSOA", u: "%", desc: "Addresses within 200 m of doorstep green space (≥0.5 ha)." },
+  green_local_pct:                { src: "Defra Green/Blue Spaces",          yr: "2023", g: "LSOA", u: "%", desc: "Addresses within 300 m of local green space (≥2 ha)." },
+  green_neighbourhood_pct:        { src: "Defra Green/Blue Spaces",          yr: "2023", g: "LSOA", u: "%", desc: "Addresses within 1 km of neighbourhood green space (≥10 ha)." },
+  blue_commitment_pct:            { src: "Defra Green/Blue Spaces",          yr: "2023", g: "LSOA", u: "%", desc: "Addresses within 15 min walk of qualifying blue space." },
+
+  // IMD 2025
+  imd_score:                      { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Composite Index of Multiple Deprivation. Higher = more deprived." },
+  imd_decile:                     { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "decile", desc: "National deprivation decile. 1 = most deprived 10%." },
+  income_score:                   { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Income Deprivation domain score." },
+  employment_score:               { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Employment Deprivation domain score." },
+  education_score:                { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Education, Skills & Training domain score." },
+  health_score:                   { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Health Deprivation & Disability domain score." },
+  crime_score:                    { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Crime domain score." },
+  barriers_score:                 { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Barriers to Housing & Services domain score." },
+  environment_score:              { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Living Environment domain score." },
+};
+function ovMeta(k) { return OV_META[k] || null; }
+
 // ═══════════════════════════════════════════════════════════════════════════
 // WARD GEOJSON — ONS WD May 2025 BFC V2 (full resolution); 188 wards across 9 NW London boroughs.
 // Westminster wards keep original names; duplicates ("Kilburn", "Regent's Park") in non-Westminster
@@ -957,6 +1117,19 @@ function ladOfLatLng(lat, lng) {
 function ramp(t, inv) {
   if (inv) t = 1 - t;
   t = Math.min(Math.max(t, 0), 1);
+  // Colour-blind safe (Viridis-ish): 5-stop piecewise interpolation through
+  // purple → blue → teal → green → yellow. Monotonic in luminance so it stays
+  // readable for deuteranopia/protanopia and desaturated print-outs alike.
+  if (window.cbSafe) {
+    const STOPS = [[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]];
+    const seg = Math.min(3, Math.floor(t * 4));
+    const f = (t * 4) - seg;
+    const a = STOPS[seg], b = STOPS[seg+1];
+    const r = Math.round(a[0] + (b[0]-a[0]) * f);
+    const g = Math.round(a[1] + (b[1]-a[1]) * f);
+    const bl = Math.round(a[2] + (b[2]-a[2]) * f);
+    return `rgb(${r},${g},${bl})`;
+  }
   let r, g, b;
   if (t < 0.5) { const f=t*2; r=Math.round(15+(239-15)*f); g=Math.round(110+(159-110)*f); b=Math.round(86+(39-86)*f); }
   else { const f=(t-.5)*2; r=Math.round(239+(163-239)*f); g=Math.round(159+(45-159)*f); b=39; }
@@ -1222,12 +1395,37 @@ function _ensureGreenspaceLayer() {
           );
         },
       });
+      if (typeof _updateLayerCounts === 'function') _updateLayerCounts();
       return grL;
     })
     .catch(() => { _grLLoading = null; return null; });
   return _grLLoading;
 }
 // gpL/hL/grL not added by default — toggle on via sidebar
+
+// ── Layer count badges ───────────────────────────────────────────────────────
+// Keeps the little "188", "1,234" numbers next to each Layers-tab entry in
+// sync with what's actually loaded. Idempotent — safe to call whenever a
+// data source finishes loading.
+function _updateLayerCounts() {
+  try {
+    const setIf = (id, n) => {
+      const e = document.getElementById(id);
+      if (e && Number.isFinite(n)) e.textContent = n.toLocaleString();
+    };
+    if (typeof GPS !== 'undefined' && Array.isArray(GPS)) setIf('gp-count', GPS.length);
+    if (typeof HOSP !== 'undefined' && Array.isArray(HOSP)) setIf('hosp-count', HOSP.length);
+    if (typeof grL !== 'undefined' && grL && typeof grL.getLayers === 'function') {
+      setIf('greenspace-count', grL.getLayers().length);
+    }
+    if (typeof wLyr !== 'undefined' && wLyr && typeof wLyr.getLayers === 'function') {
+      setIf('ward-count', wLyr.getLayers().length);
+    }
+    if (typeof lsoaLyr !== 'undefined' && lsoaLyr && typeof lsoaLyr.getLayers === 'function') {
+      setIf('lsoa-count', lsoaLyr.getLayers().length);
+    }
+  } catch (e) { console.warn('_updateLayerCounts failed', e); }
+}
 
 // ── Borough boundary layer ───────────────────────────────────────────────────
 // Per-feature style so that when a borough is focused we hide the other 8
@@ -2327,6 +2525,7 @@ function buildWardLayer() {
   map.fitBounds(wLyr.getBounds(), { padding:[28,28], maxZoom:11 });
   // Neighbourhood colours/borders start OFF; user can toggle on via 'Neighbourhood colours'
   if (showNbhdColors) buildNbhdBorders();
+  if (typeof _updateLayerCounts === 'function') _updateLayerCounts();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2634,6 +2833,15 @@ const IMD_DECILE_COLORS = {
   1:'#67000d', 2:'#a50f15', 3:'#cb181d', 4:'#ef3b2c', 5:'#fb6a4a',
   6:'#fc9272', 7:'#a1d99b', 8:'#74c476', 9:'#31a354', 10:'#006d2c'
 };
+// Cividis-inspired 10-step palette for users with red/green colour-blindness.
+// Deep blue (most deprived) → gold (least deprived) — monotonic in luminance.
+const IMD_DECILE_COLORS_CB = {
+  1:'#00224e', 2:'#123570', 3:'#3b496c', 4:'#575d6d', 5:'#707173',
+  6:'#8a8678', 7:'#a59c74', 8:'#c3b369', 9:'#e1cc55', 10:'#fee838'
+};
+function imdDecileColor(d) {
+  return (window.cbSafe ? IMD_DECILE_COLORS_CB : IMD_DECILE_COLORS)[d];
+}
 
 function imdStyle(feat, state) {
   const d = feat.properties.imd_decile;
@@ -2641,7 +2849,7 @@ function imdStyle(feat, state) {
   // users can tell ward (black) and LSOA (navy) borders apart at a glance.
   const base = {
     color: '#1E4B8E', weight: 1.2,
-    fillColor: (lsoaIMDColour && d) ? (IMD_DECILE_COLORS[d] || '#ccc') : '#ccc',
+    fillColor: (lsoaIMDColour && d) ? (imdDecileColor(d) || '#ccc') : '#ccc',
     fillOpacity: lsoaIMDColour ? 0.45 : 0.05, opacity: 0.75,
   };
   if (state === 'hover') {
@@ -3132,6 +3340,7 @@ function buildEmbeddedLSOALayer() {
 
 // Build on load
 buildEmbeddedLSOALayer();
+if (typeof _updateLayerCounts === 'function') _updateLayerCounts();
 
 // ── Populate ward dropdown in LSOA filter ──
 (function() {
@@ -3384,17 +3593,38 @@ document.getElementById('ov').addEventListener('change', e => {
     delete _ovRange[curOv];
     delete _lsoaRange[curOv];
     const range = getOvRange(curOv);
-    const fmtLo = range ? fmtNum(range.lo, 1) : cfg.lo;
-    const fmtHi = range ? fmtNum(range.hi, 1) : cfg.hi;
+    const meta = ovMeta(curOv);
+    const unitSuffix = (meta && meta.u && meta.u.length <= 6) ? (' ' + meta.u) : '';
+    const fmtLo = range ? fmtNum(range.lo, 1) + unitSuffix : cfg.lo;
+    const fmtHi = range ? fmtNum(range.hi, 1) + unitSuffix : cfg.hi;
+    const fmtMid = range ? fmtNum((range.lo + range.hi) / 2, 1) + unitSuffix : '';
     document.getElementById('sc-lo').textContent = `${cfg.lo} (${fmtLo})`;
     document.getElementById('sc-hi').textContent = `${cfg.hi} (${fmtHi})`;
-    // Legend gradient must match ramp() inversion: when wh:true (higher=worse),
-    // colour progresses green→red left-to-right; when wh:false (higher=better),
-    // we flip to red→green so the visual matches the polygon fills.
-    const grad = cfg.wh
-      ? 'linear-gradient(to right, rgb(15,110,86) 0%, rgb(239,159,39) 50%, rgb(163,45,39) 100%)'
-      : 'linear-gradient(to right, rgb(163,45,39) 0%, rgb(239,159,39) 50%, rgb(15,110,86) 100%)';
-    document.getElementById('sc-grad').style.background = grad;
+    const midEl = document.getElementById('sc-mid');
+    if (midEl) midEl.textContent = fmtMid;
+    const metaEl = document.getElementById('sc-meta');
+    if (metaEl) metaEl.textContent = meta ? `${meta.g} · ${meta.src} (${meta.yr})` : '';
+    const info = document.getElementById('ov-info');
+    const panel = document.getElementById('ov-info-panel');
+    if (info && panel) {
+      if (meta && meta.desc) {
+        info.style.display = 'inline-block';
+        info.onclick = () => { panel.style.display = panel.style.display === 'block' ? 'none' : 'block'; };
+        const lbl = (document.getElementById('ov').selectedOptions[0] || {}).text || curOv;
+        panel.innerHTML = `<div style="margin-bottom:3px"><b>${lbl}</b></div>${meta.desc}<div style="margin-top:5px;color:#888">${meta.g} · ${meta.src} · ${meta.yr}</div>`;
+        panel.style.display = 'none';
+      } else {
+        info.style.display = 'none';
+        panel.style.display = 'none';
+      }
+    }
+    // Legend gradient mirrors ramp() so the CB-safe palette flows through.
+    // When wh:true (higher=worse), left=low=good → right=high=bad; the `inv`
+    // argument to ramp() flips this for "higher=better" metrics.
+    const inv = !cfg.wh;
+    const stops = [];
+    for (let i = 0; i <= 10; i++) stops.push(`${ramp(i / 10, inv)} ${i * 10}%`);
+    document.getElementById('sc-grad').style.background = `linear-gradient(to right, ${stops.join(', ')})`;
   }
   // Auto-enable the LSOA layer if the overlay only has LSOA-level data
   // (IMD domains, claimant count etc.). Without this, users pick e.g.
@@ -3418,6 +3648,602 @@ document.getElementById('ov').addEventListener('change', e => {
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='overlay'));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='tab-overlay'));
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA-LEVEL BADGE — floating "Viewing Ward / LSOA / Neighbourhood" filter.
+// Acts as both indicator and filter: segment clicks switch the map level;
+// the badge auto-syncs when the user picks an overlay in the sidebar or
+// toggles the LSOA layer directly.
+// ═══════════════════════════════════════════════════════════════════════════
+let currentDataLevel = 'ward';
+function _setDataLevel(level, opts) {
+  opts = opts || {};
+  const hintEl = document.getElementById('dl-hint');
+  if (level === 'nbhd') {
+    if (hintEl) {
+      hintEl.textContent = 'Neighbourhood-level data — in development';
+      hintEl.classList.add('show');
+      clearTimeout(_setDataLevel._t);
+      _setDataLevel._t = setTimeout(() => hintEl.classList.remove('show'), 2400);
+    }
+    return;
+  }
+  if (level !== 'ward' && level !== 'lsoa') return;
+  currentDataLevel = level;
+  document.querySelectorAll('#dl-seg button').forEach(b => {
+    if (!b.classList.contains('disabled')) {
+      b.classList.toggle('active', b.dataset.dl === level);
+    }
+  });
+  if (opts.fromOverlay || opts.fromLsoaToggle) return;  // avoid feedback loops
+  const lsoaToggle = document.getElementById('tlsoa');
+  if (lsoaToggle) {
+    const wantLsoa = (level === 'lsoa');
+    if (lsoaToggle.checked !== wantLsoa) {
+      lsoaToggle.checked = wantLsoa;
+      lsoaToggle.dispatchEvent(new Event('change'));
+    }
+  }
+  // If switching to Ward while an LSOA-only overlay is active, reset overlay.
+  if (level === 'ward' && typeof curOv !== 'undefined' && curOv && curOv !== 'none'
+      && typeof isLsoaOnlyOv === 'function' && isLsoaOnlyOv(curOv)) {
+    const ovSel = document.getElementById('ov');
+    if (ovSel) { ovSel.value = 'none'; ovSel.dispatchEvent(new Event('change')); }
+  }
+}
+document.querySelectorAll('#dl-seg button').forEach(b => {
+  b.addEventListener('click', () => _setDataLevel(b.dataset.dl));
+});
+// Auto-sync badge when user picks an overlay in the Overlay sidebar tab.
+(function _wireDlBadgeFromOverlay() {
+  const ovSel = document.getElementById('ov');
+  if (!ovSel) return;
+  ovSel.addEventListener('change', () => {
+    const k = ovSel.value;
+    if (k && k !== 'none' && typeof isLsoaOnlyOv === 'function') {
+      _setDataLevel(isLsoaOnlyOv(k) ? 'lsoa' : 'ward', { fromOverlay: true });
+    }
+  });
+})();
+// Auto-sync badge when LSOA layer toggle is clicked independently.
+(function _wireDlBadgeFromLsoaToggle() {
+  const t = document.getElementById('tlsoa');
+  if (!t) return;
+  t.addEventListener('change', () => {
+    _setDataLevel(t.checked ? 'lsoa' : 'ward', { fromLsoaToggle: true });
+    _refreshUI();
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VIEWING STRIP + FILTER CHIPS + RESET
+// Single source of truth for "what is the map showing right now?". Reads
+// the live state (focusedBorough, focusedNbhd, curOv, showCore20Overlay,
+// vcse-area-filter, currentDataLevel) and renders the digest line + chip
+// bar above the map. Call _refreshUI() after any state mutation.
+// ═══════════════════════════════════════════════════════════════════════════
+function _ovLabel(k) {
+  if (!k || k === 'none') return '';
+  const sel = document.getElementById('ov');
+  if (sel) {
+    const opt = sel.querySelector(`option[value="${k}"]`);
+    if (opt) return opt.textContent.trim();
+  }
+  return k;
+}
+function _refreshUI() {
+  try {
+    // --- Digest line ---
+    const dig = document.getElementById('vs-digest');
+    if (dig) {
+      const parts = [];
+      parts.push(focusedBorough && focusedBorough !== 'all'
+        ? `<b>${focusedBorough}</b>` : 'All of NW London');
+      if (typeof focusedNbhd !== 'undefined' && focusedNbhd && focusedNbhd !== 'all'
+          && typeof NEIGHBOURHOODS !== 'undefined' && NEIGHBOURHOODS[focusedNbhd]) {
+        parts.push(`nbhd <b>${NEIGHBOURHOODS[focusedNbhd].label}</b>`);
+      }
+      parts.push((currentDataLevel === 'lsoa' ? '<b>LSOA</b>' : '<b>Ward</b>') + ' mode');
+      if (typeof curOv !== 'undefined' && curOv && curOv !== 'none') {
+        parts.push(`overlay <b>${_ovLabel(curOv)}</b>`);
+      }
+      if (typeof showCore20Overlay !== 'undefined' && showCore20Overlay) {
+        parts.push('<b>Core20</b> only');
+      }
+      dig.innerHTML = parts.join(' · ');
+    }
+
+    // --- Chip bar ---
+    const box = document.getElementById('filter-chips');
+    if (box) {
+      box.innerHTML = '';
+      const addChip = (cls, label, onClear) => {
+        const c = document.createElement('span');
+        c.className = 'chip ' + (cls || '');
+        c.innerHTML = `<span>${label}</span>`;
+        const x = document.createElement('button');
+        x.type = 'button';
+        x.className = 'chip-x';
+        x.textContent = '×';
+        x.title = 'Clear this filter';
+        x.addEventListener('click', () => { try { onClear(); } catch(e){} _refreshUI(); });
+        c.appendChild(x);
+        box.appendChild(c);
+      };
+      if (focusedBorough && focusedBorough !== 'all') {
+        addChip('', 'Borough: ' + focusedBorough, () => {
+          focusedBorough = 'all';
+          const bsel = document.getElementById('borough-focus');
+          if (bsel) bsel.value = 'all';
+          _applyBoroughSolo();
+          if (typeof BOROUGH_GJ !== 'undefined' && BOROUGH_GJ.features && boroughL) {
+            map.fitBounds(boroughL.getBounds(), { padding: [20, 20] });
+          }
+        });
+      }
+      if (typeof focusedNbhd !== 'undefined' && focusedNbhd && focusedNbhd !== 'all'
+          && typeof NEIGHBOURHOODS !== 'undefined' && NEIGHBOURHOODS[focusedNbhd]) {
+        addChip('', 'Nbhd: ' + NEIGHBOURHOODS[focusedNbhd].label,
+          () => setNbhdFocus('all'));
+      }
+      if (typeof curOv !== 'undefined' && curOv && curOv !== 'none') {
+        addChip('overlay', 'Overlay: ' + _ovLabel(curOv), () => {
+          const sel = document.getElementById('ov');
+          if (sel) { sel.value = 'none'; sel.dispatchEvent(new Event('change')); }
+        });
+      }
+      if (typeof showCore20Overlay !== 'undefined' && showCore20Overlay) {
+        addChip('core20', 'Core20 only', () => {
+          const t = document.getElementById('tcore20');
+          if (t) { t.checked = false; t.dispatchEvent(new Event('change')); }
+        });
+      }
+      const vsel = document.getElementById('vcse-area-filter');
+      if (vsel && vsel.value && vsel.value !== 'all' && !vsel.value.startsWith('lad-')
+          && !vsel.value.startsWith('nbhd-')) {
+        const txt = (vsel.selectedOptions[0] || {}).text || vsel.value;
+        addChip('vcse', 'VCSE: ' + txt, () => {
+          vsel.value = 'all';
+          vsel.dispatchEvent(new Event('change'));
+        });
+      }
+    }
+  } catch (e) { /* non-fatal */ }
+}
+
+// Reset everything → default view.
+function _resetAll() {
+  try {
+    // Borough
+    focusedBorough = 'all';
+    const bsel = document.getElementById('borough-focus');
+    if (bsel) bsel.value = 'all';
+    // Neighbourhood
+    if (typeof setNbhdFocus === 'function') setNbhdFocus('all');
+    // Overlay
+    const ovSel = document.getElementById('ov');
+    if (ovSel && ovSel.value !== 'none') { ovSel.value = 'none'; ovSel.dispatchEvent(new Event('change')); }
+    const ov2 = document.getElementById('ov2');
+    if (ov2 && ov2.value !== 'none') { ov2.value = 'none'; ov2.dispatchEvent(new Event('change')); }
+    // Core20
+    const tc = document.getElementById('tcore20');
+    if (tc && tc.checked) { tc.checked = false; tc.dispatchEvent(new Event('change')); }
+    // LSOA layer off
+    const tlsoa = document.getElementById('tlsoa');
+    if (tlsoa && tlsoa.checked) { tlsoa.checked = false; tlsoa.dispatchEvent(new Event('change')); }
+    // VCSE area filter
+    const vsel = document.getElementById('vcse-area-filter');
+    if (vsel && vsel.value !== 'all') { vsel.value = 'all'; vsel.dispatchEvent(new Event('change')); }
+    // Data level back to Ward
+    _setDataLevel('ward');
+    // Apply borough-solo clear + fit bounds
+    if (typeof _applyBoroughSolo === 'function') _applyBoroughSolo();
+    if (typeof BOROUGH_GJ !== 'undefined' && BOROUGH_GJ.features && typeof boroughL !== 'undefined' && boroughL) {
+      map.fitBounds(boroughL.getBounds(), { padding: [20, 20] });
+    }
+  } finally {
+    _refreshUI();
+  }
+}
+
+// Wire toolbar buttons (Reset + stubs for Copy / PNG / CSV — real impls below)
+(function _wireToolbar() {
+  const btnReset = document.getElementById('tb-reset');
+  if (btnReset) btnReset.addEventListener('click', _resetAll);
+})();
+
+// ── Colour-blind safe palette toggle ─────────────────────────────────────────
+// Swaps the choropleth ramp (ramp() in wstyle/ovColor) and the IMD decile
+// palette (imdDecileColor) between the default red-green and a Viridis/Cividis
+// pair that stays legible for deuteranopia/protanopia and in black-and-white
+// print. Flipping the flag restyles every coloured layer and refreshes the
+// legend gradient.
+window.cbSafe = false;
+function _applyColourPalette() {
+  try {
+    if (typeof wLyr !== 'undefined' && wLyr && typeof wstyle === 'function') {
+      wLyr.eachLayer(l => l.setStyle(wstyle(l.feature.properties.WD24NM, curOv,
+        (typeof selW !== 'undefined' && l.feature.properties.WD24NM === selW) ? 'selected' : 'default')));
+    }
+    if (typeof lsoaLyr !== 'undefined' && lsoaLyr && typeof imdStyle === 'function') {
+      lsoaLyr.eachLayer(l => l.setStyle(imdStyle(l.feature,
+        (typeof selLSOA !== 'undefined' && l.feature.properties.code === selLSOA) ? 'selected' : 'default')));
+    }
+    // Refresh overlay legend gradient (mirror wh inversion) + IMD swatch strip
+    const scBar = document.getElementById('sc-grad');
+    if (scBar && typeof ramp === 'function') {
+      const cfg = (typeof OV_CFG !== 'undefined' && curOv) ? OV_CFG[curOv] : null;
+      const inv = cfg ? !cfg.wh : false;
+      const stops = [];
+      for (let i = 0; i <= 10; i++) stops.push(`${ramp(i / 10, inv)} ${i * 10}%`);
+      scBar.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
+    }
+    document.querySelectorAll('[data-imd-decile]').forEach(el => {
+      const d = parseInt(el.getAttribute('data-imd-decile'), 10);
+      if (d >= 1 && d <= 10) el.style.background = imdDecileColor(d);
+    });
+  } catch (e) { console.warn('_applyColourPalette failed', e); }
+}
+(function _wireCbSafe() {
+  const btn = document.getElementById('tb-cb');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    window.cbSafe = !window.cbSafe;
+    btn.classList.toggle('active', window.cbSafe);
+    btn.setAttribute('aria-pressed', window.cbSafe ? 'true' : 'false');
+    _applyColourPalette();
+    if (typeof _writeUrlState === 'function') _writeUrlState();
+  });
+})();
+
+// ── URL state + Copy-link ────────────────────────────────────────────────────
+// Serialise the current view (overlay, borough focus, LSOA mode, Core20 flag,
+// CB-safe, map centre+zoom) to the URL so the user can bookmark or share it.
+// Kept intentionally short-param so the query string stays legible.
+function _writeUrlState() {
+  try {
+    const p = new URLSearchParams();
+    const ovEl = document.getElementById('ov');
+    const ov2El = document.getElementById('ov2');
+    const bfEl = document.getElementById('borough-focus');
+    const lsEl = document.getElementById('tlsoa');
+    const c20El = document.getElementById('tcore20');
+    if (ovEl && ovEl.value && ovEl.value !== 'none') p.set('ov', ovEl.value);
+    if (ov2El && ov2El.value && ov2El.value !== 'none') p.set('ov2', ov2El.value);
+    if (bfEl && bfEl.value && bfEl.value !== 'all') p.set('b', bfEl.value);
+    if (lsEl && lsEl.checked) p.set('lsoa', '1');
+    if (c20El && c20El.checked) p.set('c20', '1');
+    if (window.cbSafe) p.set('cb', '1');
+    if (typeof map !== 'undefined' && map) {
+      const c = map.getCenter();
+      p.set('z', map.getZoom().toString());
+      p.set('c', `${c.lat.toFixed(4)},${c.lng.toFixed(4)}`);
+    }
+    const qs = p.toString();
+    const url = location.pathname + (qs ? '?' + qs : '');
+    history.replaceState(null, '', url);
+  } catch (e) { /* ignore */ }
+}
+function _readUrlState() {
+  try {
+    const p = new URLSearchParams(location.search);
+    const applyIf = (id, val, ev) => {
+      if (!val) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.type === 'checkbox') { el.checked = (val === '1' || val === 'true'); }
+      else { el.value = val; }
+      if (ev) el.dispatchEvent(new Event(ev));
+    };
+    applyIf('borough-focus', p.get('b'), 'change');
+    applyIf('tcore20', p.get('c20'), 'change');
+    applyIf('tlsoa', p.get('lsoa'), 'change');
+    applyIf('ov', p.get('ov'), 'change');
+    applyIf('ov2', p.get('ov2'), 'change');
+    if (p.get('cb') === '1') {
+      const btn = document.getElementById('tb-cb');
+      if (btn) btn.click();
+    }
+    if (typeof map !== 'undefined' && map) {
+      const z = parseInt(p.get('z'), 10);
+      const c = (p.get('c') || '').split(',').map(parseFloat);
+      if (Number.isFinite(z) && c.length === 2 && Number.isFinite(c[0]) && Number.isFinite(c[1])) {
+        setTimeout(() => map.setView([c[0], c[1]], z), 400);
+      }
+    }
+  } catch (e) { console.warn('_readUrlState failed', e); }
+}
+(function _wireUrlStateWriters() {
+  ['ov','ov2','borough-focus','tlsoa','tcore20'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => setTimeout(_writeUrlState, 50));
+  });
+  if (typeof map !== 'undefined' && map) {
+    let t = null;
+    const sched = () => { clearTimeout(t); t = setTimeout(_writeUrlState, 400); };
+    map.on('moveend zoomend', sched);
+  }
+})();
+// Apply any inbound URL state once everything is wired up.
+setTimeout(_readUrlState, 600);
+
+// ── Free-text search (ward / LSOA / GP / charity) ───────────────────────────
+// Lightweight in-memory index — no external lib. Rebuilt lazily on first
+// keystroke (by then WARD_DATA / LSOA_IMD / GPS / vcseData are populated).
+let _searchIndex = null;
+function _buildSearchIndex() {
+  const idx = [];
+  try {
+    // Wards
+    if (typeof WARD_DATA !== 'undefined') {
+      for (const [code, w] of Object.entries(WARD_DATA)) {
+        const name = w.name || code;
+        const lad = w.lad || w.LAD || '';
+        idx.push({ type:'ward', label:name, sub:lad, _lc:(name+' '+lad).toLowerCase(), _key:name });
+      }
+    }
+    // LSOAs
+    if (typeof LSOA_IMD !== 'undefined' && LSOA_IMD && LSOA_IMD.features) {
+      LSOA_IMD.features.forEach(f => {
+        const p = f.properties || {};
+        const name = p.name || p.code;
+        idx.push({ type:'lsoa', label:name, sub:p.ward || '', _lc:(name+' '+(p.ward||'')).toLowerCase(), _code:p.code, _feat:f });
+      });
+    }
+    // GPs
+    if (typeof GPS !== 'undefined' && Array.isArray(GPS)) {
+      GPS.forEach(d => {
+        idx.push({ type:'GP', label:d.n, sub:d.ward || d.lad || d.pc || '', _lc:(d.n+' '+(d.ward||'')+' '+(d.lad||'')+' '+(d.pc||'')).toLowerCase(), _lat:d.lat, _lng:d.lng });
+      });
+    }
+    // Hospitals
+    if (typeof HOSP !== 'undefined' && Array.isArray(HOSP)) {
+      HOSP.forEach(d => idx.push({ type:'hospital', label:d.n, sub:d.t || d.trust || '', _lc:(d.n+' '+(d.trust||'')+' '+(d.t||'')).toLowerCase(), _lat:d.lat, _lng:d.lng }));
+    }
+    // Dentals
+    if (typeof dentalData !== 'undefined' && Array.isArray(dentalData)) {
+      dentalData.forEach(d => idx.push({ type:'dental', label:d.name, sub:d.postcode || '', _lc:(d.name+' '+(d.postcode||'')).toLowerCase(), _lat:d.lat, _lng:d.lng }));
+    }
+    // Pharmacies
+    if (typeof pharmData !== 'undefined' && Array.isArray(pharmData)) {
+      pharmData.forEach(d => idx.push({ type:'pharmacy', label:d.name, sub:d.postcode || '', _lc:(d.name+' '+(d.postcode||'')).toLowerCase(), _lat:d.lat, _lng:d.lng }));
+    }
+    // Charities (VCSE)
+    if (typeof vcseData !== 'undefined' && Array.isArray(vcseData)) {
+      vcseData.forEach(d => idx.push({ type:'charity', label:d.name, sub:d.addr || '', _lc:(d.name+' '+(d.addr||'')).toLowerCase(), _lat:d.lat, _lng:d.lng }));
+    }
+  } catch (e) { console.warn('_buildSearchIndex error', e); }
+  return idx;
+}
+function _searchFlyTo(lat, lng, zoom) {
+  if (typeof map !== 'undefined' && map && Number.isFinite(lat) && Number.isFinite(lng)) {
+    map.setView([lat, lng], zoom || 15, { animate: true });
+  }
+}
+function _searchPickResult(item) {
+  const input = document.getElementById('hdr-search-input');
+  const results = document.getElementById('hdr-search-results');
+  if (input) input.value = item.label;
+  if (results) results.classList.remove('show');
+  if (item.type === 'ward') {
+    // Trigger the ward's click handler via wLyr
+    if (typeof wLyr !== 'undefined' && wLyr) {
+      const lyr = wLyr.getLayers().find(l => l.feature.properties.WD24NM === item._key);
+      if (lyr) { lyr.fire('click'); if (typeof map !== 'undefined') map.fitBounds(lyr.getBounds(), { padding:[30,30] }); }
+    }
+  } else if (item.type === 'lsoa') {
+    if (typeof lsoaLyr !== 'undefined' && lsoaLyr) {
+      const lyr = lsoaLyr.getLayers().find(l => l.feature.properties.code === item._code);
+      if (lyr) {
+        // Ensure LSOA layer is visible
+        const t = document.getElementById('tlsoa');
+        if (t && !t.checked) { t.checked = true; t.dispatchEvent(new Event('change')); }
+        lyr.fire('click');
+        if (typeof map !== 'undefined') map.fitBounds(lyr.getBounds(), { padding:[40,40] });
+      }
+    }
+  } else {
+    _searchFlyTo(item._lat, item._lng, 16);
+  }
+}
+function _runSearch(q) {
+  const results = document.getElementById('hdr-search-results');
+  if (!results) return;
+  q = (q || '').trim().toLowerCase();
+  if (q.length < 2) { results.classList.remove('show'); results.innerHTML = ''; return; }
+  if (!_searchIndex) _searchIndex = _buildSearchIndex();
+  const matches = _searchIndex.filter(e => e._lc.indexOf(q) !== -1);
+  // Rank: prefix hits first, then substring
+  matches.sort((a, b) => {
+    const ap = a._lc.startsWith(q) ? 0 : 1;
+    const bp = b._lc.startsWith(q) ? 0 : 1;
+    if (ap !== bp) return ap - bp;
+    return a.label.length - b.label.length;
+  });
+  const top = matches.slice(0, 40);
+  if (top.length === 0) {
+    results.innerHTML = '<div class="sr-empty">No matches. Try a ward, LSOA code, GP name, or charity.</div>';
+    results.classList.add('show');
+    return;
+  }
+  // Group by type
+  const groups = {};
+  top.forEach(m => { (groups[m.type] = groups[m.type] || []).push(m); });
+  const order = ['ward','lsoa','GP','hospital','dental','pharmacy','charity'];
+  let html = '';
+  order.forEach(t => {
+    if (!groups[t]) return;
+    html += `<div class="sr-grp">${t} (${groups[t].length})</div>`;
+    groups[t].forEach((m, i) => {
+      const idx = top.indexOf(m);
+      html += `<div class="sr-row" data-idx="${idx}"><span class="sr-type">${m.type}</span><span class="sr-name">${m.label}</span><span class="sr-sub">${m.sub||''}</span></div>`;
+    });
+  });
+  results.innerHTML = html;
+  results.classList.add('show');
+  results.querySelectorAll('.sr-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const i = parseInt(row.getAttribute('data-idx'), 10);
+      if (Number.isFinite(i) && top[i]) _searchPickResult(top[i]);
+    });
+  });
+}
+(function _wireSearch() {
+  const input = document.getElementById('hdr-search-input');
+  const results = document.getElementById('hdr-search-results');
+  if (!input || !results) return;
+  let t = null;
+  input.addEventListener('input', e => {
+    clearTimeout(t);
+    t = setTimeout(() => _runSearch(e.target.value), 120);
+  });
+  input.addEventListener('focus', e => { if (e.target.value.length >= 2) _runSearch(e.target.value); });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { results.classList.remove('show'); input.blur(); }
+    if (e.key === 'Enter') {
+      const first = results.querySelector('.sr-row');
+      if (first) first.click();
+    }
+  });
+  document.addEventListener('click', e => {
+    if (!results.contains(e.target) && e.target !== input) results.classList.remove('show');
+  });
+  // Force index rebuild once data loads (any fetch may have filled GPS/LSOA/etc).
+  const invalidate = () => { _searchIndex = null; };
+  setTimeout(invalidate, 3000);
+})();
+
+// ── PNG + CSV export ────────────────────────────────────────────────────────
+// PNG: snapshot the map container via html2canvas. `useCORS: true` so tile
+// images resolve through CORS headers where possible; tiles that fail still
+// leave a grey tile (acceptable for a screenshot).
+async function _downloadMapPng() {
+  const btn = document.getElementById('tb-png');
+  const mapWrap = document.getElementById('map-wrap') || document.getElementById('map');
+  if (!mapWrap || typeof html2canvas !== 'function') {
+    alert('PNG export requires html2canvas (still loading?). Try again in a moment.');
+    return;
+  }
+  const prev = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = '… rendering'; btn.disabled = true; }
+  try {
+    const canvas = await html2canvas(mapWrap, {
+      useCORS: true, allowTaint: true, logging: false,
+      backgroundColor: '#f5f5f2', scale: window.devicePixelRatio || 1,
+    });
+    canvas.toBlob(blob => {
+      if (!blob) { alert('PNG export failed.'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const ts = new Date().toISOString().slice(0,16).replace(/[:T-]/g,'');
+      a.href = url; a.download = `nwl-map-${ts}.png`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }, 'image/png');
+  } catch (e) {
+    console.error('PNG export error', e);
+    alert('PNG export failed — some basemap tiles may be blocked by CORS. Try again after the tiles finish loading.');
+  } finally {
+    if (btn) { btn.textContent = prev; btn.disabled = false; }
+  }
+}
+
+// CSV: dump the ward/LSOA table behind the currently-active overlay.
+// When no overlay is selected, dumps the full ward-level indicator table.
+function _downloadOverlayCsv() {
+  try {
+    const rows = [];
+    const ov = (typeof curOv !== 'undefined' && curOv !== 'none') ? curOv : null;
+    const isLsoa = ov && typeof isLsoaOnlyOv === 'function' && isLsoaOnlyOv(ov);
+    if (isLsoa && typeof LSOA_DATA !== 'undefined') {
+      rows.push(['lsoa_code','lsoa_name','ward','borough','value'].join(','));
+      for (const [code, l] of Object.entries(LSOA_DATA)) {
+        const val = (l.indicators || l)[ov];
+        rows.push([code, (l.name||'').replace(/,/g,' '), (l.ward||l.ward_name||'').replace(/,/g,' '), (l.lad||l.borough||'').replace(/,/g,' '), val==null?'':val].join(','));
+      }
+    } else if (typeof WARD_DATA !== 'undefined') {
+      if (ov) rows.push(['ward_code','ward_name','borough','value'].join(','));
+      else rows.push(['ward_code','ward_name','borough'].join(','));
+      for (const [code, w] of Object.entries(WARD_DATA)) {
+        const name = (w.name||'').replace(/,/g,' ');
+        const lad = (w.lad||w.LAD||'').replace(/,/g,' ');
+        if (ov) {
+          const val = w.indicators ? w.indicators[ov] : null;
+          rows.push([code, name, lad, val==null?'':val].join(','));
+        } else {
+          rows.push([code, name, lad].join(','));
+        }
+      }
+    }
+    if (rows.length < 2) { alert('No data to export yet — try again once the map has finished loading.'); return; }
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date().toISOString().slice(0,16).replace(/[:T-]/g,'');
+    const suffix = ov ? ov : 'wards';
+    a.href = url; a.download = `nwl-${suffix}-${ts}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  } catch (e) {
+    console.error('CSV export error', e);
+    alert('CSV export failed: ' + e.message);
+  }
+}
+
+(function _wireExportButtons() {
+  const pngBtn = document.getElementById('tb-png');
+  const csvBtn = document.getElementById('tb-csv');
+  if (pngBtn) pngBtn.addEventListener('click', _downloadMapPng);
+  if (csvBtn) csvBtn.addEventListener('click', _downloadOverlayCsv);
+})();
+
+// Copy-link button → put current URL in the clipboard and show a toast.
+(function _wireCopyLink() {
+  const btn = document.getElementById('tb-copy');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    _writeUrlState();
+    const url = location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      const prev = btn.textContent;
+      btn.textContent = '✓ Copied';
+      btn.classList.add('active');
+      setTimeout(() => { btn.textContent = prev; btn.classList.remove('active'); }, 1500);
+    } catch (e) {
+      // Fallback: select + execCommand('copy')
+      const ta = document.createElement('textarea');
+      ta.value = url; document.body.appendChild(ta);
+      ta.select(); try { document.execCommand('copy'); } catch {}
+      ta.remove();
+      alert('Link copied: ' + url);
+    }
+  });
+})();
+
+// Keep the strip + chips in sync when any of these inputs change.
+['ov', 'ov2', 'borough-focus', 'tlsoa', 'tcore20', 'vcse-area-filter'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', () => setTimeout(_refreshUI, 0));
+});
+// And once at startup (nothing selected yet, but renders "All of NW London · Ward mode").
+setTimeout(_refreshUI, 0);
+
+// ── Collapsible Layers-tab groups ────────────────────────────────────────────
+// Each .sb-sec inside the Layers tab gets a click-to-toggle label. First-time
+// users see everything expanded; one click on the section title collapses it.
+(function _wireCollapsibleSections() {
+  const pane = document.getElementById('tab-layers');
+  if (!pane) return;
+  pane.querySelectorAll('.sb-sec > .sb-lbl').forEach(lbl => {
+    if (lbl.classList.contains('collapsible')) return;
+    lbl.classList.add('collapsible');
+    lbl.addEventListener('click', () => {
+      const sec = lbl.parentElement;
+      if (sec) sec.classList.toggle('collapsed');
+    });
+  });
+})();
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SIDEBAR TABS

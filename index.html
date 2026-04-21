@@ -336,6 +336,12 @@
             </optgroup>
             <optgroup label="Environment &amp; access">
               <option value="fuel_poverty_pct">Fuel poverty % (DESNZ LILEE)</option>
+              <option value="gb_commitment_pct">Green OR blue space within 15 min walk % (Defra)</option>
+              <option value="green_commitment_pct">Green space within 15 min walk % (Defra)</option>
+              <option value="green_doorstep_pct">Doorstep green space (&lt;200m, &ge;0.5 ha) %</option>
+              <option value="green_local_pct">Local green space (&lt;300m, &ge;2 ha) %</option>
+              <option value="green_neighbourhood_pct">Neighbourhood green space (&lt;1km, &ge;10 ha) %</option>
+              <option value="blue_commitment_pct">Blue space within 15 min walk % (Defra)</option>
             </optgroup>
             <optgroup label="Economy (Census)">
               <option value="census_level4_qual_pct">Level 4+ qualifications %</option>
@@ -392,6 +398,9 @@
               </optgroup>
               <optgroup label="Environment &amp; access">
                 <option value="fuel_poverty_pct">Fuel poverty %</option>
+                <option value="gb_commitment_pct">Green or blue space 15-min %</option>
+                <option value="green_commitment_pct">Green space 15-min %</option>
+                <option value="blue_commitment_pct">Blue space 15-min %</option>
               </optgroup>
               <optgroup label="Housing &amp; age">
                 <option value="census_social_rented_pct">Social rented %</option>
@@ -556,6 +565,15 @@ const OV_CFG = {
   // PTAI = better transport access, so we invert with hiIsWorse:false via wh:false.
   fuel_poverty_pct:                { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:25   },
   ptai_score:                      { lo:"Lower", hi:"Higher", wh:false, min:2,    max:25   },
+  // Defra 15-min green/blue space access (ODS, 2025). Higher % of UPRNs within
+  // the relevant walking distance to qualifying space = BETTER access (wh:false).
+  // Ranges chosen to span the observed NW London spread (LSOA-level).
+  gb_commitment_pct:               { lo:"Worse", hi:"Better", wh:false, min:0,    max:100  },
+  green_commitment_pct:            { lo:"Worse", hi:"Better", wh:false, min:0,    max:100  },
+  green_doorstep_pct:              { lo:"Worse", hi:"Better", wh:false, min:0,    max:80   },
+  green_local_pct:                 { lo:"Worse", hi:"Better", wh:false, min:0,    max:100  },
+  green_neighbourhood_pct:         { lo:"Worse", hi:"Better", wh:false, min:0,    max:100  },
+  blue_commitment_pct:             { lo:"Worse", hi:"Better", wh:false, min:0,    max:60   },
   // IMD 2025 domain scores (LSOA-level). Higher score = more deprived, so wh:true
   // for every score column. imd_decile is inverted (1 = most deprived), so wh:false
   // and the legend reads "more deprived -> less deprived".
@@ -617,6 +635,15 @@ const CATS = [
   ]},
   { key: "environment",  label: "Environment & access", ico: "🚆", fields: [
     { k: "fuel_poverty_pct",                 l: "Fuel poverty % (DESNZ LILEE)",  g: "ward" },
+  ]},
+  { key: "greenblue",    label: "Green & blue space (Defra, LSOA)", ico: "🌳", fields: [
+    { k: "gb_commitment_pct",                l: "Green OR blue 15-min walk (%)", g: "lsoa" },
+    { k: "green_commitment_pct",             l: "Green space 15-min walk (%)",   g: "lsoa" },
+    { k: "green_doorstep_pct",               l: "Doorstep green (<200m, ≥0.5 ha) (%)",    g: "lsoa" },
+    { k: "green_local_pct",                  l: "Local green (<300m, ≥2 ha) (%)",         g: "lsoa" },
+    { k: "green_neighbourhood_pct",          l: "Neighbourhood green (<1km, ≥10 ha) (%)", g: "lsoa" },
+    { k: "blue_commitment_pct",              l: "Blue space 15-min walk (%)",    g: "lsoa" },
+    { k: "gb_total_uprn",                    l: "UPRNs in LSOA (denominator)",   g: "lsoa" },
   ]},
   { key: "health",       label: "Health (Census 2021, ward-level)", ico: "♥", fields: [
     { k: "census_good_health_pct",           l: "Good/very good health (%)",     g: "ward" },
@@ -2158,6 +2185,7 @@ function showLSOA(feat) {
   let ethLsoaBlock = '';
   let ageLsoaBlock = '';
   let envLsoaBlock = '';
+  let gbLsoaBlock  = '';
   if (d) {
     const inds = d.indicators || d;
     const row = (k, l) => {
@@ -2243,6 +2271,26 @@ function showLSOA(feat) {
         <div class="cat-body open">${envRows}</div>
       </div>`;
     }
+
+    // Green & blue space (Defra, LSOA-level, UPRN-weighted to LSOA)
+    const gbRows = [
+      row('gb_commitment_pct',       'Green OR blue 15-min walk (%)'),
+      row('green_commitment_pct',    'Green space 15-min walk (%)'),
+      row('green_doorstep_pct',      'Doorstep green (<200m, \u22650.5 ha) (%)'),
+      row('green_local_pct',         'Local green (<300m, \u22652 ha) (%)'),
+      row('green_neighbourhood_pct', 'Neighbourhood green (<1km, \u226510 ha) (%)'),
+      row('blue_commitment_pct',     'Blue space 15-min walk (%)'),
+      row('gb_total_uprn',           'UPRNs in LSOA (denominator)'),
+    ].filter(Boolean).join('');
+    if (gbRows) {
+      gbLsoaBlock = `<div class="cat-block">
+        <div class="cat-hdr" onclick="toggleCat(this)">
+          <span class="cat-hdr-l"><span class="cat-ico">🌳</span>Green &amp; blue space (Defra)</span>
+          <span class="cat-arrow open">▶</span>
+        </div>
+        <div class="cat-body open">${gbRows}</div>
+      </div>`;
+    }
   }
 
   p.innerHTML = `
@@ -2275,6 +2323,7 @@ function showLSOA(feat) {
     ${ethLsoaBlock}
     ${ageLsoaBlock}
     ${envLsoaBlock}
+    ${gbLsoaBlock}
     <div class="data-note">
       <span class="gpill gpill-ward">lsoa</span> = LSOA level<br>
       Click a ward polygon for full ward-level data.

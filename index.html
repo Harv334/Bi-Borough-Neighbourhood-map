@@ -887,6 +887,66 @@ function ladOf(wn) {
   }
   return _ladByWard[norm(wn)] || '';
 }
+
+// LAD code ↔ borough name mapping (Charity Commission / VCSE records use
+// E09xxxxxxx codes; ward GeoJSON + BOROUGH_GJ use the friendly name).
+const LAD_NAME_TO_CODE = {
+  'Brent': 'E09000005',
+  'Camden': 'E09000007',
+  'Ealing': 'E09000009',
+  'Hammersmith & Fulham': 'E09000013',
+  'Harrow': 'E09000015',
+  'Hillingdon': 'E09000017',
+  'Hounslow': 'E09000018',
+  'Kensington & Chelsea': 'E09000020',
+  'City of Westminster': 'E09000033',
+  'Westminster': 'E09000033',
+};
+const LAD_CODE_TO_NAME = {};
+Object.entries(LAD_NAME_TO_CODE).forEach(([n, c]) => {
+  if (!LAD_CODE_TO_NAME[c]) LAD_CODE_TO_NAME[c] = n;
+});
+// Canonicalised name used on the map (matches GJ.LAD + BOROUGH_GJ.name).
+LAD_CODE_TO_NAME['E09000033'] = 'City of Westminster';
+
+// Point-in-polygon (ray casting). `ring` is [[lng,lat], ...].
+function _pointInRing(lng, lat, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1];
+    const xj = ring[j][0], yj = ring[j][1];
+    const intersect = ((yi > lat) !== (yj > lat)) &&
+      (lng < (xj - xi) * (lat - yi) / (yj - yi + 1e-12) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+function _pointInGeom(lng, lat, geom) {
+  if (!geom) return false;
+  if (geom.type === 'Polygon') {
+    const rings = geom.coordinates;
+    if (!rings.length || !_pointInRing(lng, lat, rings[0])) return false;
+    for (let h = 1; h < rings.length; h++) {
+      if (_pointInRing(lng, lat, rings[h])) return false;
+    }
+    return true;
+  }
+  if (geom.type === 'MultiPolygon') {
+    return geom.coordinates.some(poly => _pointInGeom(lng, lat, { type: 'Polygon', coordinates: poly }));
+  }
+  return false;
+}
+// Lat/lng → borough name (via BOROUGH_GJ). '' if outside all 9 boroughs.
+function ladOfLatLng(lat, lng) {
+  if (typeof BOROUGH_GJ === 'undefined' || !BOROUGH_GJ.features) return '';
+  if (lat == null || lng == null) return '';
+  for (const f of BOROUGH_GJ.features) {
+    if (_pointInGeom(lng, lat, f.geometry)) {
+      return (f.properties || {}).name || '';
+    }
+  }
+  return '';
+}
 function ramp(t, inv) {
   if (inv) t = 1 - t;
   t = Math.min(Math.max(t, 0), 1);
@@ -1082,9 +1142,12 @@ const gpL = L.layerGroup(GPS.map(d => {
   if (d.patients) rows['Patients'] = d.patients.toLocaleString();
   const popup = mkpop('#185FA5', d.n, d.a, rows);
   const tip = d.patients ? `${d.n} · ${d.patients.toLocaleString()} pts` : d.n;
-  return L.marker([d.lat, d.lng], { icon: mkicon('#185FA5', 'G') })
+  const m = L.marker([d.lat, d.lng], { icon: mkicon('#185FA5', 'G') })
     .bindPopup(popup)
     .bindTooltip(tip, { direction: 'top', className: 'marker-tip' });
+  // Canonicalise LAD name so 'Westminster' (feed) matches 'City of Westminster' (map).
+  m._lad = (d.lad === 'Westminster') ? 'City of Westminster' : (d.lad || '');
+  return m;
 }));
 
 // Enrich GP markers from ward_data.json once loaded
@@ -1101,7 +1164,13 @@ function enrichGPFromWardData(wardData) {
   if (allPractices.length === 0) return;
   console.log(`Loaded ${allPractices.length} GP practices from ward_data.json`);
 }
-const hL  = L.layerGroup(HOSP.map(d => L.marker([d.lat,d.lng],{icon:mkicon('#A32D2D','H')}).bindPopup(mkpop('#A32D2D',d.n,d.a,{Type:d.t, Trust:d.trust||''})).bindTooltip(d.n, { direction: 'top', className: 'marker-tip' })));
+const hL  = L.layerGroup(HOSP.map(d => {
+  const m = L.marker([d.lat,d.lng],{icon:mkicon('#A32D2D','H')})
+    .bindPopup(mkpop('#A32D2D',d.n,d.a,{Type:d.t, Trust:d.trust||''}))
+    .bindTooltip(d.n, { direction: 'top', className: 'marker-tip' });
+  m._lad = ladOfLatLng(d.lat, d.lng);
+  return m;
+}));
 // ── Greenspace polygon layer (OS Open Greenspace, NW London clip) ─────────
 // Palette keyed on OS 'function' — ranked roughly from highest to lowest
 // "recreational greenness": public parks on top, car-park-y sports courts
@@ -1154,15 +1223,22 @@ function _ensureGreenspaceLayer() {
 // gpL/hL/grL not added by default — toggle on via sidebar
 
 // ── Borough boundary layer ───────────────────────────────────────────────────
-const boroughL = L.geoJSON(BOROUGH_GJ, {
-  interactive: false,
-  style: {
+// Per-feature style so that when a borough is focused we hide the other 8
+// outlines (opacity:0) and keep just the selected one.
+function _boroughStyle(feat) {
+  const name = (feat && feat.properties && feat.properties.name) || '';
+  const hidden = focusedBorough && focusedBorough !== 'all' && name !== focusedBorough;
+  return {
     color: '#1a1a1a',
     weight: 2.5,
     fillOpacity: 0,
-    opacity: 0.85,
+    opacity: hidden ? 0 : 0.85,
     dashArray: null,
-  },
+  };
+}
+const boroughL = L.geoJSON(BOROUGH_GJ, {
+  interactive: false,
+  style: _boroughStyle,
   onEachFeature: (feat, lyr) => {
     // No tooltip — borough labels are distracting on scroll
   }
@@ -1179,8 +1255,19 @@ const nwWardsL = L.geoJSON(NW_WARDS_GJ, {
 
 // Black ward-boundary layer (overlay for the full 188 NW London wards).
 // Non-interactive so ward clicks still hit the main wLyr underneath.
+// Per-feature style so when a borough is focused, wards outside it disappear.
+function _wardBoundaryStyle(feat) {
+  const lad = (feat && feat.properties && feat.properties.LAD) || '';
+  const hidden = focusedBorough && focusedBorough !== 'all' && lad !== focusedBorough;
+  return {
+    color: '#000',
+    weight: hidden ? 0 : 1,
+    fill: false,
+    opacity: hidden ? 0 : 0.85,
+  };
+}
 const wardBoundaryLyr = L.geoJSON(GJ, {
-  style: { color:'#000', weight:1, fill:false, opacity:0.85 },
+  style: _wardBoundaryStyle,
   interactive: false,
 });
 
@@ -1304,9 +1391,13 @@ function loadPharmacyLayer(practices) {
     const telRow = p.tel ? `<div class="pop-row"><span class="pop-key">Tel</span><span>${p.tel}</span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#E89B1B">${p.n}</div><div class="pop-body"><div class="pop-addr">${p.a||''}${p.pc?'<br>'+p.pc:''}</div>${telRow}</div>`);
     marker.bindTooltip(p.n + ' · Pharmacy', { direction: 'top', className: 'marker-tip' });
+    marker._lad = ladOfLatLng(p.lat, p.lng);
     pharmCluster.addLayer(marker);
-    pharmData.push({ name: p.n, postcode: p.pc, lat: p.lat, lng: p.lng, marker });
+    pharmData.push({ name: p.n, postcode: p.pc, lat: p.lat, lng: p.lng, marker, _lad: marker._lad });
   });
+  // If a borough is already focused when pharmacies finish loading, apply solo
+  // view immediately so out-of-borough pharmacies don't flash in.
+  if (typeof _applyBoroughSolo === 'function') _applyBoroughSolo();
   document.getElementById('pharm-count').textContent = pharmData.length;
   // pharmCluster not added by default (user toggles via sidebar)
   console.log(`Loaded ${pharmData.length} pharmacies`);
@@ -1556,11 +1647,39 @@ function initVCSEFilters() {
 
   document.getElementById('vcse-area-filter').addEventListener('change', e => {
     currentVCSEAreaFilter = e.target.value;
-    // If selecting a neighbourhood, also trigger focus mode
-    if (e.target.value.startsWith('nbhd-')) {
-      setNbhdFocus(e.target.value.replace('nbhd-', ''));
-    } else {
+    const val = e.target.value;
+    // Neighbourhood filter → neighbourhood focus
+    if (val.startsWith('nbhd-')) {
+      setNbhdFocus(val.replace('nbhd-', ''));
+    } else if (val.startsWith('lad-')) {
+      // Borough filter → solo view on that borough (mirror Layers-tab dropdown)
       setNbhdFocus('all');
+      const code = val.slice(4);
+      const bname = LAD_CODE_TO_NAME[code] || '';
+      if (bname) {
+        focusedBorough = bname;
+        const bsel = document.getElementById('borough-focus');
+        if (bsel) bsel.value = bname;
+        _applyBoroughSolo();
+        // Zoom to borough
+        if (wLyr) {
+          const matched = wLyr.getLayers().filter(l =>
+            (l.feature.properties || {}).LAD === bname);
+          if (matched.length) {
+            const g = L.featureGroup(matched);
+            map.fitBounds(g.getBounds(), { padding:[30,30], maxZoom:12 });
+          }
+        }
+      }
+    } else {
+      // 'all' / 'london' / 'westminster' — clear any borough focus
+      setNbhdFocus('all');
+      if (focusedBorough !== 'all') {
+        focusedBorough = 'all';
+        const bsel = document.getElementById('borough-focus');
+        if (bsel) bsel.value = 'all';
+        _applyBoroughSolo();
+      }
     }
     applyVCSEFilter();
   });
@@ -1696,9 +1815,15 @@ function wstyle(wn, ov, state) {
   // Focus dimming — neighbourhood focus AND borough focus both fade non-matching wards.
   const outOfNbhd    = focusedNbhd && focusedNbhd !== 'all' && nk !== focusedNbhd;
   const outOfBorough = focusedBorough && focusedBorough !== 'all' && ladOf(wn) !== focusedBorough;
-  const outOfFocus   = outOfNbhd || outOfBorough;
-  const dimmed = outOfFocus && (shaded || spotlightMode || outOfBorough);
-  const spot   = outOfFocus && (spotlightMode || outOfBorough);
+  // Borough focus = SOLO VIEW: wards outside the focused borough disappear
+  // entirely (invisible + not interactive-looking) so only the selected borough
+  // is shown. Neighbourhood focus still uses the softer dim/spotlight path.
+  if (outOfBorough) {
+    return { color: '#000', weight: 0, fillColor: '#fff', fillOpacity: 0, opacity: 0 };
+  }
+  const outOfFocus   = outOfNbhd;
+  const dimmed = outOfFocus && (shaded || spotlightMode);
+  const spot   = outOfFocus && spotlightMode;
 
   // Black border for hover + selected states so the interactive ward is unmistakable.
   const isFocus = state === 'hover' || state === 'selected';
@@ -2288,6 +2413,110 @@ document.getElementById('tb').addEventListener('change',  e => {
   else { map.removeLayer(boroughL); }
 });
 
+// ── Borough SOLO VIEW — hide everything outside the focused borough ─────────
+// Called whenever `focusedBorough` changes. When focusedBorough === 'all' all
+// wards/boundaries/markers are restored; otherwise only features in the
+// focused borough stay visible.
+function _applyBoroughSolo() {
+  const focused = focusedBorough && focusedBorough !== 'all';
+
+  // 1. Main ward layer — wstyle() already branches on `outOfBorough` and
+  //    returns a fully-transparent style, so a restyle is enough.
+  if (typeof _restyleAll === 'function') _restyleAll();
+  else if (wLyr) wLyr.eachLayer(l =>
+    l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+
+  // 2. Borough outline layer — hide non-matching outlines (style fn reads focusedBorough).
+  if (boroughL) boroughL.setStyle(_boroughStyle);
+
+  // 3. Black ward boundary overlay — same per-feature trick.
+  if (wardBoundaryLyr) wardBoundaryLyr.setStyle(_wardBoundaryStyle);
+
+  // 4. GP / hospital markers (layerGroups). Use add/remove so hidden markers
+  //    aren't still clickable beneath the focused borough.
+  const _toggleLayerGroup = (lyr, bucket) => {
+    if (!lyr) return;
+    // Cache the full set of markers on the layer once (so we can re-add later).
+    if (!lyr._allMarkers) {
+      lyr._allMarkers = [];
+      lyr.eachLayer(m => lyr._allMarkers.push(m));
+    }
+    lyr._allMarkers.forEach(m => {
+      const inFocus = !focused || m._lad === focusedBorough;
+      if (inFocus) {
+        if (!lyr.hasLayer(m)) lyr.addLayer(m);
+      } else {
+        if (lyr.hasLayer(m)) lyr.removeLayer(m);
+        if (m.closeTooltip) m.closeTooltip();
+      }
+    });
+  };
+  _toggleLayerGroup(gpL, 'gp');
+  _toggleLayerGroup(hL, 'hosp');
+
+  // 5. Pharmacy cluster — must remove/add so cluster counts re-compute.
+  if (pharmCluster && Array.isArray(pharmData)) {
+    pharmData.forEach(p => {
+      const inFocus = !focused || p._lad === focusedBorough;
+      if (inFocus) {
+        if (!pharmCluster.hasLayer(p.marker)) pharmCluster.addLayer(p.marker);
+      } else {
+        if (pharmCluster.hasLayer(p.marker)) pharmCluster.removeLayer(p.marker);
+      }
+    });
+  }
+
+  // 6. VCSE layer — re-use applyVCSEFilter() which already supports 'lad-<code>'.
+  //    Also sync the VCSE-tab dropdown so the UI reflects the current focus.
+  const vcseSel = document.getElementById('vcse-area-filter');
+  if (vcseSel) {
+    if (focused) {
+      const code = LAD_NAME_TO_CODE[focusedBorough] || LAD_NAME_TO_CODE[
+        focusedBorough === 'City of Westminster' ? 'Westminster' : focusedBorough
+      ];
+      if (code) {
+        vcseSel.value = 'lad-' + code;
+        currentVCSEAreaFilter = 'lad-' + code;
+      }
+    } else if (vcseSel.value && vcseSel.value.startsWith('lad-')) {
+      // Restore 'All NW London' only if the dropdown is currently on a lad-* filter
+      vcseSel.value = 'all';
+      currentVCSEAreaFilter = 'all';
+    }
+    if (typeof applyVCSEFilter === 'function') applyVCSEFilter();
+  }
+
+  // 7. Greenspace polygons — centroid-in-borough test, cached on each layer.
+  if (typeof grL !== 'undefined' && grL) {
+    grL.eachLayer(l => {
+      if (!l._lad) {
+        try {
+          const c = l.getBounds().getCenter();
+          l._lad = ladOfLatLng(c.lat, c.lng);
+        } catch(e) { l._lad = ''; }
+      }
+      const inFocus = !focused || l._lad === focusedBorough;
+      // Greenspaces carry a category colour — stash the original style on first hide.
+      if (!l._origStyle) {
+        const s = l.options && l.options.style;
+        l._origStyle = (typeof s === 'function' ? s(l.feature) : s) || null;
+      }
+      if (inFocus) {
+        if (l._origStyle) l.setStyle(l._origStyle);
+      } else {
+        l.setStyle({ opacity: 0, fillOpacity: 0, weight: 0 });
+      }
+    });
+  }
+
+  // 8. LSOA layer — re-run its filter so out-of-borough LSOAs disappear.
+  if (typeof applyLSOAFilter === 'function' && lsoaLyr) applyLSOAFilter();
+
+  // 9. Keep overlay ordering sensible after restyles.
+  if (boroughL && boroughL._map) boroughL.bringToFront();
+  if (wardBoundaryLyr && wardBoundaryLyr._map) wardBoundaryLyr.bringToFront();
+}
+
 // ── Borough focus dropdown — populate from the ward GeoJSON LAD property ──
 (function initBoroughFocus() {
   const sel = document.getElementById('borough-focus');
@@ -2301,9 +2530,7 @@ document.getElementById('tb').addEventListener('change',  e => {
   });
   sel.addEventListener('change', e => {
     focusedBorough = e.target.value || 'all';
-    if (typeof _restyleAll === 'function') _restyleAll();
-    else if (wLyr) wLyr.eachLayer(l =>
-      l.setStyle(wstyle(l.feature.properties.WD24NM, curOv, gs(l.feature.properties.WD24NM))));
+    _applyBoroughSolo();
     // Zoom to the focused borough's wards
     if (focusedBorough !== 'all' && wLyr) {
       const matched = wLyr.getLayers().filter(l =>
@@ -2312,6 +2539,9 @@ document.getElementById('tb').addEventListener('change',  e => {
         const g = L.featureGroup(matched);
         map.fitBounds(g.getBounds(), { padding:[30,30], maxZoom:12 });
       }
+    } else if (focusedBorough === 'all' && wLyr) {
+      // Restoring 'all' — re-fit to whole NW London map.
+      map.fitBounds(wLyr.getBounds(), { padding:[28,28] });
     }
   });
 })();
@@ -2355,6 +2585,8 @@ document.getElementById('tgr').addEventListener('change', e => {
         if (lyr.bringToBack) lyr.bringToBack();
         if (boroughL && boroughL._map) boroughL.bringToFront();
         if (wLyr && wLyr._map) wLyr.bringToFront();
+        // Respect any in-flight borough solo view.
+        if (typeof _applyBoroughSolo === 'function') _applyBoroughSolo();
       }
     });
   } else if (grL) {
@@ -2910,6 +3142,7 @@ buildEmbeddedLSOALayer();
 function applyLSOAFilter() {
   if (!lsoaLyr) return;
   const scope = lsoaScope;
+  const boroughActive = focusedBorough && focusedBorough !== 'all';
   lsoaLyr.eachLayer(lyr => {
     const ward = lyr.feature.properties.ward;
     let visible = true;
@@ -2920,7 +3153,10 @@ function applyLSOAFilter() {
     } else if (scope.startsWith('ward:')) {
       visible = ward === scope.slice(5);
     }
-    // else 'all' — show everything
+    // Borough solo view: intersect with LSOAs whose ward is in the focused borough.
+    if (visible && boroughActive) {
+      visible = ladOf(ward) === focusedBorough;
+    }
     if (visible) {
       lyr.setStyle(imdStyle(lyr.feature, lyr.feature.properties.code === selLSOA ? 'selected' : 'default'));
     } else {

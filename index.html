@@ -14,11 +14,10 @@
 
   /* ── Layout ── */
   .app { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; }
-  .hdr { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  .hdr-left { display: flex; align-items: center; gap: 12px; }
-  .hdr-logo { font-size: 15px; font-weight: 600; color: #1a1a1a; }
-  .hdr-sub { font-size: 12px; color: #666; margin-top: 1px; }
-  .hdr-right { display: flex; align-items: center; gap: 8px; }
+  /* Compact title strip replacing the old heavy header. No toolbar here — tabs are now the top interactive element in the sidebar. */
+  .hdr-logo-strip { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 6px 14px; display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .hdr-logo { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+  .hdr-sub { font-size: 11px; color: #666; }
 
   /* ── Header toolbar (Reset / Copy link / PNG / CSV) ── */
   .tb-btn { background: #fff; border: 1px solid #d4d4d4; border-radius: 6px; padding: 5px 10px; font-size: 11.5px; color: #333; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: 500; transition: background .12s, border-color .12s; }
@@ -36,6 +35,14 @@
   .hdr-search input { width: 200px; padding: 5px 10px 5px 28px; border: 1px solid #d4d4d4; border-radius: 6px; font-size: 12px; color: #333; background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.35-4.35'/></svg>") no-repeat 8px center; outline: none; transition: border-color .12s, box-shadow .12s; }
   .hdr-search input:focus { border-color: #185FA5; box-shadow: 0 0 0 3px rgba(24,95,165,.12); }
   .hdr-search-results { position: absolute; top: 100%; left: 0; margin-top: 4px; width: 320px; max-height: 360px; overflow-y: auto; background: #fff; border: 1px solid #d4d4d4; border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.15); display: none; z-index: 3000; }
+  /* Search now lives in the sidebar footer — make it full-width and open the dropdown UPWARD so it doesn't go off-screen. */
+  .sb-footer-search { position: relative; margin-bottom: 8px; }
+  .sb-footer-search input { width: 100%; padding: 6px 10px 6px 28px; border: 1px solid #d4d4d4; border-radius: 6px; font-size: 12px; color: #333; background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.35-4.35'/></svg>") no-repeat 8px center; outline: none; transition: border-color .12s, box-shadow .12s; }
+  .sb-footer-search input:focus { border-color: #185FA5; box-shadow: 0 0 0 3px rgba(24,95,165,.12); }
+  .hdr-search-results.sb-footer-results { position: absolute; top: auto; bottom: 100%; left: 0; right: 0; width: auto; margin: 0 0 4px 0; max-height: 320px; }
+  /* 2×2 button grid for the four toolbar actions */
+  .sb-footer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
+  .sb-footer-btns .tb-btn { width: 100%; justify-content: center; padding: 5px 6px; font-size: 11px; }
   .hdr-search-results.show { display: block; }
   .sr-row { padding: 7px 10px; font-size: 12px; color: #333; cursor: pointer; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f0f0ec; }
   .sr-row:hover, .sr-row.active { background: #f5f8fc; }
@@ -71,19 +78,20 @@
   .nb.on { opacity: 1; }
   .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
-  /* ── Sidebar ── */
-  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; overflow: hidden; flex-shrink: 0; background: #fff; height: 100%; max-height: 100%; min-height: 0; }
-  .sidebar > .nbfocus-bar { grid-row: 1; }
-  .sidebar > .sb-tabs      { grid-row: 2; }
-  .sidebar > .tab-pane     { grid-row: 3; min-height: 0; overflow: hidden; }
-  .sidebar > .sb-sec       { grid-row: 4; }
-  .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; background: #fafaf7; position: relative; z-index: 5; min-height: 36px; }
+  /* ── Sidebar ── Absolute-positioned: tabs pinned top, footer pinned bottom, active tab-pane fills the gap. Guarantees tabs never move regardless of content.  */
+  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; flex-shrink: 0; background: #fff; position: relative; overflow: hidden; height: 100%; --sidebar-footer-h: 150px; }
+  .sidebar > .nbfocus-bar { position: absolute; top: 0; left: 0; right: 0; z-index: 4; }
+  .sidebar > .sb-tabs     { position: absolute; top: 0; left: 0; right: 0; z-index: 3; }
+  .sidebar > .tab-pane    { position: absolute; top: 37px; bottom: var(--sidebar-footer-h); left: 0; right: 0; display: none; flex-direction: column; overflow: hidden; }
+  .sidebar > .tab-pane.active { display: flex; }
+  .sidebar > .sb-sec      { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; background: #fafaf6; }
+  .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; background: #fafaf7; min-height: 36px; }
   .sb-tab { flex: 1 1 0; min-width: 0; padding: 9px 2px; font-size: 11px; font-weight: 600; color: #666; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, background .12s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sb-tab:hover { color: #185FA5; background: #fff; }
   .sb-tab.active { color: #1a1a1a; border-bottom-color: #185FA5; background: #fff; }
-  .tab-pane { display: none; flex-direction: column; flex: 1 1 0; min-height: 0; max-height: 100%; overflow: hidden; }
-  .tab-pane.active { display: flex; }
-  .ward-scroll { max-height: 100%; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  .ward-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
   .sb-sec { padding: 11px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
   .deselect-btn { border: 1px solid #c9c9c4; background: #fff; color: #555; font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 5px; cursor: pointer; line-height: 1.2; white-space: nowrap; flex-shrink: 0; }
   .deselect-btn:hover { background: #f2f2ec; border-color: #999; color: #222; }
@@ -284,26 +292,10 @@
 
 <div class="app">
 
-  <!-- Header -->
-  <div class="hdr">
-    <div class="hdr-left">
-      <div>
-        <div class="hdr-logo">Westminster Neighbourhood Map</div>
-        <div class="hdr-sub">9 boroughs · 188 wards · loading VCSE organisations...</div>
-      </div>
-    </div>
-    <div class="hdr-right">
-      <div class="hdr-search">
-        <input type="text" id="hdr-search-input" placeholder="Search ward, LSOA, GP, charity…" autocomplete="off" />
-        <div class="hdr-search-results" id="hdr-search-results"></div>
-      </div>
-      <div class="tb-sep"></div>
-      <button type="button" class="tb-btn" id="tb-reset" title="Clear all filters and return to default view">↺ Reset</button>
-      <button type="button" class="tb-btn" id="tb-cb" title="Switch to a colour-blind safe palette (deuteranopia/protanopia friendly)" aria-pressed="false">◐ CB safe</button>
-      <button type="button" class="tb-btn" id="tb-copy" title="Copy shareable URL of this view">🔗 Copy link</button>
-      <button type="button" class="tb-btn" id="tb-png" title="Download the current map as a PNG image">⤓ PNG</button>
-      <button type="button" class="tb-btn" id="tb-csv" title="Download the ward/LSOA data behind the current overlay">⤓ CSV</button>
-    </div>
+  <!-- Header removed — toolbar + search now live in the sidebar footer. -->
+  <div class="hdr-logo-strip">
+    <span class="hdr-logo">Westminster Neighbourhood Map</span>
+    <span class="hdr-sub" id="hdr-sub-inline">9 boroughs · 188 wards · loading VCSE organisations...</span>
   </div>
 
   <div class="main">
@@ -645,7 +637,18 @@
       </div>
       <!-- Shared slider footer — visible on every tab -->
       <div class="sb-sec" style="flex-shrink:0;border-top:1px solid #e5e5e0;background:#fafaf6">
-        <div class="sb-lbl">Map controls</div>
+        <!-- Relocated toolbar (previously in the top header bar) -->
+        <div class="sb-footer-search">
+          <input type="text" id="hdr-search-input" placeholder="Search ward, LSOA, GP, charity…" autocomplete="off" />
+          <div class="hdr-search-results sb-footer-results" id="hdr-search-results"></div>
+        </div>
+        <div class="sb-footer-btns">
+          <button type="button" class="tb-btn" id="tb-reset" title="Clear all filters and return to default view">↺ Reset</button>
+          <button type="button" class="tb-btn" id="tb-cb" title="Switch to a colour-blind safe palette (deuteranopia/protanopia friendly)" aria-pressed="false">◐ CB safe</button>
+          <button type="button" class="tb-btn" id="tb-png" title="Download the current map as a PNG image">⤓ PNG</button>
+          <button type="button" class="tb-btn" id="tb-csv" title="Download the ward/LSOA data behind the current overlay">⤓ CSV</button>
+        </div>
+        <div class="sb-lbl" style="margin-top:10px">Map controls</div>
         <div class="opacity-row">
           <label>Fill</label>
           <input type="range" id="fill-opacity" min="0" max="100" value="40">
@@ -4121,23 +4124,40 @@ function _runSearch(q) {
 })();
 
 // ── PNG + CSV export ────────────────────────────────────────────────────────
-// PNG: snapshot the live map via html2canvas. The NW London boundary mask is
-// always applied so everything outside the 9 boroughs renders white — the
-// output drops cleanly onto a PowerPoint slide. Zoom is controlled from the
-// sidebar slider; export captures whatever is currently on screen.
+// PNG: snapshot the live map via html2canvas. Whatever the user currently
+// sees gets captured; everything outside the in-scope boundary is painted
+// white so the image drops cleanly onto a PowerPoint slide.
+//   – No borough focus  → mask = world minus all 9 NW London boroughs
+//   – Borough-only view → mask = world minus the focused borough's polygon
+// Scope is inferred from `focusedBorough` (set by the borough-focus dropdown).
 
-// World-minus-NWL polygon. Outer ring = large bbox (≈ world), holes = each
-// borough polygon. Anything outside the NWL boroughs gets painted white.
+// World-minus-<scope> polygon. Outer ring is a large bbox, holes are the
+// in-scope borough polygons. Leaflet renders the result as a single white
+// fill covering every pixel outside the holes.
 function _buildWhiteMask() {
   if (typeof BOROUGH_GJ === 'undefined' || !BOROUGH_GJ.features) return null;
   const outer = [[-2, 50], [-2, 53], [2, 53], [2, 50], [-2, 50]];
+  const scopeBoroughRaw = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all')
+    ? focusedBorough : null;
+  // BOROUGH_GJ uses "City of Westminster" but the focus dropdown/ward data
+  // often says just "Westminster". Normalise both sides for comparison.
+  const norm = s => String(s || '').toLowerCase().replace(/^city of /, '').trim();
+  const scopeNorm = scopeBoroughRaw ? norm(scopeBoroughRaw) : null;
   const holes = [];
   BOROUGH_GJ.features.forEach(f => {
     const g = f.geometry;
     if (!g) return;
+    // When a borough is focused, only that borough's geometry becomes a hole
+    // → everything else (including the other 8 NWL boroughs) goes white.
+    if (scopeNorm) {
+      const p = f.properties || {};
+      const name = p.LAD24NM || p.lad_name || p.name || p.LAD22NM;
+      if (norm(name) !== scopeNorm) return;
+    }
     if (g.type === 'Polygon') holes.push(g.coordinates[0]);
     else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => holes.push(poly[0]));
   });
+  if (holes.length === 0) return null;
   return L.geoJSON({
     type: 'Feature', properties: {},
     geometry: { type: 'Polygon', coordinates: [outer, ...holes] },
@@ -4298,29 +4318,8 @@ function _downloadOverlayCsv() {
   if (csvBtn) csvBtn.addEventListener('click', _downloadOverlayCsv);
 })();
 
-// Copy-link button → put current URL in the clipboard and show a toast.
-(function _wireCopyLink() {
-  const btn = document.getElementById('tb-copy');
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    _writeUrlState();
-    const url = location.href;
-    try {
-      await navigator.clipboard.writeText(url);
-      const prev = btn.textContent;
-      btn.textContent = '✓ Copied';
-      btn.classList.add('active');
-      setTimeout(() => { btn.textContent = prev; btn.classList.remove('active'); }, 1500);
-    } catch (e) {
-      // Fallback: select + execCommand('copy')
-      const ta = document.createElement('textarea');
-      ta.value = url; document.body.appendChild(ta);
-      ta.select(); try { document.execCommand('copy'); } catch {}
-      ta.remove();
-      alert('Link copied: ' + url);
-    }
-  });
-})();
+// (Copy-link button removed — if we want shareable URLs later, wire it
+// back via location.href + navigator.clipboard.writeText.)
 
 // Keep the strip + chips in sync when any of these inputs change.
 ['ov', 'ov2', 'borough-focus', 'tlsoa', 'tcore20', 'vcse-area-filter'].forEach(id => {
@@ -4529,6 +4528,27 @@ function _restyleAll() {
       map.setZoom(sliderToZoom(zs.value), { animate: true });
     });
     map.on('zoomend', syncFromMap);
+  }
+})();
+
+// ── Sidebar layout helper ──────────────────────────────────────────────────
+// Sidebar uses absolute positioning (tabs pinned top, footer pinned bottom,
+// active tab-pane fills the gap). Measure the footer height and publish it
+// as a CSS variable so the tab-pane always sits flush above it — even if
+// the footer's content or the sliders change height.
+(function wireSidebarFooterMeasure() {
+  const sb = document.querySelector('.sidebar');
+  const footer = sb && sb.querySelector(':scope > .sb-sec');
+  if (!sb || !footer) return;
+  const measure = () => {
+    const h = footer.getBoundingClientRect().height;
+    if (h > 0) sb.style.setProperty('--sidebar-footer-h', h + 'px');
+  };
+  measure();
+  // Re-measure on window resize + when the footer's own box changes.
+  window.addEventListener('resize', measure);
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(measure).observe(footer);
   }
 })();
 

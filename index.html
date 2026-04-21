@@ -10,10 +10,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a1a; }
+  html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a1a; }
 
   /* ── Layout ── */
-  .app { display: flex; flex-direction: column; height: 100vh; }
+  .app { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; }
   .hdr { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
   .hdr-left { display: flex; align-items: center; gap: 12px; }
   .hdr-logo { font-size: 15px; font-weight: 600; color: #1a1a1a; }
@@ -72,13 +72,14 @@
   .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
   /* ── Sidebar ── */
-  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; background: #fff; }
+  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; background: #fff; height: 100%; max-height: 100%; min-height: 0; }
   .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; background: #fafaf7; position: relative; z-index: 5; min-height: 36px; }
   .sb-tab { flex: 1 1 0; min-width: 0; padding: 9px 2px; font-size: 11px; font-weight: 600; color: #666; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, background .12s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sb-tab:hover { color: #185FA5; background: #fff; }
   .sb-tab.active { color: #1a1a1a; border-bottom-color: #185FA5; background: #fff; }
-  .tab-pane { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+  .tab-pane { display: none; flex-direction: column; flex: 1 1 0; min-height: 0; max-height: 100%; overflow: hidden; }
   .tab-pane.active { display: flex; }
+  .ward-scroll { max-height: 100%; }
   .sb-sec { padding: 11px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
   .deselect-btn { border: 1px solid #c9c9c4; background: #fff; color: #555; font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 5px; cursor: pointer; line-height: 1.2; white-space: nowrap; flex-shrink: 0; }
   .deselect-btn:hover { background: #f2f2ec; border-color: #999; color: #222; }
@@ -124,7 +125,7 @@
   .vcse-more { padding: 8px 13px; font-size: 11px; color: #999; text-align: center; font-style: italic; }
 
   /* ── Ward detail panel ── */
-  .ward-scroll { flex: 1; overflow-y: auto; padding: 11px 13px; min-height: 0; }
+  .ward-scroll { flex: 1 1 0; overflow-y: auto; padding: 11px 13px; min-height: 0; height: 0; }
   .ph { text-align: center; padding: 28px 12px; color: #999; font-size: 12px; line-height: 1.8; }
   .ph-icon { font-size: 22px; margin-bottom: 8px; opacity: .4; }
   .nbadge-sm { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-bottom: 9px; }
@@ -298,7 +299,6 @@
       <button type="button" class="tb-btn" id="tb-copy" title="Copy shareable URL of this view">🔗 Copy link</button>
       <button type="button" class="tb-btn" id="tb-png" title="Download the current map as a PNG image">⤓ PNG</button>
       <button type="button" class="tb-btn" id="tb-csv" title="Download the ward/LSOA data behind the current overlay">⤓ CSV</button>
-      <div class="nbadges" id="nbadges"></div>
     </div>
   </div>
 
@@ -641,7 +641,7 @@
       </div>
       <!-- Shared slider footer — visible on every tab -->
       <div class="sb-sec" style="flex-shrink:0;border-top:1px solid #e5e5e0;background:#fafaf6">
-        <div class="sb-lbl">Ward transparency</div>
+        <div class="sb-lbl">Map controls</div>
         <div class="opacity-row">
           <label>Fill</label>
           <input type="range" id="fill-opacity" min="0" max="100" value="40">
@@ -651,6 +651,11 @@
           <label>Border</label>
           <input type="range" id="border-weight" min="0" max="8" value="0" step="0.5">
           <span class="opacity-val" id="border-weight-val">0</span>
+        </div>
+        <div class="opacity-row" style="margin-top:6px">
+          <label>Zoom</label>
+          <input type="range" id="zoom-slider" min="9" max="16" value="11" step="1">
+          <span class="opacity-val" id="zoom-slider-val">11</span>
         </div>
       </div>
     </div>
@@ -2116,6 +2121,9 @@ function showWard(wn) {
   // Switch to ward tab
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='ward'));
   document.querySelectorAll('.tab-pane').forEach(t => t.classList.toggle('active', t.id==='tab-ward'));
+  // Hide the viewing-strip description — the ward profile replaces it
+  const _vs = document.getElementById('viewing-strip');
+  if (_vs) _vs.style.display = 'none';
 
   // Auto-filter LSOA layer to this ward if active
   if (lsoaActive && lsoaLyr) {
@@ -2212,12 +2220,16 @@ window.deselectWard = function() {
   if (typeof _restyleAll === 'function') _restyleAll();
   const p = document.getElementById('wpanel');
   if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
+  const vs = document.getElementById('viewing-strip');
+  if (vs) vs.style.display = '';
 };
 window.deselectLSOA = function() {
   selLSOA = null;
   if (typeof _restyleAll === 'function') _restyleAll();
   const p = document.getElementById('wpanel');
   if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
+  const vs = document.getElementById('viewing-strip');
+  if (vs) vs.style.display = '';
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2579,27 +2591,16 @@ function refreshPointVisibility() {
 // ═══════════════════════════════════════════════════════════════════════════
 // NEIGHBOURHOOD BADGES & FILTERS
 // ═══════════════════════════════════════════════════════════════════════════
-const nbBadgesEl   = document.getElementById('nbadges');
 const nfiltersEl   = document.getElementById('nfilters');
 const nbFocusBar   = document.getElementById('nbfocus-bar');
 
 Object.entries(NEIGHBOURHOODS).forEach(([k, nb]) => {
-  // Header badge — now triggers focus mode
-  const b = document.createElement('div');
-  b.className = 'nb on';
-  b.dataset.key = k;
-  b.textContent = nb.short;
-  b.style.cssText = `background:${nb.bg};color:${nb.color};border-color:${nb.color}`;
-  b.onclick = () => setNbhdFocus(focusedNbhd === k ? 'all' : k);
-  nbBadgesEl.appendChild(b);
-
   // Sidebar filter — unchecked by default; ticking shades that neighbourhood.
   const r = document.createElement('label');
   r.className = 'lrow';
   r.innerHTML = `<div style="width:11px;height:11px;border-radius:3px;border:2px solid ${nb.color};background:${nb.bg};flex-shrink:0"></div><span class="lname" style="font-size:12px">${nb.label}</span><input type="checkbox" style="accent-color:${nb.color}">`;
   r.querySelector('input').addEventListener('change', e => {
     const on = e.target.checked;
-    b.classList.toggle('on', on);
     if (on) shadedNbhds.add(k); else shadedNbhds.delete(k);
     // Full restyle — guarantees every ward repaints (avoids stale state if a
     // ward's nbhd mapping slipped through due to name edge-cases).
@@ -2915,6 +2916,9 @@ function showLSOA(feat) {
 
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='ward'));
   document.querySelectorAll('.tab-pane').forEach(t => t.classList.toggle('active', t.id==='tab-ward'));
+  // Hide the viewing-strip description — the LSOA profile replaces it
+  const _vs2 = document.getElementById('viewing-strip');
+  if (_vs2) _vs2.style.display = 'none';
 
   // IMD data from embedded properties
   const decile = props.imd_decile || '—';
@@ -4113,97 +4117,27 @@ function _runSearch(q) {
 })();
 
 // ── PNG + CSV export ────────────────────────────────────────────────────────
-// PNG: snapshot the live map via html2canvas. The user picks output zoom
-// (default = current), and can toggle a white backdrop outside NW London
-// so the PNG drops cleanly onto a white PowerPoint slide.
-//
-// Why a dialog rather than one-click? html2canvas needs the DOM to settle
-// after any zoom change (new tiles must download), and the "white outside NWL"
-// mask is a world-minus-boroughs polygon that temporarily covers tiles —
-// both are behaviours the user should opt into.
-
-function _pngOpenDialog() {
-  return new Promise((resolve) => {
-    // Cleanup any previous dialog
-    const old = document.getElementById('png-dialog-overlay');
-    if (old) old.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'png-dialog-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    const curZoom = (typeof map !== 'undefined' && map.getZoom) ? map.getZoom() : 11;
-    const minZ = (map && map.getMinZoom) ? Math.max(9, map.getMinZoom()) : 9;
-    const maxZ = (map && map.getMaxZoom) ? Math.min(16, map.getMaxZoom()) : 16;
-    overlay.innerHTML = `
-      <div style="background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.3);padding:18px 22px;min-width:320px;max-width:400px;font-size:13px;color:#1a1a1a;">
-        <div style="font-size:15px;font-weight:600;margin-bottom:12px;">Download map as PNG</div>
-        <label style="display:block;margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span>Zoom level</span>
-            <span id="png-zoom-val" style="font-family:ui-monospace,monospace;font-size:12px;color:#555;">${curZoom}</span>
-          </div>
-          <input id="png-zoom" type="range" min="${minZ}" max="${maxZ}" value="${curZoom}" step="1" style="width:100%;">
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:#999;margin-top:2px;">
-            <span>wider</span><span>closer</span>
-          </div>
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;margin:14px 0 6px 0;cursor:pointer;">
-          <input id="png-white-bg" type="checkbox" checked>
-          <span>White background outside NW London <span style="color:#888;">(for PowerPoint)</span></span>
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;margin:6px 0 14px 0;cursor:pointer;">
-          <input id="png-hide-ui" type="checkbox" checked>
-          <span>Hide data-level badge in export</span>
-        </label>
-        <div style="display:flex;justify-content:flex-end;gap:8px;">
-          <button id="png-cancel" style="padding:7px 14px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;font-size:12px;">Cancel</button>
-          <button id="png-ok" style="padding:7px 16px;border:none;background:#185FA5;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Render PNG</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    const zEl = overlay.querySelector('#png-zoom');
-    const zLbl = overlay.querySelector('#png-zoom-val');
-    zEl.addEventListener('input', () => { zLbl.textContent = zEl.value; });
-    overlay.querySelector('#png-cancel').addEventListener('click', () => { overlay.remove(); resolve(null); });
-    overlay.querySelector('#png-ok').addEventListener('click', () => {
-      const opts = {
-        zoom: parseInt(zEl.value, 10),
-        whiteBg: overlay.querySelector('#png-white-bg').checked,
-        hideUi: overlay.querySelector('#png-hide-ui').checked,
-      };
-      overlay.remove();
-      resolve(opts);
-    });
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) { overlay.remove(); resolve(null); } });
-  });
-}
+// PNG: snapshot the live map via html2canvas. The NW London boundary mask is
+// always applied so everything outside the 9 boroughs renders white — the
+// output drops cleanly onto a PowerPoint slide. Zoom is controlled from the
+// sidebar slider; export captures whatever is currently on screen.
 
 // World-minus-NWL polygon. Outer ring = large bbox (≈ world), holes = each
 // borough polygon. Anything outside the NWL boroughs gets painted white.
 function _buildWhiteMask() {
   if (typeof BOROUGH_GJ === 'undefined' || !BOROUGH_GJ.features) return null;
-  // Outer ring: counter-clockwise huge rectangle covering London and beyond
   const outer = [[-2, 50], [-2, 53], [2, 53], [2, 50], [-2, 50]];
   const holes = [];
   BOROUGH_GJ.features.forEach(f => {
     const g = f.geometry;
     if (!g) return;
-    if (g.type === 'Polygon') {
-      // Each polygon's first ring becomes a hole
-      holes.push(g.coordinates[0]);
-    } else if (g.type === 'MultiPolygon') {
-      g.coordinates.forEach(poly => holes.push(poly[0]));
-    }
+    if (g.type === 'Polygon') holes.push(g.coordinates[0]);
+    else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => holes.push(poly[0]));
   });
-  const feat = {
-    type: 'Feature',
-    properties: {},
-    geometry: {
-      type: 'Polygon',
-      coordinates: [outer, ...holes],
-    },
-  };
-  return L.geoJSON(feat, {
+  return L.geoJSON({
+    type: 'Feature', properties: {},
+    geometry: { type: 'Polygon', coordinates: [outer, ...holes] },
+  }, {
     style: { fillColor: '#ffffff', fillOpacity: 1, color: '#ffffff', weight: 0, interactive: false },
   });
 }
@@ -4211,81 +4145,53 @@ function _buildWhiteMask() {
 async function _downloadMapPng() {
   const btn = document.getElementById('tb-png');
   const mapEl = document.getElementById('map');
-  const mapWrap = document.getElementById('map-wrap');
   if (!mapEl || typeof html2canvas !== 'function' || typeof map === 'undefined') {
     alert('PNG export requires the map and html2canvas (still loading?). Try again in a moment.');
     return;
   }
 
-  const opts = await _pngOpenDialog();
-  if (!opts) return;
-
   const prev = btn ? btn.textContent : '';
   if (btn) { btn.textContent = '… rendering'; btn.disabled = true; }
 
-  const startZoom = map.getZoom();
   let maskLyr = null;
   const dlBadge = document.getElementById('dl-badge');
   const dlPrevVis = dlBadge ? dlBadge.style.visibility : '';
 
-  // Helper: wait until the main tile layer finishes loading (or timeout)
+  // Wait until any tile layers currently loading finish (safety-timeout 2s)
   const waitForTiles = () => new Promise(resolve => {
     let done = false;
     const finish = () => { if (!done) { done = true; resolve(); } };
-    // Find tile layers currently on the map
     const tileLayers = [];
     map.eachLayer(l => { if (l instanceof L.TileLayer) tileLayers.push(l); });
-    if (tileLayers.length === 0) { setTimeout(finish, 200); return; }
+    if (tileLayers.length === 0) { setTimeout(finish, 100); return; }
     let pending = tileLayers.length;
     tileLayers.forEach(tl => {
       if (!tl._loading) { pending--; return; }
       tl.once('load', () => { if (--pending <= 0) finish(); });
     });
-    if (pending <= 0) setTimeout(finish, 200);
-    setTimeout(finish, 3500); // safety timeout
+    if (pending <= 0) setTimeout(finish, 100);
+    setTimeout(finish, 2000);
   });
 
   try {
-    // Step 1: add white mask (if requested) — painted AFTER boroughL so it
-    // covers tiles outside NW London but underneath any UI overlays.
-    if (opts.whiteBg) {
-      maskLyr = _buildWhiteMask();
-      if (maskLyr) {
-        maskLyr.addTo(map);
-        // Send to back among overlay layers but keep over tiles
-        if (typeof boroughL !== 'undefined' && boroughL && boroughL.bringToFront) boroughL.bringToFront();
-      }
+    // Paint a white backdrop outside the NW London boroughs
+    maskLyr = _buildWhiteMask();
+    if (maskLyr) {
+      maskLyr.addTo(map);
+      if (typeof boroughL !== 'undefined' && boroughL && boroughL.bringToFront) boroughL.bringToFront();
     }
+    // Hide the data-level badge so it doesn't end up in the capture
+    if (dlBadge) dlBadge.style.visibility = 'hidden';
 
-    // Step 2: hide the data-level badge so it doesn't end up in the capture
-    if (opts.hideUi && dlBadge) dlBadge.style.visibility = 'hidden';
-
-    // Step 3: change zoom if the user asked for a different one. Use a promise
-    // that resolves on the next moveend, then also wait for tiles.
-    if (opts.zoom !== startZoom) {
-      await new Promise(res => {
-        const handler = () => { map.off('moveend', handler); res(); };
-        map.on('moveend', handler);
-        map.setZoom(opts.zoom, { animate: false });
-        // Safety timeout in case moveend doesn't fire
-        setTimeout(() => { map.off('moveend', handler); res(); }, 1500);
-      });
-    }
     await waitForTiles();
-    // Small settle delay so Leaflet's CSS transforms finalise
-    await new Promise(r => setTimeout(r, 250));
+    await new Promise(r => setTimeout(r, 150));
 
-    // Step 4: capture. Use #map (not #map-wrap) so the viewing strip and any
-    // UI chrome outside the map canvas aren't included. backgroundColor white
-    // matches the mask; scale devicePixelRatio keeps the output crisp.
     const canvas = await html2canvas(mapEl, {
       useCORS: true,
       allowTaint: true,
       logging: false,
-      backgroundColor: opts.whiteBg ? '#ffffff' : '#f5f5f2',
+      backgroundColor: '#ffffff',
       scale: window.devicePixelRatio || 1,
-      // Force html2canvas to use the element's bounding box (handles Leaflet's
-      // absolutely-positioned panes correctly).
       width: mapEl.clientWidth,
       height: mapEl.clientHeight,
     });
@@ -4295,7 +4201,7 @@ async function _downloadMapPng() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const ts = new Date().toISOString().slice(0,16).replace(/[:T-]/g,'');
-      a.href = url; a.download = `nwl-map-z${opts.zoom}-${ts}.png`;
+      a.href = url; a.download = `nwl-map-${ts}.png`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     }, 'image/png');
@@ -4303,11 +4209,7 @@ async function _downloadMapPng() {
     console.error('PNG export error', e);
     alert('PNG export failed — some basemap tiles may be blocked by CORS. Try again after the tiles finish loading.');
   } finally {
-    // Restore state: remove mask, restore zoom, restore badge
     if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
-    if (opts && opts.zoom !== startZoom) {
-      map.setZoom(startZoom, { animate: false });
-    }
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     if (btn) { btn.textContent = prev; btn.disabled = false; }
   }
@@ -4448,6 +4350,12 @@ document.querySelectorAll('.sb-tab').forEach(t => {
     document.querySelectorAll('.sb-tab').forEach(x => x.classList.toggle('active', x===t));
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='tab-'+t.dataset.tab));
     if (t.dataset.tab === 'nbhd') renderNbhdTable();
+    // Restore viewing-strip unless the Ward tab is showing an actual selection.
+    const vs = document.getElementById('viewing-strip');
+    if (vs) {
+      const hasSel = (typeof selW !== 'undefined' && selW) || (typeof selLSOA !== 'undefined' && selLSOA);
+      vs.style.display = (t.dataset.tab === 'ward' && hasSel) ? 'none' : '';
+    }
   });
 });
 
@@ -4582,6 +4490,8 @@ function _restyleAll() {
   const fov = document.getElementById('fill-opacity-val');
   const bw = document.getElementById('border-weight');
   const bwv = document.getElementById('border-weight-val');
+  const zs = document.getElementById('zoom-slider');
+  const zsv = document.getElementById('zoom-slider-val');
   // Fill slider = absolute transparency (0–100 % → 0.0–1.0 fill opacity).
   if (fo) fo.addEventListener('input', () => {
     fillOpacityMult = (+fo.value) / 100;
@@ -4590,10 +4500,26 @@ function _restyleAll() {
   });
   // Border slider = black outline thickness. Value is the stroke weight in px.
   if (bw) bw.addEventListener('input', () => {
-    borderWeightMult = (+bw.value);  // used as an absolute weight multiplier on a base of 1px
+    borderWeightMult = (+bw.value);
     if (bwv) bwv.textContent = bw.value;
     _restyleAll();
   });
+  // Zoom slider — drives map.setZoom. Sync the slider back when the user
+  // pinches/scrolls the map so the value stays truthful.
+  if (zs && typeof map !== 'undefined') {
+    const syncFromMap = () => {
+      const z = map.getZoom();
+      zs.value = Math.max(+zs.min, Math.min(+zs.max, Math.round(z)));
+      if (zsv) zsv.textContent = zs.value;
+    };
+    // Initialise to current zoom once the map is ready
+    setTimeout(syncFromMap, 50);
+    zs.addEventListener('input', () => {
+      if (zsv) zsv.textContent = zs.value;
+      map.setZoom(+zs.value, { animate: true });
+    });
+    map.on('zoomend', syncFromMap);
+  }
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════

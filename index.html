@@ -187,7 +187,7 @@
   .loading-sub { font-size: 11px; color: #aaa; }
 
   /* ── Data-level badge (floating overlay, top-right of map) ── */
-  .dl-badge { position: absolute; top: 12px; right: 12px; z-index: 1001; background: rgba(255,255,255,0.96); border: 1px solid #d4d4d4; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 6px 8px; display: flex; align-items: center; gap: 8px; user-select: none; }
+  .dl-badge { position: absolute; top: 12px; right: 12px; z-index: 2500; background: rgba(255,255,255,0.96); border: 1px solid #d4d4d4; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 6px 8px; display: flex; align-items: center; gap: 8px; user-select: none; }
   .dl-badge-label { font-weight: 600; color: #555; letter-spacing: 0.04em; text-transform: uppercase; font-size: 9px; }
   .dl-seg { display: flex; background: #f2f2f0; border-radius: 6px; padding: 2px; gap: 2px; }
   .dl-seg button { background: transparent; border: none; padding: 4px 10px; font-size: 11px; color: #666; border-radius: 4px; cursor: pointer; font-weight: 500; transition: background .12s, color .12s; }
@@ -673,7 +673,6 @@
         <div class="dl-seg" id="dl-seg">
           <button type="button" data-dl="ward" class="active" title="Ward-level data (188 wards)">Ward</button>
           <button type="button" data-dl="lsoa" title="LSOA-level data (~1,200 areas, more granular)">LSOA</button>
-          <button type="button" data-dl="nbhd" class="disabled" title="Neighbourhood mode — in development">Neighbourhood</button>
         </div>
         <div class="dl-hint" id="dl-hint"></div>
       </div>
@@ -4114,29 +4113,189 @@ function _runSearch(q) {
 })();
 
 // ── PNG + CSV export ────────────────────────────────────────────────────────
-// PNG: snapshot the map container via html2canvas. `useCORS: true` so tile
-// images resolve through CORS headers where possible; tiles that fail still
-// leave a grey tile (acceptable for a screenshot).
+// PNG: snapshot the live map via html2canvas. The user picks output zoom
+// (default = current), and can toggle a white backdrop outside NW London
+// so the PNG drops cleanly onto a white PowerPoint slide.
+//
+// Why a dialog rather than one-click? html2canvas needs the DOM to settle
+// after any zoom change (new tiles must download), and the "white outside NWL"
+// mask is a world-minus-boroughs polygon that temporarily covers tiles —
+// both are behaviours the user should opt into.
+
+function _pngOpenDialog() {
+  return new Promise((resolve) => {
+    // Cleanup any previous dialog
+    const old = document.getElementById('png-dialog-overlay');
+    if (old) old.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'png-dialog-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    const curZoom = (typeof map !== 'undefined' && map.getZoom) ? map.getZoom() : 11;
+    const minZ = (map && map.getMinZoom) ? Math.max(9, map.getMinZoom()) : 9;
+    const maxZ = (map && map.getMaxZoom) ? Math.min(16, map.getMaxZoom()) : 16;
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.3);padding:18px 22px;min-width:320px;max-width:400px;font-size:13px;color:#1a1a1a;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:12px;">Download map as PNG</div>
+        <label style="display:block;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span>Zoom level</span>
+            <span id="png-zoom-val" style="font-family:ui-monospace,monospace;font-size:12px;color:#555;">${curZoom}</span>
+          </div>
+          <input id="png-zoom" type="range" min="${minZ}" max="${maxZ}" value="${curZoom}" step="1" style="width:100%;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#999;margin-top:2px;">
+            <span>wider</span><span>closer</span>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;margin:14px 0 6px 0;cursor:pointer;">
+          <input id="png-white-bg" type="checkbox" checked>
+          <span>White background outside NW London <span style="color:#888;">(for PowerPoint)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;margin:6px 0 14px 0;cursor:pointer;">
+          <input id="png-hide-ui" type="checkbox" checked>
+          <span>Hide data-level badge in export</span>
+        </label>
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+          <button id="png-cancel" style="padding:7px 14px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;font-size:12px;">Cancel</button>
+          <button id="png-ok" style="padding:7px 16px;border:none;background:#185FA5;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Render PNG</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    const zEl = overlay.querySelector('#png-zoom');
+    const zLbl = overlay.querySelector('#png-zoom-val');
+    zEl.addEventListener('input', () => { zLbl.textContent = zEl.value; });
+    overlay.querySelector('#png-cancel').addEventListener('click', () => { overlay.remove(); resolve(null); });
+    overlay.querySelector('#png-ok').addEventListener('click', () => {
+      const opts = {
+        zoom: parseInt(zEl.value, 10),
+        whiteBg: overlay.querySelector('#png-white-bg').checked,
+        hideUi: overlay.querySelector('#png-hide-ui').checked,
+      };
+      overlay.remove();
+      resolve(opts);
+    });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) { overlay.remove(); resolve(null); } });
+  });
+}
+
+// World-minus-NWL polygon. Outer ring = large bbox (≈ world), holes = each
+// borough polygon. Anything outside the NWL boroughs gets painted white.
+function _buildWhiteMask() {
+  if (typeof BOROUGH_GJ === 'undefined' || !BOROUGH_GJ.features) return null;
+  // Outer ring: counter-clockwise huge rectangle covering London and beyond
+  const outer = [[-2, 50], [-2, 53], [2, 53], [2, 50], [-2, 50]];
+  const holes = [];
+  BOROUGH_GJ.features.forEach(f => {
+    const g = f.geometry;
+    if (!g) return;
+    if (g.type === 'Polygon') {
+      // Each polygon's first ring becomes a hole
+      holes.push(g.coordinates[0]);
+    } else if (g.type === 'MultiPolygon') {
+      g.coordinates.forEach(poly => holes.push(poly[0]));
+    }
+  });
+  const feat = {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: [outer, ...holes],
+    },
+  };
+  return L.geoJSON(feat, {
+    style: { fillColor: '#ffffff', fillOpacity: 1, color: '#ffffff', weight: 0, interactive: false },
+  });
+}
+
 async function _downloadMapPng() {
   const btn = document.getElementById('tb-png');
-  const mapWrap = document.getElementById('map-wrap') || document.getElementById('map');
-  if (!mapWrap || typeof html2canvas !== 'function') {
-    alert('PNG export requires html2canvas (still loading?). Try again in a moment.');
+  const mapEl = document.getElementById('map');
+  const mapWrap = document.getElementById('map-wrap');
+  if (!mapEl || typeof html2canvas !== 'function' || typeof map === 'undefined') {
+    alert('PNG export requires the map and html2canvas (still loading?). Try again in a moment.');
     return;
   }
+
+  const opts = await _pngOpenDialog();
+  if (!opts) return;
+
   const prev = btn ? btn.textContent : '';
   if (btn) { btn.textContent = '… rendering'; btn.disabled = true; }
-  try {
-    const canvas = await html2canvas(mapWrap, {
-      useCORS: true, allowTaint: true, logging: false,
-      backgroundColor: '#f5f5f2', scale: window.devicePixelRatio || 1,
+
+  const startZoom = map.getZoom();
+  let maskLyr = null;
+  const dlBadge = document.getElementById('dl-badge');
+  const dlPrevVis = dlBadge ? dlBadge.style.visibility : '';
+
+  // Helper: wait until the main tile layer finishes loading (or timeout)
+  const waitForTiles = () => new Promise(resolve => {
+    let done = false;
+    const finish = () => { if (!done) { done = true; resolve(); } };
+    // Find tile layers currently on the map
+    const tileLayers = [];
+    map.eachLayer(l => { if (l instanceof L.TileLayer) tileLayers.push(l); });
+    if (tileLayers.length === 0) { setTimeout(finish, 200); return; }
+    let pending = tileLayers.length;
+    tileLayers.forEach(tl => {
+      if (!tl._loading) { pending--; return; }
+      tl.once('load', () => { if (--pending <= 0) finish(); });
     });
+    if (pending <= 0) setTimeout(finish, 200);
+    setTimeout(finish, 3500); // safety timeout
+  });
+
+  try {
+    // Step 1: add white mask (if requested) — painted AFTER boroughL so it
+    // covers tiles outside NW London but underneath any UI overlays.
+    if (opts.whiteBg) {
+      maskLyr = _buildWhiteMask();
+      if (maskLyr) {
+        maskLyr.addTo(map);
+        // Send to back among overlay layers but keep over tiles
+        if (typeof boroughL !== 'undefined' && boroughL && boroughL.bringToFront) boroughL.bringToFront();
+      }
+    }
+
+    // Step 2: hide the data-level badge so it doesn't end up in the capture
+    if (opts.hideUi && dlBadge) dlBadge.style.visibility = 'hidden';
+
+    // Step 3: change zoom if the user asked for a different one. Use a promise
+    // that resolves on the next moveend, then also wait for tiles.
+    if (opts.zoom !== startZoom) {
+      await new Promise(res => {
+        const handler = () => { map.off('moveend', handler); res(); };
+        map.on('moveend', handler);
+        map.setZoom(opts.zoom, { animate: false });
+        // Safety timeout in case moveend doesn't fire
+        setTimeout(() => { map.off('moveend', handler); res(); }, 1500);
+      });
+    }
+    await waitForTiles();
+    // Small settle delay so Leaflet's CSS transforms finalise
+    await new Promise(r => setTimeout(r, 250));
+
+    // Step 4: capture. Use #map (not #map-wrap) so the viewing strip and any
+    // UI chrome outside the map canvas aren't included. backgroundColor white
+    // matches the mask; scale devicePixelRatio keeps the output crisp.
+    const canvas = await html2canvas(mapEl, {
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: opts.whiteBg ? '#ffffff' : '#f5f5f2',
+      scale: window.devicePixelRatio || 1,
+      // Force html2canvas to use the element's bounding box (handles Leaflet's
+      // absolutely-positioned panes correctly).
+      width: mapEl.clientWidth,
+      height: mapEl.clientHeight,
+    });
+
     canvas.toBlob(blob => {
       if (!blob) { alert('PNG export failed.'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const ts = new Date().toISOString().slice(0,16).replace(/[:T-]/g,'');
-      a.href = url; a.download = `nwl-map-${ts}.png`;
+      a.href = url; a.download = `nwl-map-z${opts.zoom}-${ts}.png`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     }, 'image/png');
@@ -4144,46 +4303,82 @@ async function _downloadMapPng() {
     console.error('PNG export error', e);
     alert('PNG export failed — some basemap tiles may be blocked by CORS. Try again after the tiles finish loading.');
   } finally {
+    // Restore state: remove mask, restore zoom, restore badge
+    if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
+    if (opts && opts.zoom !== startZoom) {
+      map.setZoom(startZoom, { animate: false });
+    }
+    if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     if (btn) { btn.textContent = prev; btn.disabled = false; }
   }
 }
 
-// CSV: dump the ward/LSOA table behind the currently-active overlay.
-// When no overlay is selected, dumps the full ward-level indicator table.
+// CSV: dump the ward/LSOA table behind the currently-active overlay, FILTERED
+// to the currently-visible view. Honours focusedBorough, focusedNbhd,
+// lsoaScope, and the Core20 toggle so the CSV reflects what the user sees.
+function _csvEscape(v) {
+  if (v == null) return '';
+  const s = String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
 function _downloadOverlayCsv() {
   try {
     const rows = [];
     const ov = (typeof curOv !== 'undefined' && curOv !== 'none') ? curOv : null;
     const isLsoa = ov && typeof isLsoaOnlyOv === 'function' && isLsoaOnlyOv(ov);
-    if (isLsoa && typeof LSOA_DATA !== 'undefined') {
-      rows.push(['lsoa_code','lsoa_name','ward','borough','value'].join(','));
+    const wantLsoa = isLsoa || (typeof currentDataLevel !== 'undefined' && currentDataLevel === 'lsoa');
+    const boroughFilter = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all') ? focusedBorough : null;
+    const nbhdFilter    = (typeof focusedNbhd     !== 'undefined' && focusedNbhd && focusedNbhd !== 'all')    ? focusedNbhd    : null;
+    const core20Only    = (typeof showCore20Overlay !== 'undefined' && showCore20Overlay) === true;
+    const scope         = (typeof lsoaScope !== 'undefined') ? lsoaScope : 'all';
+    let nKept = 0, nSkipped = 0;
+    if (wantLsoa && typeof LSOA_DATA !== 'undefined') {
+      const header = ['lsoa_code','lsoa_name','ward','borough','imd_decile','core20'];
+      if (ov) header.push(ov);
+      rows.push(header.map(_csvEscape).join(','));
       for (const [code, l] of Object.entries(LSOA_DATA)) {
-        const val = (l.indicators || l)[ov];
-        rows.push([code, (l.name||'').replace(/,/g,' '), (l.ward||l.ward_name||'').replace(/,/g,' '), (l.lad||l.borough||'').replace(/,/g,' '), val==null?'':val].join(','));
+        const ind = l.indicators || l;
+        const ward = l.ward || l.ward_name || '';
+        const lad  = l.lad  || l.borough   || '';
+        if (boroughFilter && lad !== boroughFilter) { nSkipped++; continue; }
+        if (scope && scope !== 'all') {
+          if (scope.startsWith('ward:') && ward !== scope.slice(5)) { nSkipped++; continue; }
+          if (scope.startsWith('nb:')   && l.nbhd !== scope.slice(3) && l.neighbourhood !== scope.slice(3)) { nSkipped++; continue; }
+        }
+        const dec = l.imd_decile != null ? l.imd_decile : (ind.imd_decile != null ? ind.imd_decile : '');
+        const isCore20 = (dec === 1 || dec === 2);
+        if (core20Only && !isCore20) { nSkipped++; continue; }
+        const row = [code, l.name||'', ward, lad, dec, isCore20 ? 'Y' : ''];
+        if (ov) row.push(ind[ov]);
+        rows.push(row.map(_csvEscape).join(','));
+        nKept++;
       }
     } else if (typeof WARD_DATA !== 'undefined') {
-      if (ov) rows.push(['ward_code','ward_name','borough','value'].join(','));
-      else rows.push(['ward_code','ward_name','borough'].join(','));
+      const header = ['ward_code','ward_name','borough','neighbourhood'];
+      if (ov) header.push(ov);
+      rows.push(header.map(_csvEscape).join(','));
       for (const [code, w] of Object.entries(WARD_DATA)) {
-        const name = (w.name||'').replace(/,/g,' ');
-        const lad = (w.lad||w.LAD||'').replace(/,/g,' ');
-        if (ov) {
-          const val = w.indicators ? w.indicators[ov] : null;
-          rows.push([code, name, lad, val==null?'':val].join(','));
-        } else {
-          rows.push([code, name, lad].join(','));
-        }
+        const lad = w.lad || w.LAD || '';
+        const nk  = w.neighbourhood || '';
+        if (boroughFilter && lad !== boroughFilter) { nSkipped++; continue; }
+        if (nbhdFilter    && nk  !== nbhdFilter)    { nSkipped++; continue; }
+        const row = [code, w.name||'', lad, nk];
+        if (ov) row.push(w.indicators ? w.indicators[ov] : '');
+        rows.push(row.map(_csvEscape).join(','));
+        nKept++;
       }
     }
-    if (rows.length < 2) { alert('No data to export yet — try again once the map has finished loading.'); return; }
+    if (rows.length < 2) { alert('No data matches the current view. Clear filters and try again.'); return; }
     const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const ts = new Date().toISOString().slice(0,16).replace(/[:T-]/g,'');
-    const suffix = ov ? ov : 'wards';
+    const tag = wantLsoa ? 'lsoa' : 'ward';
+    const suffix = ov ? `${tag}-${ov}` : tag;
     a.href = url; a.download = `nwl-${suffix}-${ts}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
+    console.log(`CSV export: ${nKept} rows kept, ${nSkipped} filtered out`);
   } catch (e) {
     console.error('CSV export error', e);
     alert('CSV export failed: ' + e.message);

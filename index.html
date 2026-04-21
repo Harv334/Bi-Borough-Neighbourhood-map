@@ -98,7 +98,7 @@
   /* ── Overlay scale ── */
   .scale-bar { display: none; margin-top: 8px; }
   .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 3px; }
-  .scale-grad { display: flex; height: 6px; border-radius: 3px; overflow: hidden; }
+  .scale-grad { display: block; height: 6px; border-radius: 3px; overflow: hidden; }
 
   /* ── Map ── */
   .map-wrap { flex: 1; position: relative; min-height: 0; min-width: 0; }
@@ -277,8 +277,9 @@
           <div class="sb-lbl">Filter by area</div>
           <select id="vcse-area-filter" style="width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;color:#333;background:#fff;margin-bottom:8px">
             <option value="london">All London (all organisations)</option>
-            <option value="all" selected>Westminster only</option>
-            <optgroup label="── Neighbourhoods ──">
+            <option value="all" selected>All NW London</option>
+            <option value="westminster">Westminster only</option>
+            <optgroup label="── Westminster neighbourhoods ──">
               <option value="nbhd-sw">South Westminster</option>
               <option value="nbhd-we">West End &amp; Marylebone</option>
               <option value="nbhd-rh">Regent Heath</option>
@@ -373,13 +374,8 @@
 
           <div class="scale-bar" id="scale">
             <div class="scale-labels"><span id="sc-lo">Low</span><span id="sc-hi">High</span></div>
-            <div class="scale-grad" id="sc-grad">
-              <div style="flex:1;background:#0F6E56"></div>
-              <div style="flex:1;background:#3B9E5A"></div>
-              <div style="flex:1;background:#EF9F27"></div>
-              <div style="flex:1;background:#D85A30"></div>
-              <div style="flex:1;background:#A32D2D"></div>
-            </div>
+            <!-- Gradient must match ramp() in JS exactly: rgb(15,110,86) → rgb(239,159,39) → rgb(163,45,39) -->
+            <div class="scale-grad" id="sc-grad" style="background:linear-gradient(to right, rgb(15,110,86) 0%, rgb(239,159,39) 50%, rgb(163,45,39) 100%)"></div>
           </div>
 
           <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">
@@ -1244,6 +1240,10 @@ function applyVCSEFilter() {
       // Show everything regardless of location
       areaMatch = true;
     } else if (areaFilter === 'all') {
+      // All NW London — no geographic filter (pinned VCSEs are already
+      // restricted to the 9 NWL boroughs by the data pipeline)
+      areaMatch = true;
+    } else if (areaFilter === 'westminster') {
       // Westminster only — must fall within one of the 18 ward bounds
       areaMatch = nbhdOfLatLng(o.lat, o.lng) !== null;
     } else {
@@ -1269,6 +1269,8 @@ function applyVCSEFilter() {
     if (areaFilter === 'london') {
       areaMatch = true;
     } else if (areaFilter === 'all') {
+      areaMatch = true;
+    } else if (areaFilter === 'westminster') {
       areaMatch = nbhdOfLatLng(o.lat, o.lng) !== null;
     } else {
       areaMatch = nbhdOfLatLng(o.lat, o.lng) === areaFilter.replace('nbhd-', '');
@@ -1475,15 +1477,18 @@ function wstyle(wn, ov, state) {
   }
 
   // Overlay / bivariate: fill comes from the chosen indicator colour.
-  const fill = (curOv2 && curOv2 !== 'none' && ov !== 'none')
-    ? bivariateColor(wn, ov, curOv2)
-    : ovColor(wn, ov);
+  const bivActive = curOv2 && curOv2 !== 'none' && ov !== 'none';
+  const bivFill = bivActive ? bivariateColor(wn, ov, curOv2, 'ward') : null;
+  const fill = bivActive ? (bivFill || '#ccc') : ovColor(wn, ov);
   const baseW  = {default:1.0, hover:3.0, selected:4.0}[state] || 1.0;
   // When the overlay is LSOA-only, the ward layer has nothing meaningful to
   // colour with — making it fully opaque just hides the LSOA choropleth
   // underneath. Drop to a near-transparent fill + thin outline so the LSOA
   // layer carries the choropleth and wards keep their boundary reference.
-  const lsoaOnly = ov !== 'none' && isLsoaOnlyOv(ov);
+  // Same applies when the bivariate colour is null (either indicator is
+  // LSOA-only): the LSOA layer paints the choropleth, wards stay outlines.
+  const lsoaOnly = (ov !== 'none' && isLsoaOnlyOv(ov))
+                   || (bivActive && (isLsoaOnlyOv(ov) || isLsoaOnlyOv(curOv2)));
   const baseFo = lsoaOnly ? 0.0 : absFill;
   const fo = spot ? 0.05 : (dimmed ? Math.min(0.12, baseFo) : baseFo);
   const w  = spot ? 0.6  : (dimmed ? 1.0 : Math.max(0, baseW * borderWeightMult));
@@ -2131,15 +2136,24 @@ function imdStyle(feat, state) {
   }
   // If an overlay is active, blend with overlay colour
   if (curOv !== 'none') {
-    const cfg = OV_CFG[curOv];
-    const d2 = LSOA_DATA[feat.properties.code];
-    if (d2 && cfg) {
-      const val = (d2.indicators || d2)?.[curOv];
-      if (val != null) {
-        const range = getLsoaRange(curOv);
-        if (range && range.hi !== range.lo) {
-          const t = (parseFloat(val) - range.lo) / (range.hi - range.lo);
-          base.fillColor = ramp(Math.max(0, Math.min(1, t)), !cfg.wh);
+    const code = feat.properties.code;
+    const bivActive = curOv2 && curOv2 !== 'none';
+    if (bivActive) {
+      // Bivariate: colour by tercile-cross. Works even when either overlay
+      // is LSOA-only because _bivTercile now dispatches to the right pool.
+      const c = bivariateColor(code, curOv, curOv2, 'lsoa');
+      if (c) base.fillColor = c;
+    } else {
+      const cfg = OV_CFG[curOv];
+      const d2 = LSOA_DATA[code];
+      if (d2 && cfg) {
+        const val = (d2.indicators || d2)?.[curOv];
+        if (val != null) {
+          const range = getLsoaRange(curOv);
+          if (range && range.hi !== range.lo) {
+            const t = (parseFloat(val) - range.lo) / (range.hi - range.lo);
+            base.fillColor = ramp(Math.max(0, Math.min(1, t)), !cfg.wh);
+          }
         }
       }
     }
@@ -2736,7 +2750,13 @@ document.getElementById('ov').addEventListener('change', e => {
     const fmtHi = range ? fmtNum(range.hi, 1) : cfg.hi;
     document.getElementById('sc-lo').textContent = `${cfg.lo} (${fmtLo})`;
     document.getElementById('sc-hi').textContent = `${cfg.hi} (${fmtHi})`;
-    document.getElementById('sc-grad').style.flexDirection = cfg.wh ? 'row' : 'row-reverse';
+    // Legend gradient must match ramp() inversion: when wh:true (higher=worse),
+    // colour progresses green→red left-to-right; when wh:false (higher=better),
+    // we flip to red→green so the visual matches the polygon fills.
+    const grad = cfg.wh
+      ? 'linear-gradient(to right, rgb(15,110,86) 0%, rgb(239,159,39) 50%, rgb(163,45,39) 100%)'
+      : 'linear-gradient(to right, rgb(163,45,39) 0%, rgb(239,159,39) 50%, rgb(15,110,86) 100%)';
+    document.getElementById('sc-grad').style.background = grad;
   }
   // Auto-enable the LSOA layer if the overlay only has LSOA-level data
   // (IMD domains, claimant count etc.). Without this, users pick e.g.
@@ -2926,29 +2946,60 @@ const BIV_PALETTE = [
   ['#c85a5a', '#985356', '#574249'], // ov2 high
 ];
 
-function _bivTercile(wn, key) {
-  // Classify a ward's value into 0/1/2 (low/mid/high) by ranking across all wards.
-  if (!WARD_DATA || Object.keys(WARD_DATA).length === 0) return 1;
+// Tercile classifier — uses WARD_DATA for ward-level overlays, LSOA_DATA for
+// LSOA-only overlays. `type` tells us whether we're colouring a ward or an
+// LSOA feature (identified by `id`: ward name or LSOA code). Returns 0/1/2.
+function _bivTercile(id, key, type) {
+  type = type || 'ward';
+  const useLsoaPool = isLsoaOnlyOv(key);
+  const pool = useLsoaPool ? (typeof LSOA_DATA !== 'undefined' ? LSOA_DATA : null)
+                           : (typeof WARD_DATA !== 'undefined' ? WARD_DATA : null);
+  if (!pool || Object.keys(pool).length === 0) return 1;
   const vals = [];
-  for (const w of Object.values(WARD_DATA)) {
-    const v = (w.indicators || {})[key];
+  for (const row of Object.values(pool)) {
+    const v = (row.indicators || row)[key];
     if (v != null && v !== '' && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
   }
   if (vals.length < 3) return 1;
   vals.sort((a, b) => a - b);
   const t1 = vals[Math.floor(vals.length / 3)];
   const t2 = vals[Math.floor(vals.length * 2 / 3)];
-  const wobj = WARD_DATA[wn] || Object.values(WARD_DATA).find(w => w.name === wn);
-  const v = wobj && wobj.indicators ? parseFloat(wobj.indicators[key]) : null;
+
+  // Find the feature's own value for this key.
+  let v = null;
+  if (type === 'lsoa') {
+    // LSOA feature: read LSOA_DATA[code]; if the key is ward-only (not LSOA)
+    // fall back to the parent ward's value via LSOA_DATA[code].ward_name.
+    const row = pool[id];
+    if (row) v = parseFloat((row.indicators || row)[key]);
+    if ((v == null || isNaN(v)) && !useLsoaPool && typeof LSOA_DATA !== 'undefined') {
+      const lrow = LSOA_DATA[id];
+      const wn = lrow && (lrow.ward_name || lrow.ward);
+      if (wn && WARD_DATA) {
+        const wobj = WARD_DATA[wn] || Object.values(WARD_DATA).find(w => w.name === wn);
+        if (wobj && wobj.indicators) v = parseFloat(wobj.indicators[key]);
+      }
+    }
+  } else {
+    // Ward feature: read WARD_DATA[wn]; if the key is LSOA-only, we can't
+    // colour the ward on an LSOA-only metric — return -1 to signal "no colour".
+    if (useLsoaPool) return -1;
+    const wobj = WARD_DATA[id] || Object.values(WARD_DATA).find(w => w.name === id);
+    if (wobj && wobj.indicators) v = parseFloat(wobj.indicators[key]);
+  }
   if (v == null || isNaN(v)) return 1;
   if (v <= t1) return 0;
   if (v <= t2) return 1;
   return 2;
 }
 
-function bivariateColor(wn, ov1, ov2) {
-  const a = _bivTercile(wn, ov1);
-  const b = _bivTercile(wn, ov2);
+function bivariateColor(id, ov1, ov2, type) {
+  const a = _bivTercile(id, ov1, type);
+  const b = _bivTercile(id, ov2, type);
+  // -1 means "feature has no value for this LSOA-only overlay" (only hits on
+  // ward features). In that case return null so the caller can fall through
+  // to a transparent fill and let the LSOA layer carry the choropleth.
+  if (a < 0 || b < 0) return null;
   return BIV_PALETTE[b][a];
 }
 

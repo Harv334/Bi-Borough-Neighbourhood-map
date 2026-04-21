@@ -127,13 +127,25 @@ def rule(msg: str) -> None:  print("\n" + _c("1;34", f"─── {msg} " + "─"
 def write_atomic(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
-    # newline="" disables Windows' default CRLF translation on text-mode writes,
-    # so files keep whatever line endings the `text` already contains (LF).
-    # Without this, splice_index_html() would churn every line in git diff.
-    with open(tmp, "w", encoding="utf-8", newline="") as f:
-        f.write(text)
+    # Write as bytes so the OS byte count is unambiguous — avoids Windows
+    # text-mode translation AND sidesteps any `newline=""` edge cases that
+    # could leave `text` partially buffered.
+    payload = text.encode("utf-8")
+    expected = len(payload)
+    with open(tmp, "wb") as f:
+        f.write(payload)
         f.flush()
         os.fsync(f.fileno())
+    # Verify we actually wrote all bytes. If not, remove the tmp file and
+    # raise so callers don't silently commit a half-written JSON.
+    actual = tmp.stat().st_size
+    if actual != expected:
+        try: tmp.unlink()
+        except Exception: pass
+        raise IOError(
+            f"write_atomic: short write to {tmp} "
+            f"(wrote {actual} of {expected} bytes)"
+        )
     os.replace(tmp, path)
 
 def _scrub_nan(obj):

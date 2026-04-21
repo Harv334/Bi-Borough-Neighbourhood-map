@@ -73,10 +73,10 @@
 
   /* ── Sidebar ── */
   .sidebar { width: 268px; border-right: 1px solid #e5e5e0; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; background: #fff; }
-  .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
-  .sb-tab { flex: 1; padding: 9px 4px; font-size: 11px; font-weight: 500; color: #888; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s; }
-  .sb-tab:hover { color: #333; }
-  .sb-tab.active { color: #1a1a1a; border-bottom-color: #185FA5; }
+  .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; background: #fafaf7; position: relative; z-index: 5; min-height: 36px; }
+  .sb-tab { flex: 1 1 0; min-width: 0; padding: 9px 2px; font-size: 11px; font-weight: 600; color: #666; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, background .12s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sb-tab:hover { color: #185FA5; background: #fff; }
+  .sb-tab.active { color: #1a1a1a; border-bottom-color: #185FA5; background: #fff; }
   .tab-pane { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
   .tab-pane.active { display: flex; }
   .sb-sec { padding: 11px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; }
@@ -313,7 +313,7 @@
         <div class="sb-tab active" data-tab="layers">Layers</div>
         <div class="sb-tab" data-tab="vcse">VCSE</div>
         <div class="sb-tab" data-tab="overlay">Overlay</div>
-        <div class="sb-tab" data-tab="nbhd">Neighbourhoods</div>
+        <div class="sb-tab" data-tab="nbhd" title="Neighbourhoods">Nbhds</div>
         <div class="sb-tab" data-tab="ward">Ward</div>
       </div>
 

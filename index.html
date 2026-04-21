@@ -888,6 +888,13 @@ function ladOf(wn) {
   return _ladByWard[norm(wn)] || '';
 }
 
+// Borough focus state — hoisted up here (was declared much later with `let`)
+// so the style callbacks on boroughL / wardBoundaryLyr / etc can read it when
+// those L.geoJSON layers run their style function at construction time.
+// Without this, the layer builders hit the `let` Temporal Dead Zone and throw,
+// leaving the page stuck on "Loading ward data".
+var focusedBorough = 'all';
+
 // LAD code ↔ borough name mapping (Charity Commission / VCSE records use
 // E09xxxxxxx codes; ward GeoJSON + BOROUGH_GJ use the friendly name).
 const LAD_NAME_TO_CODE = {
@@ -1692,7 +1699,8 @@ let wLyr = null, selW = null, curOv = 'none';
 let WARD_DATA = {};
 let WARD_DATA_BY_CODE = {};
 let focusedNbhd = 'all';   // neighbourhood focus: 'all' or key like 'sw'
-let focusedBorough = 'all'; // borough focus: 'all' or an LAD string (e.g. "City of Westminster")
+// focusedBorough is hoisted near the top of the script (see `var focusedBorough`)
+// so boroughL / wardBoundaryLyr style callbacks can read it at construction time.
 let showNbhdColors = false; // colored neighbourhood fills/borders start OFF (blank map on load)
 let spotlightMode = false; // hard-dim everything outside focused nbhd regardless of showNbhdColors
 let curOv2 = 'none';       // bivariate: secondary overlay indicator

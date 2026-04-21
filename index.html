@@ -72,7 +72,11 @@
   .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
   /* ── Sidebar ── */
-  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; background: #fff; height: 100%; max-height: 100%; min-height: 0; }
+  .sidebar { width: 268px; border-right: 1px solid #e5e5e0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; overflow: hidden; flex-shrink: 0; background: #fff; height: 100%; max-height: 100%; min-height: 0; }
+  .sidebar > .nbfocus-bar { grid-row: 1; }
+  .sidebar > .sb-tabs      { grid-row: 2; }
+  .sidebar > .tab-pane     { grid-row: 3; min-height: 0; overflow: hidden; }
+  .sidebar > .sb-sec       { grid-row: 4; }
   .sb-tabs { display: flex; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; background: #fafaf7; position: relative; z-index: 5; min-height: 36px; }
   .sb-tab { flex: 1 1 0; min-width: 0; padding: 9px 2px; font-size: 11px; font-weight: 600; color: #666; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, background .12s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sb-tab:hover { color: #185FA5; background: #fff; }
@@ -649,13 +653,13 @@
         </div>
         <div class="opacity-row" style="margin-top:6px">
           <label>Border</label>
-          <input type="range" id="border-weight" min="0" max="8" value="0" step="0.5">
-          <span class="opacity-val" id="border-weight-val">0</span>
+          <input type="range" id="border-weight" min="1" max="10" value="1" step="1">
+          <span class="opacity-val" id="border-weight-val">1</span>
         </div>
         <div class="opacity-row" style="margin-top:6px">
           <label>Zoom</label>
-          <input type="range" id="zoom-slider" min="9" max="16" value="11" step="1">
-          <span class="opacity-val" id="zoom-slider-val">11</span>
+          <input type="range" id="zoom-slider" min="1" max="10" value="3" step="1">
+          <span class="opacity-val" id="zoom-slider-val">3</span>
         </div>
       </div>
     </div>
@@ -795,7 +799,7 @@ const OV_CFG = {
 // fillOpacityMult is an absolute fill opacity in [0,1]; 0 = fully transparent, 1 = opaque.
 // borderWeightMult is an absolute black-border weight in px (0 = no border).
 let fillOpacityMult = 0.40;  // matches the #fill-opacity slider default of 40
-let borderWeightMult = 0;    // matches the #border-weight slider default of 0 (no borders until user opts in)
+let borderWeightMult = 0.5;  // matches the #border-weight slider default of 1 on the 1–10 scale (0.5 px)
 
 const CATS = [
   { key: "headline",     label: "At a glance",         ico: "◎", fields: [
@@ -4498,25 +4502,31 @@ function _restyleAll() {
     if (fov) fov.textContent = fo.value + '%';
     _restyleAll();
   });
-  // Border slider = black outline thickness. Value is the stroke weight in px.
+  // Border slider = black outline thickness on a simple 1–10 scale.
+  // slider value s → stroke weight in px = s * 0.5 (range 0.5 – 5.0 px).
   if (bw) bw.addEventListener('input', () => {
-    borderWeightMult = (+bw.value);
+    borderWeightMult = (+bw.value) * 0.5;
     if (bwv) bwv.textContent = bw.value;
     _restyleAll();
   });
   // Zoom slider — drives map.setZoom. Sync the slider back when the user
   // pinches/scrolls the map so the value stays truthful.
   if (zs && typeof map !== 'undefined') {
+    // Slider is a simple 1-10 scale; Leaflet zoom runs ~10-19.
+    // Map slider -> leaflet: leafletZoom = 9 + sliderValue
+    // Map leaflet -> slider: sliderValue = leafletZoom - 9
+    const sliderToZoom = (s) => 9 + (+s);
+    const zoomToSlider = (z) => Math.round(z) - 9;
     const syncFromMap = () => {
-      const z = map.getZoom();
-      zs.value = Math.max(+zs.min, Math.min(+zs.max, Math.round(z)));
+      const s = zoomToSlider(map.getZoom());
+      zs.value = Math.max(+zs.min, Math.min(+zs.max, s));
       if (zsv) zsv.textContent = zs.value;
     };
     // Initialise to current zoom once the map is ready
     setTimeout(syncFromMap, 50);
     zs.addEventListener('input', () => {
       if (zsv) zsv.textContent = zs.value;
-      map.setZoom(+zs.value, { animate: true });
+      map.setZoom(sliderToZoom(zs.value), { animate: true });
     });
     map.on('zoomend', syncFromMap);
   }
@@ -4745,18 +4755,16 @@ leg.onAdd = () => {
   const d = L.DomUtil.create('div');
   d.style.cssText = 'background:#fff;padding:8px 11px;border-radius:8px;border:1px solid #e5e5e0;font-size:11px;color:#333;box-shadow:0 1px 6px rgba(0,0,0,.08)';
   d.innerHTML =
-    `<div style="font-size:10px;font-weight:600;color:#999;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Neighbourhoods</div>` +
-    Object.values(NEIGHBOURHOODS).map(n => `<div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:11px;height:11px;border-radius:3px;border:2px solid ${n.color};background:${n.bg};flex-shrink:0"></div>${n.short}</div>`).join('') +
-    `<div style="border-top:1px solid #eee;margin:5px 0 4px"></div>
-    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#185FA5;flex-shrink:0"></div>GP practice</div>
+    `<div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#185FA5;flex-shrink:0"></div>GP practice</div>
     <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#A32D2D;flex-shrink:0"></div>Hospital</div>
     <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#0F6E56;flex-shrink:0"></div>Green space</div>
-    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#854F0B;flex-shrink:0"></div>VCSE org (247)</div>
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#854F0B;flex-shrink:0"></div>VCSE org</div>
     <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#7B2D8E;flex-shrink:0"></div>Dental practice</div>
     <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:9px;height:9px;border-radius:50%;background:#E89B1B;flex-shrink:0"></div>Pharmacy</div>
     <div style="border-top:1px solid #eee;margin:5px 0 4px"></div>
     <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:11px;height:11px;border:2px solid #1a1a1a;border-radius:2px;flex-shrink:0"></div>Borough boundary</div>
-    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:11px;height:11px;border:1.5px dashed #999;border-radius:2px;flex-shrink:0"></div>NW London wards</div>`;
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:11px;height:11px;border:1.5px dashed #999;border-radius:2px;flex-shrink:0"></div>NW London wards</div>
+    <div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="width:11px;height:11px;border:1px solid #185FA5;border-radius:2px;flex-shrink:0"></div>LSOA</div>`;
   return d;
 };
 leg.addTo(map);

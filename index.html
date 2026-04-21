@@ -2134,9 +2134,13 @@ function showWard(wn) {
   // Switch to ward tab
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='ward'));
   document.querySelectorAll('.tab-pane').forEach(t => t.classList.toggle('active', t.id==='tab-ward'));
-  // Hide the viewing-strip description — the ward profile replaces it
+  // Hide the viewing-strip description — the ward profile replaces it.
+  // Toggling its display changes the .map-wrap grid geometry, so tell Leaflet
+  // to recompute its container size on the next frame or the newly-exposed
+  // area renders as blank white tiles (bug: whole map goes white on click).
   const _vs = document.getElementById('viewing-strip');
   if (_vs) _vs.style.display = 'none';
+  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
 
   // Auto-filter LSOA layer to this ward if active
   if (lsoaActive && lsoaLyr) {
@@ -2235,6 +2239,7 @@ window.deselectWard = function() {
   if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
   const vs = document.getElementById('viewing-strip');
   if (vs) vs.style.display = '';
+  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
 };
 window.deselectLSOA = function() {
   selLSOA = null;
@@ -2243,6 +2248,7 @@ window.deselectLSOA = function() {
   if (p) p.innerHTML = `<div class="ph"><div class="ph-icon">\u2196</div>Click any ward on the map to explore its health, crime, deprivation and service data</div>`;
   const vs = document.getElementById('viewing-strip');
   if (vs) vs.style.display = '';
+  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2929,9 +2935,12 @@ function showLSOA(feat) {
 
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='ward'));
   document.querySelectorAll('.tab-pane').forEach(t => t.classList.toggle('active', t.id==='tab-ward'));
-  // Hide the viewing-strip description — the LSOA profile replaces it
+  // Hide the viewing-strip description — the LSOA profile replaces it.
+  // Invalidate map size after the grid row collapses (otherwise the newly-
+  // exposed map area paints blank white).
   const _vs2 = document.getElementById('viewing-strip');
   if (_vs2) _vs2.style.display = 'none';
+  if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
 
   // IMD data from embedded properties
   const decile = props.imd_decile || '—';
@@ -4365,6 +4374,9 @@ document.querySelectorAll('.sb-tab').forEach(t => {
       const hasSel = (typeof selW !== 'undefined' && selW) || (typeof selLSOA !== 'undefined' && selLSOA);
       vs.style.display = (t.dataset.tab === 'ward' && hasSel) ? 'none' : '';
     }
+    // Tab switch can collapse/expand the viewing-strip grid row, so refresh
+    // the Leaflet map size (otherwise revealed area paints white).
+    if (typeof map !== 'undefined') requestAnimationFrame(() => map.invalidateSize());
   });
 });
 

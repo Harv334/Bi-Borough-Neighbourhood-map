@@ -309,12 +309,30 @@
 
       <!-- VCSE tab -->
       <div class="tab-pane" id="tab-vcse">
+        <div class="sb-sec" style="padding-bottom:6px">
+          <label class="lrow" style="padding:2px 0;border:none">
+            <div class="ldot" style="background:#854F0B"></div>
+            <span class="lname">Show VCSE organisations on map</span>
+            <input type="checkbox" id="vcse-tab-toggle">
+          </label>
+        </div>
         <div class="sb-sec" style="padding-bottom:8px">
           <div class="sb-lbl">Filter by area</div>
           <select id="vcse-area-filter" style="width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;color:#333;background:#fff;margin-bottom:8px">
             <option value="london">All London (all organisations)</option>
             <option value="all" selected>All NW London</option>
-            <option value="westminster">Westminster only</option>
+            <optgroup label="── Borough ──">
+              <option value="lad-E09000005">Brent</option>
+              <option value="lad-E09000007">Camden</option>
+              <option value="lad-E09000009">Ealing</option>
+              <option value="lad-E09000013">Hammersmith &amp; Fulham</option>
+              <option value="lad-E09000015">Harrow</option>
+              <option value="lad-E09000017">Hillingdon</option>
+              <option value="lad-E09000018">Hounslow</option>
+              <option value="lad-E09000020">Kensington &amp; Chelsea</option>
+              <option value="lad-E09000033">Westminster</option>
+            </optgroup>
+            <option value="westminster">Westminster (by ward bounds)</option>
             <optgroup label="── Westminster neighbourhoods ──">
               <option value="nbhd-sw">South Westminster</option>
               <option value="nbhd-we">West End &amp; Marylebone</option>
@@ -1467,11 +1485,14 @@ function applyVCSEFilter() {
       // All NW London — no geographic filter (pinned VCSEs are already
       // restricted to the 9 NWL boroughs by the data pipeline)
       areaMatch = true;
+    } else if (areaFilter.startsWith('lad-')) {
+      // Filter to a single borough by its LAD code (e.g. E09000033)
+      areaMatch = (o.record.lad || '') === areaFilter.slice(4);
     } else if (areaFilter === 'westminster') {
       // Westminster only — must fall within one of the 18 ward bounds
       areaMatch = nbhdOfLatLng(o.lat, o.lng) !== null;
     } else {
-      // Specific neighbourhood
+      // Specific Westminster neighbourhood
       const nbhdKey = areaFilter.replace('nbhd-', '');
       areaMatch = nbhdOfLatLng(o.lat, o.lng) === nbhdKey;
     }
@@ -1496,6 +1517,8 @@ function applyVCSEFilter() {
       areaMatch = true;
     } else if (areaFilter === 'all') {
       areaMatch = true;
+    } else if (areaFilter.startsWith('lad-')) {
+      areaMatch = (o.record.lad || '') === areaFilter.slice(4);
     } else if (areaFilter === 'westminster') {
       areaMatch = nbhdOfLatLng(o.lat, o.lng) !== null;
     } else {
@@ -2338,7 +2361,23 @@ document.getElementById('tgr').addEventListener('change', e => {
     map.removeLayer(grL);
   }
 });
-document.getElementById('tv').addEventListener('change',  e => e.target.checked ? vcseCluster.addTo(map) : map.removeLayer(vcseCluster));
+// VCSE layer toggles — two checkboxes drive the same layer:
+//   #tv          (Layers tab, alongside GP / pharmacy / hospital)
+//   #vcse-tab-toggle (VCSE tab, so you can turn it on from the filter pane)
+// Whichever one changes, we apply the state to the map AND mirror it to the other.
+function _setVcseLayerVisible(on) {
+  if (on) vcseCluster.addTo(map);
+  else    map.removeLayer(vcseCluster);
+  const a = document.getElementById('tv');
+  const b = document.getElementById('vcse-tab-toggle');
+  if (a && a.checked !== !!on) a.checked = !!on;
+  if (b && b.checked !== !!on) b.checked = !!on;
+}
+document.getElementById('tv').addEventListener('change', e => _setVcseLayerVisible(e.target.checked));
+{
+  const vt = document.getElementById('vcse-tab-toggle');
+  if (vt) vt.addEventListener('change', e => _setVcseLayerVisible(e.target.checked));
+}
 document.getElementById('td').addEventListener('change',  e => e.target.checked ? dentalCluster.addTo(map) : map.removeLayer(dentalCluster));
 document.getElementById('tph').addEventListener('change', e => e.target.checked ? pharmCluster.addTo(map) : map.removeLayer(pharmCluster));
 

@@ -100,6 +100,14 @@
   .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 3px; }
   .scale-grad { display: block; height: 6px; border-radius: 3px; overflow: hidden; }
 
+  /* ── Top / bottom 20 rankings ── */
+  .rank-list { display: flex; flex-direction: column; gap: 1px; }
+  .rank-row { display: flex; align-items: baseline; gap: 4px; font-size: 10px; padding: 2px 4px; border-radius: 3px; cursor: pointer; line-height: 1.2; }
+  .rank-row:hover { background: #f1f5f9; }
+  .rank-rank { color: #999; width: 16px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .rank-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #333; }
+  .rank-val { color: #666; font-variant-numeric: tabular-nums; flex-shrink: 0; font-size: 9.5px; }
+
   /* ── Map ── */
   .map-wrap { flex: 1; position: relative; min-height: 0; min-width: 0; }
   #map { width: 100%; height: 100%; }
@@ -416,6 +424,27 @@
               <div style="font-size:10px;color:#666;margin-top:4px;line-height:1.4">
                 Each ward is binned into thirds (low/mid/high) for each indicator. Teal = ov1 high, pink = ov2 high, dark slate = both high.
               </div>
+            </div>
+          </div>
+
+          <!-- Top 20 / Bottom 20 rankings — single-indicator mode only -->
+          <div id="rank-panel" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid #eee">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div class="sb-lbl" style="margin:0">Top & bottom 20</div>
+              <div id="rank-unit" style="font-size:10px;color:#888"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;min-width:0">
+                <div id="rank-best-hdr" style="font-size:10px;color:#0F6E56;font-weight:600;margin-bottom:4px">Best 20</div>
+                <div id="rank-best" class="rank-list"></div>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div id="rank-worst-hdr" style="font-size:10px;color:#A32D2D;font-weight:600;margin-bottom:4px">Worst 20</div>
+                <div id="rank-worst" class="rank-list"></div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:#888;margin-top:6px;line-height:1.4">
+              Hidden in bivariate mode. Click a row to zoom.
             </div>
           </div>
 
@@ -2736,6 +2765,99 @@ function injectWardIMD() {
   }
 }
 
+// Top 20 / bottom 20 rankings — single-indicator mode only. Uses WARD_DATA
+// for ward-level metrics and LSOA_DATA for LSOA-only metrics. The "best" end
+// depends on cfg.wh: wh:true means higher=worse, so best = lowest values.
+function renderTopBottom() {
+  const panel = document.getElementById('rank-panel');
+  if (!panel) return;
+  const bivActive = curOv2 && curOv2 !== 'none';
+  if (!curOv || curOv === 'none' || bivActive) {
+    panel.style.display = 'none';
+    return;
+  }
+  const cfg = OV_CFG[curOv];
+  if (!cfg) { panel.style.display = 'none'; return; }
+  const useLsoa = isLsoaOnlyOv(curOv);
+  const pool = useLsoa ? (typeof LSOA_DATA !== 'undefined' ? LSOA_DATA : {})
+                       : (WARD_DATA || {});
+
+  // Build [id, name, value] tuples. Skip rows with no value for curOv.
+  const rows = [];
+  for (const [id, row] of Object.entries(pool)) {
+    const v = (row.indicators || row || {})[curOv];
+    if (v == null || v === '' || isNaN(parseFloat(v))) continue;
+    const name = useLsoa ? (row.name || row.lsoa_name || row.LSOA21NM || id)
+                         : (row.name || id);
+    rows.push({ id, name, v: parseFloat(v) });
+  }
+  if (rows.length < 3) { panel.style.display = 'none'; return; }
+  rows.sort((a, b) => a.v - b.v);
+
+  // wh:true → higher is worse; best = lowest values (front of ascending list).
+  // wh:false → higher is better; best = highest values (end of ascending list).
+  const bestSlice  = cfg.wh ? rows.slice(0, 20) : rows.slice(-20).reverse();
+  const worstSlice = cfg.wh ? rows.slice(-20).reverse() : rows.slice(0, 20);
+
+  const unitEl = document.getElementById('rank-unit');
+  if (unitEl) unitEl.textContent = useLsoa ? `${rows.length} LSOAs` : `${rows.length} wards`;
+  document.getElementById('rank-best-hdr').textContent  = `Best 20 (${cfg.wh ? 'lowest' : 'highest'})`;
+  document.getElementById('rank-worst-hdr').textContent = `Worst 20 (${cfg.wh ? 'highest' : 'lowest'})`;
+
+  const fmt = v => {
+    if (Math.abs(v) >= 100) return v.toFixed(0);
+    if (Math.abs(v) >= 10)  return v.toFixed(1);
+    return v.toFixed(2);
+  };
+  const render = (arr) => arr.map((r, i) => {
+    const safeName = (r.name || '').replace(/[<>&"']/g, c => (
+      {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]
+    ));
+    const safeId = String(r.id).replace(/'/g, '&#39;');
+    return `<div class="rank-row" data-kind="${useLsoa ? 'lsoa' : 'ward'}" data-id="${safeId}" title="${safeName}: ${fmt(r.v)}">`
+      + `<span class="rank-rank">${i+1}.</span>`
+      + `<span class="rank-name">${safeName}</span>`
+      + `<span class="rank-val">${fmt(r.v)}</span>`
+      + `</div>`;
+  }).join('');
+  const bestEl  = document.getElementById('rank-best');
+  const worstEl = document.getElementById('rank-worst');
+  bestEl.innerHTML  = render(bestSlice);
+  worstEl.innerHTML = render(worstSlice);
+
+  // Click-to-zoom. Wards → showWard() focuses + opens profile; LSOAs → call
+  // the LSOA profile opener via feature match.
+  const click = (ev) => {
+    const t = ev.target.closest('.rank-row');
+    if (!t) return;
+    const kind = t.getAttribute('data-kind');
+    const id   = t.getAttribute('data-id');
+    if (kind === 'ward') {
+      if (typeof showWard === 'function') showWard(id);
+      // Zoom to ward bounds
+      if (wLyr) {
+        wLyr.eachLayer(l => {
+          if (l.feature && l.feature.properties && l.feature.properties.WD24NM === id) {
+            try { map.fitBounds(l.getBounds(), { maxZoom: 14, padding: [20,20] }); } catch(e){}
+          }
+        });
+      }
+    } else if (kind === 'lsoa') {
+      if (lsoaLyr) {
+        lsoaLyr.eachLayer(l => {
+          if (l.feature && l.feature.properties && l.feature.properties.code === id) {
+            try { map.fitBounds(l.getBounds(), { maxZoom: 15, padding: [20,20] }); } catch(e){}
+            if (l.fire) l.fire('click');
+          }
+        });
+      }
+    }
+  };
+  bestEl.onclick  = click;
+  worstEl.onclick = click;
+  panel.style.display = 'block';
+}
+
 document.getElementById('ov').addEventListener('change', e => {
   curOv = e.target.value;
   const cfg = OV_CFG[curOv];
@@ -2774,6 +2896,8 @@ document.getElementById('ov').addEventListener('change', e => {
   if (lsoaLyr) { lsoaLyr.eachLayer(l => l.setStyle(imdStyle(l.feature, l.feature.properties.code === selLSOA ? 'selected' : 'default'))); applyLSOAFilter(); }
   // Keep neighbourhood borders visible on top of choropleth
   if (nbhdBorderLyr) { nbhdBorderLyr.bringToFront(); if (boroughL._map) boroughL.bringToFront(); }
+  // Refresh the Top/Bottom 20 rankings for the new indicator.
+  renderTopBottom();
   // Switch to overlay tab
   document.querySelectorAll('.sb-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='overlay'));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='tab-overlay'));
@@ -3023,6 +3147,8 @@ document.getElementById('ov2').addEventListener('change', e => {
     if (leg) leg.style.display = 'none';
     if (scale) scale.style.display = curOv !== 'none' ? 'block' : 'none';
   }
+  // Hide the Top/Bottom 20 panel in bivariate mode; show it otherwise.
+  renderTopBottom();
   _restyleAll();
 });
 
@@ -3255,6 +3381,8 @@ async function loadData() {
           lsoaLyr.eachLayer(l => l.setStyle(imdStyle(l.feature,
             l.feature.properties.code === selLSOA ? 'selected' : 'default')));
         }
+        // LSOA-only rankings rely on LSOA_DATA — refresh once it arrives.
+        if (typeof renderTopBottom === 'function') renderTopBottom();
       });
 
     // Now ward layer exists — init VCSE filters

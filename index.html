@@ -46,6 +46,21 @@
   input[type=text] { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; color: #333; background: #fff; outline: none; }
   input[type=text]:focus { border-color: #185FA5; box-shadow: 0 0 0 2px rgba(24,95,165,.1); }
 
+  /* ── VCSE tag filter ── */
+  .vcse-tag-group { margin: 4px 0; border-top: 1px dotted #e5e5e0; }
+  .vcse-tag-group:first-of-type { border-top: none; }
+  .vcse-tag-group > summary { list-style: none; cursor: pointer; padding: 5px 0; font-size: 11px; color: #555; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .vcse-tag-group > summary::-webkit-details-marker { display: none; }
+  .vcse-tag-group > summary::before { content: '▸'; font-size: 9px; color: #999; transition: transform .1s; display: inline-block; }
+  .vcse-tag-group[open] > summary::before { transform: rotate(90deg); }
+  .vcse-tag-count { margin-left: auto; font-size: 10px; color: #999; font-weight: 400; }
+  .vcse-tag-count.active { color: #185FA5; font-weight: 600; }
+  .vcse-tag-list { display: flex; flex-direction: column; gap: 2px; padding: 2px 0 6px 14px; }
+  .vcse-tag-list label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #333; cursor: pointer; padding: 2px 0; }
+  .vcse-tag-list label:hover { color: #111; }
+  .vcse-tag-list input { margin: 0; }
+  .vcse-tag-list .vcse-tag-n { margin-left: auto; color: #999; font-size: 10px; }
+
   /* ── VCSE list ── */
   .vcse-count { font-size: 11px; color: #888; padding: 6px 13px; border-bottom: 1px solid #e5e5e0; flex-shrink: 0; background: #fafaf8; }
   .vcse-list { flex: 1; overflow-y: auto; min-height: 0; }
@@ -308,6 +323,24 @@
             </optgroup>
           </select>
           <input type="text" id="vcse-search" placeholder="Search organisations...">
+        </div>
+        <div class="sb-sec" id="vcse-tag-filter" style="padding-top:0;padding-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="sb-lbl" style="margin-bottom:0">Filter by tags</div>
+            <button type="button" id="vcse-tag-clear" style="font-size:11px;color:#666;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;display:none">clear</button>
+          </div>
+          <details class="vcse-tag-group" data-fam="wt">
+            <summary>What they do <span class="vcse-tag-count"></span></summary>
+            <div class="vcse-tag-list"></div>
+          </details>
+          <details class="vcse-tag-group" data-fam="ht">
+            <summary>How they help <span class="vcse-tag-count"></span></summary>
+            <div class="vcse-tag-list"></div>
+          </details>
+          <details class="vcse-tag-group" data-fam="ot">
+            <summary>Whom they help <span class="vcse-tag-count"></span></summary>
+            <div class="vcse-tag-list"></div>
+          </details>
         </div>
         <div class="vcse-count" id="vcse-count">loading...</div>
         <div class="vcse-list" id="vcse-list"></div>
@@ -1181,6 +1214,8 @@ function wireVCSE(records) {
   if (hdrSub) hdrSub.textContent = `9 boroughs · 188 wards · ${n.toLocaleString()} mappable VCSE organisations`;
   _vcseLoadedOnce = true;
   console.log(`VCSE loaded: ${n} pinned / ${tot} total`);
+  // Populate the tag-filter checkboxes now that VCSE_ALL is ready.
+  try { buildVCSETagFilters(); } catch(e) { console.error('buildVCSETagFilters failed:', e); }
 }
 
 fetch('vcse_data.json')
@@ -1319,6 +1354,105 @@ function nbhdOfLatLng(lat, lng) {
 
 let currentVCSEAreaFilter = 'all';
 
+// Active tag filters, keyed by family (wt/ht/ot). Each entry is a Set of
+// tag codes (e.g. 'education', 'services'). OR within a family; AND across
+// families. Empty set = no constraint from that family.
+const currentVCSETags = { wt: new Set(), ht: new Set(), ot: new Set() };
+
+// Human-readable labels for each family — populated from VCSE_ALL descriptors
+// (wd/hd/od) after data loads, so we don't hard-code the mapping here.
+const VCSE_TAG_LABELS = { wt: {}, ht: {}, ot: {} };
+// Labels shown as the group title (must match the 3 <summary> texts in index).
+const VCSE_FAM_LABELS = {
+  wt: 'What they do',
+  ht: 'How they help',
+  ot: 'Whom they help',
+};
+
+function _vcseOrgMatchesTags(r) {
+  // AND across families; within each family, org must carry at least one
+  // of the selected tags.
+  for (const fam of ['wt','ht','ot']) {
+    const wanted = currentVCSETags[fam];
+    if (wanted.size === 0) continue;
+    const orgTags = r[fam] || [];
+    let hit = false;
+    for (const t of orgTags) { if (wanted.has(t)) { hit = true; break; } }
+    if (!hit) return false;
+  }
+  return true;
+}
+
+function buildVCSETagFilters() {
+  // Build the three checkbox groups from VCSE_ALL. Called once after the
+  // fetch of vcse_data.json completes. Safe to call again — it rebuilds.
+  if (!VCSE_ALL || !VCSE_ALL.length) return;
+  const counts = { wt: {}, ht: {}, ot: {} };
+  for (const r of VCSE_ALL) {
+    for (const fam of ['wt','ht','ot']) {
+      const tags = r[fam] || [];
+      const descs = r[fam[0]+'d'] || [];
+      for (let i = 0; i < tags.length; i++) {
+        const t = tags[i];
+        counts[fam][t] = (counts[fam][t] || 0) + 1;
+        if (descs[i] && !VCSE_TAG_LABELS[fam][t]) VCSE_TAG_LABELS[fam][t] = descs[i];
+      }
+    }
+  }
+  document.querySelectorAll('.vcse-tag-group').forEach(grp => {
+    const fam = grp.dataset.fam;
+    const list = grp.querySelector('.vcse-tag-list');
+    if (!list) return;
+    list.innerHTML = '';
+    // Sort by count desc, then label asc
+    const entries = Object.entries(counts[fam]).sort((a,b) => b[1]-a[1] || (VCSE_TAG_LABELS[fam][a[0]]||a[0]).localeCompare(VCSE_TAG_LABELS[fam][b[0]]||b[0]));
+    for (const [code, n] of entries) {
+      const label = VCSE_TAG_LABELS[fam][code] || code;
+      const row = document.createElement('label');
+      row.innerHTML = `<input type="checkbox" data-fam="${fam}" data-tag="${code}"><span>${label}</span><span class="vcse-tag-n">${n.toLocaleString()}</span>`;
+      list.appendChild(row);
+    }
+  });
+  // Wire up the checkboxes
+  document.querySelectorAll('.vcse-tag-list input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const fam = e.target.dataset.fam;
+      const tag = e.target.dataset.tag;
+      if (e.target.checked) currentVCSETags[fam].add(tag);
+      else                  currentVCSETags[fam].delete(tag);
+      updateVCSETagGroupCounts();
+      applyVCSEFilter();
+    });
+  });
+  // Clear-all button
+  const clearBtn = document.getElementById('vcse-tag-clear');
+  if (clearBtn) {
+    clearBtn.onclick = () => {
+      for (const fam of ['wt','ht','ot']) currentVCSETags[fam].clear();
+      document.querySelectorAll('.vcse-tag-list input[type=checkbox]').forEach(cb => cb.checked = false);
+      updateVCSETagGroupCounts();
+      applyVCSEFilter();
+    };
+  }
+  updateVCSETagGroupCounts();
+}
+
+function updateVCSETagGroupCounts() {
+  // Update the "(2 selected)" indicator on each group summary + clear btn
+  let anyActive = false;
+  document.querySelectorAll('.vcse-tag-group').forEach(grp => {
+    const fam = grp.dataset.fam;
+    const badge = grp.querySelector('.vcse-tag-count');
+    const n = currentVCSETags[fam].size;
+    if (badge) {
+      if (n > 0) { badge.textContent = `${n} selected`; badge.classList.add('active'); anyActive = true; }
+      else       { badge.textContent = '';              badge.classList.remove('active'); }
+    }
+  });
+  const clearBtn = document.getElementById('vcse-tag-clear');
+  if (clearBtn) clearBtn.style.display = anyActive ? '' : 'none';
+}
+
 function applyVCSEFilter() {
   const areaFilter = currentVCSEAreaFilter;
   const textFilter = (document.getElementById('vcse-search')?.value || '').toLowerCase().trim();
@@ -1345,7 +1479,9 @@ function applyVCSEFilter() {
       o.name.toLowerCase().includes(textFilter) ||
       (o.addr||'').toLowerCase().includes(textFilter);
 
-    const visible = areaMatch && textMatch;
+    const tagMatch = _vcseOrgMatchesTags(o.record);
+
+    const visible = areaMatch && textMatch && tagMatch;
     if (visible) {
       if (!vcseCluster.hasLayer(o.marker)) vcseCluster.addLayer(o.marker);
     } else {
@@ -1365,7 +1501,7 @@ function applyVCSEFilter() {
     } else {
       areaMatch = nbhdOfLatLng(o.lat, o.lng) === areaFilter.replace('nbhd-', '');
     }
-    return areaMatch && (!textFilter || o.name.toLowerCase().includes(textFilter) || (o.addr||'').toLowerCase().includes(textFilter));
+    return areaMatch && _vcseOrgMatchesTags(o.record) && (!textFilter || o.name.toLowerCase().includes(textFilter) || (o.addr||'').toLowerCase().includes(textFilter));
   });
 
   const countEl = document.getElementById('vcse-count');

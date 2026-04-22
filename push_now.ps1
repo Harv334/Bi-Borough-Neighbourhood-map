@@ -14,46 +14,63 @@ Remove-Item -Force -ErrorAction SilentlyContinue .git\HEAD.lock
 # mis-parsed as flags).
 $msgPath = Join-Path $env:TEMP "nwl_commit_msg.txt"
 $msg = @'
-fix(ui): harden outer layout with CSS grid so tabs can't disappear
+data(scope,lookup): ONS WD24 best-fit lookup + drop Camden (NCL)
 
-Tabs (Layers/VCSE/Overlay/Nbhds/Wards) were intermittently pushed
-behind the viewing strip + sidebar footer when a ward was deselected
-- the entire UI slid upward leaving grey space under the map
-controls. Regression traced to the interaction between the new
-search/Reset/CB/PNG toolbar, collapsible sidebar sections, and the
-old flex-based outer layout: flex children of .app / .main / .map-wrap
-could be pushed out of their slots when viewing-strip display toggled
-between none and flex.
+Adopts the official ONS LSOA (2021) -> Electoral Ward (May 2024)
+best-fit lookup as the authoritative LSOA->ward mapping, replacing
+the prior ONSPD postcode-modal heuristic. Scopes the dataset to
+the 8-borough NW London ICS footprint; Camden is NCL, not NWL,
+and is excluded everywhere.
 
-Fix: convert all outer containers to rigid CSS grid with
-minmax(0, 1fr) + overflow:hidden + min-height:0 so children can
-never overflow their slots.
+Verified: 168 of 168 NWL wards now match the ICHT reference table
+exactly (to 4 dp) on pop-weighted IMD score. Remaining deltas
+under the previous ONSPD-derived lookup are eliminated.
 
-- .app: grid-template-rows auto minmax(0,1fr) auto (header / main /
-  status) with height 100vh and overflow hidden.
-- .main: grid-template-columns auto minmax(0,1fr) (sidebar / map).
-- .map-wrap: grid-template-rows auto minmax(0,1fr) (strip / map).
-- .sidebar: grid-template-rows auto auto minmax(0,1fr) auto with
-  grid-template-areas focus/tabs/pane/footer; tabs and footer now
-  live in rigid grid cells, pane auto-shrinks.
-- Tab-pane toggles display none/flex via .active; min-height 0.
-- Remove wireSidebarFooterMeasure IIFE and the sidebar-footer-h CSS
-  var (obsolete with grid).
-- Revert earlier relocation: Reset / CB safe / PNG / CSV + search
-  are back in the top header toolbar (.hdr) where they were.
-- Strip trailing virtiofs padding (null bytes + whitespace) from
-  index.html tail.
-- Fix white-screen-on-ward-click regression: the viewing-strip was
-  being hidden/shown on ward & LSOA click, which changed the
-  .map-wrap grid row height and caused Leaflet to paint tiles at
-  stale dimensions (resulting in a blank white map). Fix: leave the
-  viewing-strip visible at all times and just swap its digest text
-  to "Ward: X" / "LSOA: X" / "All of NW London". Map-wrap grid
-  geometry now never changes, so the map never needs to repaint on
-  selection change.
+Previous commit (retained): dual-population model
+  * census_population       = ONS mid-2024 (display)
+  * imd_denominator_mid2022 = MHCLG File_7 col 52 (IMD weight,
+                              matches ICHT methodology)
 
-Confirmed fix: ward deselect no longer pushes UI upward, tabs stay
-pinned at all times.
+Changes
+-------
+- LSOA->ward authority switched to ONS WD24 best-fit lookup
+  (LSOA21CD -> WD24CD/WD24NM/LAD24CD/LAD24NM, 8 NWL LADs).
+- Camden removed from all NWL surfaces:
+  * index.html:
+      - GJ (ward polygons): 188 -> 168 features (-20 Camden).
+      - GPS (GP practices): 369 -> 337 (-32 Camden).
+      - BOROUGH_GJ: 9 -> 8 features (-1 Camden).
+      - LSOA_IMD: 1313 -> 1183 features (-130); remaining 175
+        features' ward_code/ward/borough overwritten from ONS
+        WD24 lookup.
+      - #vcse-area-filter: Camden <option> removed.
+      - LAD_NAME_TO_CODE: Camden entry removed.
+  * ward_data.json: 188 -> 168 wards (20 Camden dropped).
+    All 31 census_*_pct fields + 8 IMD domains re-aggregated
+    under the new LSOA membership. Metadata adds
+    lsoa_to_ward_lookup / lsoa_to_ward_lookup_year / scope /
+    scope_lads fields.
+  * pharmacies.json: 540 -> 480 (-60 Camden).
+  * vcse_data.json: 9555 -> 8964 (-591 Camden-HQ charities;
+    coverage-area references to Camden in retained records are
+    intentional).
+  * fetch_all_data.py: BOROUGHS list, NWL_LAD_CODES,
+    NWL_AOO_NAMES all drop Camden. Doc comments note why
+    (NCL ICS, not NWL).
+
+New scripts
+-----------
+- scripts/reconfigure_to_ons_wd24_lookup.py: authoritative
+  rebuild. Filters LSOA_IMD to 8 NWL LADs, rewrites ward/borough
+  attribution from ONS WD24 lookup, re-aggregates ward_data.json
+  (IMD pop-weighted on mid-2022; census_*_pct pop-weighted on
+  mid-2024).
+
+Final borough distribution (168 wards)
+--------------------------------------
+  Brent 22, Ealing 24, Hammersmith & Fulham 21, Harrow 22,
+  Hillingdon 21, Hounslow 22, Kensington & Chelsea 18,
+  Westminster 18.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

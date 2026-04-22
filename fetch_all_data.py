@@ -91,11 +91,10 @@ CACHE_DIR = REPO_ROOT / ".cache"
 DATA_DIR  = REPO_ROOT / "data"
 
 # ============================================================================
-# SCOPE: 9 NW London boroughs (LAD25CD)
+# SCOPE: 8 NW London boroughs (NWL ICS, LAD24CD). Camden is NCL, not NWL.
 # ============================================================================
 BOROUGHS = [
     ("Brent",                 "E09000005", ["HA", "NW", "W"]),
-    ("Camden",                "E09000007", ["N", "NW", "WC", "W"]),
     ("Ealing",                "E09000009", ["W", "UB", "TW", "NW"]),
     ("Hammersmith & Fulham",  "E09000013", ["W", "SW"]),
     ("Harrow",                "E09000015", ["HA", "NW"]),
@@ -1053,9 +1052,10 @@ def run_claimant_count() -> pd.DataFrame:
     # NWL LSOA lists, chunked into ~500-code requests.
     cache = cache_dir / "claimant_nwl_latest_v3.csv"
 
-    # Build the NW London LSOA set from ONSPD (LAD25CDs for the 9 boroughs).
+    # Build the NW London LSOA set from ONSPD (LAD24CDs for the 8 NWL ICS
+    # boroughs). Camden (E09000007) is NCL, not NWL - excluded.
     NWL_LAD_CODES = {
-        "E09000005", "E09000007", "E09000009", "E09000013", "E09000015",
+        "E09000005", "E09000009", "E09000013", "E09000015",
         "E09000017", "E09000018", "E09000020", "E09000033",
     }
     try:
@@ -2095,7 +2095,6 @@ def _ccew_income_band(inc):
 # that appear in the Charity Commission area_of_operation table.
 NWL_AOO_NAMES = {
     "brent":                  "E09000005",
-    "camden":                 "E09000007",
     "ealing":                 "E09000009",
     "hammersmith and fulham": "E09000013",
     "hammersmith & fulham":   "E09000013",

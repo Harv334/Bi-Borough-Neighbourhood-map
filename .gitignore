@@ -14,6 +14,9 @@ venv/
 .cache/
 pipeline/.cache/
 
+# Raw ONS / upstream dumps (large, keep local only)
+raw_data/
+
 # Pytest / mypy
 .pytest_cache/
 .mypy_cache/

@@ -326,7 +326,7 @@
         <div class="sb-tab active" data-tab="layers">Layers</div>
         <div class="sb-tab" data-tab="vcse">VCSE</div>
         <div class="sb-tab" data-tab="overlay">Overlay</div>
-        <div class="sb-tab" data-tab="nbhd" title="Neighbourhoods">Nbhds</div>
+        <div class="sb-tab" data-tab="nbhd" title="Neighbourhoods — in development" style="position:relative">Neighbourhoods<span style="display:inline-block;margin-left:5px;padding:1px 5px;background:#fff1d6;color:#8a5a00;border:1px solid #e0c28a;border-radius:8px;font-size:9px;font-weight:600;letter-spacing:.02em;vertical-align:middle">IN DEV</span></div>
         <div class="sb-tab" data-tab="ward">Ward</div>
       </div>
 
@@ -463,77 +463,78 @@
           <div id="ov-info-panel" style="display:none;background:#fafafa;border:1px solid #eee;border-radius:5px;padding:7px 9px;margin:0 0 8px;font-size:11px;color:#555;line-height:1.5"></div>
           <select id="ov">
             <option value="none">— none (neighbourhood colours) —</option>
-            <optgroup label="Health (Census 2021, ward-level)">
-              <option value="census_good_health_pct">Good/very good health %</option>
-              <option value="census_bad_health_pct">Bad/very bad health %</option>
-              <option value="census_disability_any_pct">Disability (any) %</option>
-              <option value="census_disability_lot_pct">Disability (limited a lot) %</option>
-              <option value="census_provides_unpaid_care_pct">Provides unpaid care %</option>
+            <optgroup label="Health (Census 2021)">
+              <option value="census_good_health_pct">Good/very good health % · Ward</option>
+              <option value="census_bad_health_pct">Bad/very bad health % · Ward</option>
+              <option value="census_disability_any_pct">Disability (any) % · Ward</option>
+              <option value="census_disability_lot_pct">Disability (limited a lot) % · Ward</option>
+              <option value="census_provides_unpaid_care_pct">Provides unpaid care % · Ward</option>
             </optgroup>
             <optgroup label="Crime &amp; deprivation">
-              <option value="crime_total">Total crimes (12 months)</option>
-              <option value="core20_lsoa_count">Core20 LSOAs in ward</option>
-              <option value="census_unemployed_pct">Unemployed %</option>
-              <option value="census_no_qual_pct">No qualifications %</option>
-              <option value="census_no_car_pct">No car/van %</option>
+              <option value="crime_total">Total crimes (12 months) · Ward</option>
+              <option value="core20_lsoa_count">Core20 LSOAs in ward · Ward</option>
+              <option value="census_unemployed_pct">Unemployed % · Ward</option>
+              <option value="census_no_qual_pct">No qualifications % · Ward</option>
+              <option value="census_no_car_pct">No car/van % · Ward</option>
             </optgroup>
             <optgroup label="Housing (Census)">
-              <option value="census_social_rented_pct">Social rented %</option>
-              <option value="census_private_rented_pct">Private rented %</option>
-              <option value="census_owned_pct">Owner occupied %</option>
+              <option value="census_social_rented_pct">Social rented % · Ward</option>
+              <option value="census_private_rented_pct">Private rented % · Ward</option>
+              <option value="census_owned_pct">Owner occupied % · Ward</option>
             </optgroup>
             <optgroup label="Population (Census)">
-              <option value="census_population">Resident population</option>
-              <option value="census_non_white_pct">Non-White %</option>
-              <option value="census_born_outside_uk_pct">Born outside UK %</option>
+              <option value="census_population">Resident population · Ward</option>
+              <option value="census_non_white_pct">Non-White % · Ward</option>
+              <option value="census_born_outside_uk_pct">Born outside UK % · Ward</option>
             </optgroup>
             <optgroup label="Ethnicity (Census 2021)">
-              <option value="census_white_pct">White %</option>
-              <option value="census_asian_pct">Asian / Asian British %</option>
-              <option value="census_black_pct">Black / Black British %</option>
-              <option value="census_mixed_pct">Mixed / Multiple %</option>
-              <option value="census_other_ethnic_pct">Other ethnic group %</option>
+              <option value="census_white_pct">White % · Ward</option>
+              <option value="census_asian_pct">Asian / Asian British % · Ward</option>
+              <option value="census_black_pct">Black / Black British % · Ward</option>
+              <option value="census_mixed_pct">Mixed / Multiple % · Ward</option>
+              <option value="census_other_ethnic_pct">Other ethnic group % · Ward</option>
             </optgroup>
             <optgroup label="Age profile (Census 2021)">
-              <option value="census_under16_pct">Under 16 %</option>
-              <option value="census_working_age_pct">Working age (16–64) %</option>
-              <option value="census_over65_pct">65+ %</option>
-              <option value="census_over85_pct">85+ %</option>
+              <option value="census_under16_pct">Under 16 % · Ward</option>
+              <option value="census_working_age_pct">Working age (16–64) % · Ward</option>
+              <option value="census_over65_pct">65+ % · Ward</option>
+              <option value="census_over85_pct">85+ % · Ward</option>
             </optgroup>
             <optgroup label="Environment &amp; access">
-              <option value="fuel_poverty_pct">Fuel poverty % (DESNZ LILEE)</option>
-              <option value="gb_commitment_pct">Green OR blue space within 15 min walk % (Defra)</option>
-              <option value="green_commitment_pct">Green space within 15 min walk % (Defra)</option>
-              <option value="green_doorstep_pct">Doorstep green space (&lt;200m, &ge;0.5 ha) %</option>
-              <option value="green_local_pct">Local green space (&lt;300m, &ge;2 ha) %</option>
-              <option value="green_neighbourhood_pct">Neighbourhood green space (&lt;1km, &ge;10 ha) %</option>
-              <option value="blue_commitment_pct">Blue space within 15 min walk % (Defra)</option>
+              <option value="fuel_poverty_pct">Fuel poverty % (DESNZ LILEE) · LSOA</option>
+              <option value="gb_commitment_pct">Green OR blue space within 15 min walk % (Defra) · LSOA</option>
+              <option value="green_commitment_pct">Green space within 15 min walk % (Defra) · LSOA</option>
+              <option value="green_doorstep_pct">Doorstep green space (&lt;200m, &ge;0.5 ha) % · LSOA</option>
+              <option value="green_local_pct">Local green space (&lt;300m, &ge;2 ha) % · LSOA</option>
+              <option value="green_neighbourhood_pct">Neighbourhood green space (&lt;1km, &ge;10 ha) % · LSOA</option>
+              <option value="blue_commitment_pct">Blue space within 15 min walk % (Defra) · LSOA</option>
             </optgroup>
             <optgroup label="Economy (Census)">
-              <option value="census_level4_qual_pct">Level 4+ qualifications %</option>
-              <option value="census_higher_managerial_pct">Higher managerial/professional %</option>
-              <option value="census_routine_semi_routine_pct">Routine/semi-routine %</option>
-              <option value="claimant_rate_pct">Claimant count rate % (NOMIS CLA01)</option>
+              <option value="census_level4_qual_pct">Level 4+ qualifications % · Ward</option>
+              <option value="census_higher_managerial_pct">Higher managerial/professional % · Ward</option>
+              <option value="census_routine_semi_routine_pct">Routine/semi-routine % · Ward</option>
+              <option value="claimant_rate_pct">Claimant count rate % (NOMIS CLA01) · LSOA</option>
             </optgroup>
-            <optgroup label="IMD 2025 domains (LSOA-level)">
-              <option value="imd_score">IMD score (composite)</option>
-              <option value="imd_decile">IMD decile (1 = most deprived)</option>
-              <option value="income_score">Income deprivation score</option>
-              <option value="employment_score">Employment deprivation score</option>
-              <option value="education_score">Education, skills &amp; training score</option>
-              <option value="health_score">Health deprivation &amp; disability score</option>
-              <option value="crime_score">Crime deprivation score</option>
-              <option value="barriers_score">Barriers to housing &amp; services score</option>
-              <option value="environment_score">Living environment score</option>
+            <optgroup label="IMD 2025 domains">
+              <option value="imd_score_ward">IMD composite score (ICHT methodology) · Ward</option>
+              <option value="imd_score">IMD score (composite) · LSOA</option>
+              <option value="imd_decile">IMD decile (1 = most deprived) · LSOA</option>
+              <option value="income_score">Income deprivation score · LSOA</option>
+              <option value="employment_score">Employment deprivation score · LSOA</option>
+              <option value="education_score">Education, skills &amp; training score · LSOA</option>
+              <option value="health_score">Health deprivation &amp; disability score · LSOA</option>
+              <option value="crime_score">Crime deprivation score · LSOA</option>
+              <option value="barriers_score">Barriers to housing &amp; services score · LSOA</option>
+              <option value="environment_score">Living environment score · LSOA</option>
             </optgroup>
             <optgroup label="Household language (Census 2021, TS025)">
-              <option value="census_english_hh_all_pct">All adults in household have English as main language %</option>
-              <option value="census_english_hh_none_pct">No people in household have English as main language %</option>
+              <option value="census_english_hh_all_pct">All adults in household have English as main language % · Ward</option>
+              <option value="census_english_hh_none_pct">No people in household have English as main language % · Ward</option>
             </optgroup>
             <optgroup label="Travel to work (Census 2021, TS061)">
-              <option value="census_active_travel_pct">Walk/cycle to work %</option>
-              <option value="census_public_transport_pct">Public transport to work %</option>
-              <option value="census_car_to_work_pct">Car/van to work %</option>
+              <option value="census_active_travel_pct">Walk/cycle to work % · Ward</option>
+              <option value="census_public_transport_pct">Public transport to work % · Ward</option>
+              <option value="census_car_to_work_pct">Car/van to work % · Ward</option>
             </optgroup>
           </select>
 
@@ -549,26 +550,30 @@
             <select id="ov2" style="width:100%;padding:5px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
               <option value="none">— none —</option>
               <optgroup label="Health (Census 2021)">
-                <option value="census_bad_health_pct">Bad/very bad health %</option>
-                <option value="census_disability_any_pct">Disability (any) %</option>
-                <option value="census_provides_unpaid_care_pct">Provides unpaid care %</option>
+                <option value="census_bad_health_pct">Bad/very bad health % · Ward</option>
+                <option value="census_disability_any_pct">Disability (any) % · Ward</option>
+                <option value="census_provides_unpaid_care_pct">Provides unpaid care % · Ward</option>
               </optgroup>
               <optgroup label="Crime &amp; deprivation">
-                <option value="crime_total">Total crimes (12 months)</option>
-                <option value="core20_lsoa_count">Core20 LSOAs in ward</option>
-                <option value="census_unemployed_pct">Unemployed %</option>
+                <option value="crime_total">Total crimes (12 months) · Ward</option>
+                <option value="core20_lsoa_count">Core20 LSOAs in ward · Ward</option>
+                <option value="census_unemployed_pct">Unemployed % · Ward</option>
+              </optgroup>
+              <optgroup label="Deprivation">
+                <option value="imd_score_ward">IMD composite (ICHT) · Ward</option>
+                <option value="imd_score">IMD composite · LSOA</option>
               </optgroup>
               <optgroup label="Environment &amp; access">
-                <option value="fuel_poverty_pct">Fuel poverty %</option>
-                <option value="gb_commitment_pct">Green or blue space 15-min %</option>
-                <option value="green_commitment_pct">Green space 15-min %</option>
-                <option value="blue_commitment_pct">Blue space 15-min %</option>
+                <option value="fuel_poverty_pct">Fuel poverty % · LSOA</option>
+                <option value="gb_commitment_pct">Green or blue space 15-min % · LSOA</option>
+                <option value="green_commitment_pct">Green space 15-min % · LSOA</option>
+                <option value="blue_commitment_pct">Blue space 15-min % · LSOA</option>
               </optgroup>
               <optgroup label="Housing &amp; age">
-                <option value="census_social_rented_pct">Social rented %</option>
-                <option value="census_no_car_pct">No car/van %</option>
-                <option value="census_over65_pct">65+ %</option>
-                <option value="census_under16_pct">Under 16 %</option>
+                <option value="census_social_rented_pct">Social rented % · Ward</option>
+                <option value="census_no_car_pct">No car/van % · Ward</option>
+                <option value="census_over65_pct">65+ % · Ward</option>
+                <option value="census_under16_pct">Under 16 % · Ward</option>
               </optgroup>
             </select>
             <div id="biv-legend" style="display:none;margin-top:10px">
@@ -624,6 +629,15 @@
 
       <!-- Neighbourhoods tab -->
       <div class="tab-pane" id="tab-nbhd">
+        <div class="sb-sec" style="padding:10px 12px;background:#fff8ea;border-left:3px solid #e5a94a;border-bottom:1px solid #ecd7aa">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+            <span style="padding:1px 6px;background:#e5a94a;color:#fff;border-radius:9px;font-size:9.5px;font-weight:700;letter-spacing:.04em">IN DEVELOPMENT</span>
+            <span style="font-size:12px;font-weight:600;color:#7a4e00">Neighbourhoods — section in development</span>
+          </div>
+          <div style="font-size:10.5px;color:#7a5a2a;line-height:1.55">
+            This tab is still being built. Westminster's 4-neighbourhood breakdown is shown as a preview; equivalent neighbourhood groupings for the other seven NW London boroughs are not yet wired in, and the indicators panel here will expand over coming releases.
+          </div>
+        </div>
         <div class="sb-sec" style="padding-bottom:8px">
           <div class="sb-lbl">Neighbourhoods</div>
           <div style="font-size:10px;color:#888;line-height:1.5;margin-bottom:0">
@@ -780,6 +794,10 @@ const OV_CFG = {
   // for every score column. imd_decile is inverted (1 = most deprived), so wh:false
   // and the legend reads "more deprived -> less deprived".
   imd_score:                       { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:60   },
+  // Ward-level IMD composite, population-weighted on MHCLG mid-2022 denominators
+  // (matches ICHT NW London reference table). Aliases to each ward's imd_score
+  // field via OV_FIELD_ALIAS.
+  imd_score_ward:                  { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:45   },
   imd_decile:                      { lo:"More deprived", hi:"Less deprived", wh:false, min:1, max:10 },
   income_score:                    { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:0.5  },
   employment_score:                { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:0.4  },
@@ -868,6 +886,7 @@ const CATS = [
     { k: "census_no_car_pct",                l: "No car/van (%)",                g: "ward" },
   ]},
   { key: "imd2025",      label: "IMD 2025 domains",    ico: "⚖", fields: [
+    { k: "imd_score_ward",                   l: "IMD composite score (ward, pop-weighted mid-2022 — ICHT methodology)", g: "ward" },
     { k: "imd_score",                        l: "IMD composite score",           g: "lsoa" },
     { k: "imd_decile",                       l: "IMD decile (1 = most deprived)",g: "lsoa" },
     { k: "income_score",                     l: "Income deprivation",            g: "lsoa" },
@@ -953,6 +972,7 @@ const OV_META = {
 
   // IMD 2025
   imd_score:                      { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Composite Index of Multiple Deprivation. Higher = more deprived." },
+  imd_score_ward:                 { src: "MHCLG IMD 2025 (pop-weighted, mid-2022)", yr: "2025", g: "Ward", u: "score",  desc: "Ward-aggregate IMD composite score. Population-weighted mean of constituent LSOA scores using MHCLG mid-2022 denominators, matching the Imperial College Healthcare Trust NW London reference methodology." },
   imd_decile:                     { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "decile", desc: "National deprivation decile. 1 = most deprived 10%." },
   income_score:                   { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Income Deprivation domain score." },
   employment_score:               { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Employment Deprivation domain score." },
@@ -1166,15 +1186,24 @@ function ovLabel(k) {
   }
   return k;
 }
+// Field aliases: an overlay key that doesn't exist in the data file but
+// should resolve to a different field. Used to expose the ward-aggregate
+// IMD score (pop-weighted on mid-2022, ICHT-matching) under a distinct key
+// from the LSOA-level imd_score, since both live in the same indicators bag.
+const OV_FIELD_ALIAS = {
+  imd_score_ward: 'imd_score',
+};
+function resolveOvField(k) { return (OV_FIELD_ALIAS && OV_FIELD_ALIAS[k]) || k; }
+
 function wardOvValue(wn, k) {
   const w = (typeof WARD_DATA !== 'undefined') ? WARD_DATA[wn] : null;
   if (!w) return null;
-  return (w.indicators || w)[k];
+  return (w.indicators || w)[resolveOvField(k)];
 }
 function lsoaOvValue(code, k) {
   const d = (typeof LSOA_DATA !== 'undefined') ? LSOA_DATA[code] : null;
   if (!d) return null;
-  return (d.indicators || d)[k];
+  return (d.indicators || d)[resolveOvField(k)];
 }
 function fmtOv(v, k) {
   if (v === null || v === undefined || v === '') return '—';
@@ -1974,8 +2003,9 @@ function gs(wn) { return wn === selW ? 'selected' : 'default'; }
 const _ovRange = {};
 function getOvRange(ovKey) {
   if (_ovRange[ovKey]) return _ovRange[ovKey];
+  const fld = resolveOvField(ovKey);
   const vals = Object.values(WARD_DATA)
-    .map(w => parseFloat(w.indicators?.[ovKey]))
+    .map(w => parseFloat(w.indicators?.[fld]))
     .filter(v => !isNaN(v));
   if (vals.length < 2) { _ovRange[ovKey] = null; return null; }
   const sorted = vals.slice().sort((a,b) => a - b);
@@ -1989,7 +2019,7 @@ function getOvRange(ovKey) {
 function ovColor(wn, ovKey) {
   const cfg = OV_CFG[ovKey]; if (!cfg) return '#aaa';
   const w = WARD_DATA[wn]; if (!w) return '#aaa';
-  const val = w.indicators?.[ovKey]; if (val == null || val === '') return '#ccc';
+  const val = w.indicators?.[resolveOvField(ovKey)]; if (val == null || val === '') return '#ccc';
   const range = getOvRange(ovKey);
   if (!range) return '#ccc';
   const t = range.hi === range.lo ? 0.5 : (parseFloat(val) - range.lo) / (range.hi - range.lo);
@@ -4282,7 +4312,7 @@ function _downloadOverlayCsv() {
         const isCore20 = (dec === 1 || dec === 2);
         if (core20Only && !isCore20) { nSkipped++; continue; }
         const row = [code, l.name||'', ward, lad, dec, isCore20 ? 'Y' : ''];
-        if (ov) row.push(ind[ov]);
+        if (ov) row.push(ind[resolveOvField(ov)]);
         rows.push(row.map(_csvEscape).join(','));
         nKept++;
       }
@@ -4296,7 +4326,7 @@ function _downloadOverlayCsv() {
         if (boroughFilter && lad !== boroughFilter) { nSkipped++; continue; }
         if (nbhdFilter    && nk  !== nbhdFilter)    { nSkipped++; continue; }
         const row = [code, w.name||'', lad, nk];
-        if (ov) row.push(w.indicators ? w.indicators[ov] : '');
+        if (ov) row.push(w.indicators ? w.indicators[resolveOvField(ov)] : '');
         rows.push(row.map(_csvEscape).join(','));
         nKept++;
       }
@@ -4556,12 +4586,13 @@ const BIV_PALETTE = [
 function _bivTercile(id, key, type) {
   type = type || 'ward';
   const useLsoaPool = isLsoaOnlyOv(key);
+  const fld = resolveOvField(key);
   const pool = useLsoaPool ? (typeof LSOA_DATA !== 'undefined' ? LSOA_DATA : null)
                            : (typeof WARD_DATA !== 'undefined' ? WARD_DATA : null);
   if (!pool || Object.keys(pool).length === 0) return 1;
   const vals = [];
   for (const row of Object.values(pool)) {
-    const v = (row.indicators || row)[key];
+    const v = (row.indicators || row)[fld];
     if (v != null && v !== '' && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
   }
   if (vals.length < 3) return 1;
@@ -4575,13 +4606,13 @@ function _bivTercile(id, key, type) {
     // LSOA feature: read LSOA_DATA[code]; if the key is ward-only (not LSOA)
     // fall back to the parent ward's value via LSOA_DATA[code].ward_name.
     const row = pool[id];
-    if (row) v = parseFloat((row.indicators || row)[key]);
+    if (row) v = parseFloat((row.indicators || row)[fld]);
     if ((v == null || isNaN(v)) && !useLsoaPool && typeof LSOA_DATA !== 'undefined') {
       const lrow = LSOA_DATA[id];
       const wn = lrow && (lrow.ward_name || lrow.ward);
       if (wn && WARD_DATA) {
         const wobj = WARD_DATA[wn] || Object.values(WARD_DATA).find(w => w.name === wn);
-        if (wobj && wobj.indicators) v = parseFloat(wobj.indicators[key]);
+        if (wobj && wobj.indicators) v = parseFloat(wobj.indicators[fld]);
       }
     }
   } else {
@@ -4589,7 +4620,7 @@ function _bivTercile(id, key, type) {
     // colour the ward on an LSOA-only metric — return -1 to signal "no colour".
     if (useLsoaPool) return -1;
     const wobj = WARD_DATA[id] || Object.values(WARD_DATA).find(w => w.name === id);
-    if (wobj && wobj.indicators) v = parseFloat(wobj.indicators[key]);
+    if (wobj && wobj.indicators) v = parseFloat(wobj.indicators[fld]);
   }
   if (v == null || isNaN(v)) return 1;
   if (v <= t1) return 0;

@@ -71,6 +71,26 @@ Final borough distribution (168 wards)
   Brent 22, Ealing 24, Hammersmith & Fulham 21, Harrow 22,
   Hillingdon 21, Hounslow 22, Kensington & Chelsea 18,
   Westminster 18.
+
+UI additions in this push
+-------------------------
+- New "IMD composite score (ICHT methodology)" overlay exposed
+  at ward level (key imd_score_ward), resolved via a new
+  OV_FIELD_ALIAS map so the ward-aggregate (pop-weighted on
+  mid-2022) and the LSOA-level imd_score can coexist without
+  key collision. Wired through wardOvValue, lsoaOvValue,
+  ovColor, getOvRange, the tercile classifier and the CSV
+  export.
+- Every option in #ov and #ov2 overlay dropdowns now carries a
+  " · Ward" or " · LSOA" suffix so users can see the output
+  level at a glance (67 options tagged). Optgroup label
+  "(LSOA-level)" suffix removed where the per-option tag
+  makes it redundant.
+- Neighbourhoods tab relabelled from "Nbhds" to
+  "Neighbourhoods" with an "IN DEV" chip, and the pane now
+  opens with an amber "Neighbourhoods — section in
+  development" banner explaining that only Westminster's
+  4-neighbourhood preview is wired in.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

@@ -4356,15 +4356,24 @@ async function _downloadMapPng() {
     await new Promise(r => setTimeout(r, 220));
 
     const dpr = window.devicePixelRatio || 1;
+    // NOTE: do NOT pass `width` / `height` here. When you pass both `width/height`
+    // and `scale`, html2canvas produces a canvas at the LOGICAL size (width x
+    // height) instead of scaled-up pixels — which then mismatches any dpr-scaled
+    // crop rect and leaves the bottom-right of the output blank. Omitting them
+    // makes html2canvas output `clientWidth*scale` x `clientHeight*scale`, and
+    // we measure the true scale post-hoc via `fullCanvas.width / clientWidth`.
     const fullCanvas = await html2canvas(mapEl, {
       useCORS: true,
       allowTaint: true,
       logging: false,
       backgroundColor: '#ffffff',
       scale: dpr,
-      width: mapEl.clientWidth,
-      height: mapEl.clientHeight,
     });
+
+    // Measure the ACTUAL pixel ratio html2canvas used, rather than trusting
+    // `dpr` — some browsers / html2canvas versions diverge.
+    const xScale = mapEl.clientWidth  ? (fullCanvas.width  / mapEl.clientWidth)  : dpr;
+    const yScale = mapEl.clientHeight ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
     // Compute the tight-crop pixel box from the scope bounds, with a small
     // padding so boundary strokes aren't clipped. Clamp to the canvas.
@@ -4378,21 +4387,23 @@ async function _downloadMapPng() {
       const wCss = Math.min(mapEl.clientWidth  - xCss, Math.abs(se.x - nw.x) + padPx * 2);
       const hCss = Math.min(mapEl.clientHeight - yCss, Math.abs(se.y - nw.y) + padPx * 2);
       if (wCss > 40 && hCss > 40) {
-        const cx = Math.round(xCss * dpr);
-        const cy = Math.round(yCss * dpr);
-        const cw = Math.round(wCss * dpr);
-        const ch = Math.round(hCss * dpr);
+        const cx = Math.max(0, Math.round(xCss * xScale));
+        const cy = Math.max(0, Math.round(yCss * yScale));
+        const cw = Math.min(fullCanvas.width  - cx, Math.round(wCss * xScale));
+        const ch = Math.min(fullCanvas.height - cy, Math.round(hCss * yScale));
         cropCanvas = document.createElement('canvas');
         cropCanvas.width  = cw;
         cropCanvas.height = ch;
-        cropCanvas._nwlDpr = dpr;
+        cropCanvas._nwlDpr = Math.max(xScale, yScale);
         const ctx = cropCanvas.getContext('2d');
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, cw, ch);
+        // Source rect uses canvas-pixel coords (scaled); destination rect matches
+        // the destination canvas size so we get a true 1:1 copy with no scaling.
         ctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
       }
     }
-    if (!cropCanvas._nwlDpr) cropCanvas._nwlDpr = dpr;
+    if (!cropCanvas._nwlDpr) cropCanvas._nwlDpr = Math.max(xScale, yScale);
 
     // Storytelling caption (scope · overlay · month YYYY).
     try { _stampCaption(cropCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }

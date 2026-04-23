@@ -127,6 +127,29 @@ PNG export — rewritten for PowerPoint-ready output
   slide-ready image regardless of the user's current zoom
   level, with the map chrome hidden, the background white,
   and a caption that identifies the scope/overlay/date.
+
+PNG export — dpr/scale crop fix
+-------------------------------
+- First version of the rewrite above shipped with a
+  devicePixelRatio mismatch: html2canvas was called with
+  both `width`/`height` AND `scale: dpr`. When both are
+  passed, html2canvas produces a canvas at the LOGICAL
+  size (clientWidth x clientHeight), not the dpr-scaled
+  size. The crop rect multiplied CSS-pixel coords by dpr,
+  so the source rect ran past the canvas and drawImage
+  copied only the top-left region 1:1 into the
+  destination — leaving the bottom-right of the PNG
+  pure white (the pre-fill colour).
+- Fix: drop the explicit width/height so html2canvas
+  uses its default (clientWidth*scale, clientHeight*scale),
+  then measure the true pixel ratio post-hoc via
+  `fullCanvas.width / mapEl.clientWidth` (xScale / yScale)
+  and use THOSE to convert CSS-pixel crop coords into
+  canvas-pixel coords. Crop width/height are now also
+  clamped to `fullCanvas.width - cx` / `fullCanvas.height
+  - cy` so we never request out-of-bounds source pixels.
+- Result: full scope renders correctly across all dpr
+  values (1x, 1.25x, 1.5x, 2x).
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

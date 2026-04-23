@@ -4161,36 +4161,71 @@ function _runSearch(q) {
 })();
 
 // ── PNG + CSV export ────────────────────────────────────────────────────────
-// PNG: snapshot the live map via html2canvas. Whatever the user currently
-// sees gets captured; everything outside the in-scope boundary is painted
-// white so the image drops cleanly onto a PowerPoint slide.
-//   – No borough focus  → mask = world minus all 9 NW London boroughs
-//   – Borough-only view → mask = world minus the focused borough's polygon
-// Scope is inferred from `focusedBorough` (set by the borough-focus dropdown).
+// PNG: produces a PowerPoint-ready snapshot of the NW London footprint (or
+// the currently-focused borough). Procedure:
+//   1. Save the user's current map view (center + zoom).
+//   2. Fit the map to the in-scope polygon bounds (NWL or one borough).
+//   3. Apply a white mask so everything outside the polygon is white.
+//   4. Wait for basemap tiles + overlays to settle.
+//   5. html2canvas the map div.
+//   6. Tight-crop the resulting canvas to the polygon's pixel bbox (+ small
+//      padding) so there's no wasted margin.
+//   7. Stamp a small caption strip (scope · overlay · date) onto the bottom
+//      so the image tells its own story when dropped into a slide.
+//   8. Restore the user's original view.
+// All user-controlled data state (overlays, layers, filters, selected
+// ward, markers, Core20 highlight, etc.) is left untouched — only the map
+// viewport is moved and then restored.
 
-// World-minus-<scope> polygon. Outer ring is a large bbox, holes are the
-// in-scope borough polygons. Leaflet renders the result as a single white
-// fill covering every pixel outside the holes.
-function _buildWhiteMask() {
-  if (typeof BOROUGH_GJ === 'undefined' || !BOROUGH_GJ.features) return null;
-  const outer = [[-2, 50], [-2, 53], [2, 53], [2, 50], [-2, 50]];
-  const scopeBoroughRaw = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all')
+// Normalise borough names ("City of Westminster" → "westminster") for the
+// fuzzy match between BOROUGH_GJ and focusedBorough / ward data.
+function _pngNormBorough(s) {
+  return String(s || '').toLowerCase().replace(/^city of /, '').trim();
+}
+
+// Return the list of in-scope borough features (1 when a borough is focused,
+// otherwise all 8 NWL boroughs).
+function _pngScopeFeatures() {
+  if (typeof BOROUGH_GJ === 'undefined' || !BOROUGH_GJ.features) return [];
+  const scopeRaw = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all')
     ? focusedBorough : null;
-  // BOROUGH_GJ uses "City of Westminster" but the focus dropdown/ward data
-  // often says just "Westminster". Normalise both sides for comparison.
-  const norm = s => String(s || '').toLowerCase().replace(/^city of /, '').trim();
-  const scopeNorm = scopeBoroughRaw ? norm(scopeBoroughRaw) : null;
+  if (!scopeRaw) return BOROUGH_GJ.features;
+  const target = _pngNormBorough(scopeRaw);
+  return BOROUGH_GJ.features.filter(f => {
+    const p = f.properties || {};
+    const name = p.LAD24NM || p.lad_name || p.name || p.LAD22NM;
+    return _pngNormBorough(name) === target;
+  });
+}
+
+// Human-readable scope name for the caption + filename.
+function _pngScopeLabel() {
+  const scopeRaw = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all')
+    ? focusedBorough : null;
+  return scopeRaw ? scopeRaw.replace(/^City of /, '') : 'NW London';
+}
+
+// L.LatLngBounds for the current scope — used both to fit the map before
+// capture and to compute the tight-crop pixel bbox afterwards.
+function _pngScopeBounds() {
+  const feats = _pngScopeFeatures();
+  if (feats.length === 0) return null;
+  const layer = L.geoJSON({ type: 'FeatureCollection', features: feats });
+  const b = layer.getBounds();
+  return b.isValid() ? b : null;
+}
+
+// White "world-minus-scope" mask. Outer ring covers a wide bbox; holes are
+// the in-scope borough polygons. Rendered under overlays/markers so every
+// pixel outside the polygon becomes white.
+function _buildWhiteMask() {
+  const feats = _pngScopeFeatures();
+  if (feats.length === 0) return null;
+  const outer = [[-2, 50], [-2, 53], [2, 53], [2, 50], [-2, 50]];
   const holes = [];
-  BOROUGH_GJ.features.forEach(f => {
+  feats.forEach(f => {
     const g = f.geometry;
     if (!g) return;
-    // When a borough is focused, only that borough's geometry becomes a hole
-    // → everything else (including the other 8 NWL boroughs) goes white.
-    if (scopeNorm) {
-      const p = f.properties || {};
-      const name = p.LAD24NM || p.lad_name || p.name || p.LAD22NM;
-      if (norm(name) !== scopeNorm) return;
-    }
     if (g.type === 'Polygon') holes.push(g.coordinates[0]);
     else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => holes.push(poly[0]));
   });
@@ -4201,6 +4236,58 @@ function _buildWhiteMask() {
   }, {
     style: { fillColor: '#ffffff', fillOpacity: 1, color: '#ffffff', weight: 0, interactive: false },
   });
+}
+
+// Compose a one-line caption e.g. "NW London · IMD composite (ICHT) · April 2026".
+function _pngCaption() {
+  const scope = _pngScopeLabel();
+  let ovTxt = '';
+  if (typeof curOv !== 'undefined' && curOv && curOv !== 'none') {
+    try { ovTxt = ovLabel(curOv) || ''; } catch (e) { ovTxt = curOv; }
+  }
+  const now = new Date();
+  const dateTxt = now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  return [scope, ovTxt, dateTxt].filter(Boolean).join('  \u00B7  ');
+}
+
+// Stamp a caption strip across the bottom of a cropped canvas. Keeps the
+// image self-explanatory for storytelling slides.
+function _stampCaption(canvas, caption) {
+  const dpr = canvas._nwlDpr || 1;
+  const ctx = canvas.getContext('2d');
+  const padX = 14 * dpr, padY = 9 * dpr;
+  const fontPx = 13 * dpr;
+  ctx.save();
+  ctx.font = `600 ${fontPx}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif`;
+  const tw = ctx.measureText(caption).width;
+  const barW = tw + padX * 2;
+  const barH = fontPx + padY * 2;
+  const x = 10 * dpr;
+  const y = canvas.height - barH - 10 * dpr;
+  // Soft white pill with a thin left accent bar.
+  ctx.fillStyle = 'rgba(255,255,255,0.94)';
+  ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 1 * dpr;
+  const r = 6 * dpr;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + barW - r, y);
+  ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+  ctx.lineTo(x + barW, y + barH - r);
+  ctx.quadraticCurveTo(x + barW, y + barH, x + barW - r, y + barH);
+  ctx.lineTo(x + r, y + barH);
+  ctx.quadraticCurveTo(x, y + barH, x, y + barH - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#B8371F';
+  ctx.fillRect(x, y, 3 * dpr, barH);
+  ctx.fillStyle = '#222';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(caption, x + padX, y + barH / 2);
+  ctx.restore();
 }
 
 async function _downloadMapPng() {
@@ -4214,55 +4301,111 @@ async function _downloadMapPng() {
   const prev = btn ? btn.textContent : '';
   if (btn) { btn.textContent = '… rendering'; btn.disabled = true; }
 
-  let maskLyr = null;
+  // Save the user's view so we can restore it after capture.
+  const savedCenter = map.getCenter();
+  const savedZoom = map.getZoom();
+
+  // UI chrome to hide in the capture. Leaflet attribution stays (legally
+  // required) — it's a thin line at the bottom-right and doesn't fight
+  // the caption.
   const dlBadge = document.getElementById('dl-badge');
   const dlPrevVis = dlBadge ? dlBadge.style.visibility : '';
+  const zoomCtl = mapEl.querySelector('.leaflet-control-zoom');
+  const zoomPrevVis = zoomCtl ? zoomCtl.style.visibility : '';
 
-  // Wait until any tile layers currently loading finish (safety-timeout 2s)
+  let maskLyr = null;
+
+  // Wait until every tile layer finishes loading (cap at 3s).
   const waitForTiles = () => new Promise(resolve => {
     let done = false;
     const finish = () => { if (!done) { done = true; resolve(); } };
     const tileLayers = [];
     map.eachLayer(l => { if (l instanceof L.TileLayer) tileLayers.push(l); });
-    if (tileLayers.length === 0) { setTimeout(finish, 100); return; }
+    if (tileLayers.length === 0) { setTimeout(finish, 120); return; }
     let pending = tileLayers.length;
     tileLayers.forEach(tl => {
       if (!tl._loading) { pending--; return; }
       tl.once('load', () => { if (--pending <= 0) finish(); });
     });
-    if (pending <= 0) setTimeout(finish, 100);
-    setTimeout(finish, 2000);
+    if (pending <= 0) setTimeout(finish, 120);
+    setTimeout(finish, 3000);
   });
 
   try {
-    // Paint a white backdrop outside the NW London boroughs
+    // Hide UI chrome
+    if (dlBadge)  dlBadge.style.visibility  = 'hidden';
+    if (zoomCtl)  zoomCtl.style.visibility  = 'hidden';
+
+    // Determine scope + fit the map to it. Padding keeps a little breathing
+    // room so boundary strokes don't touch the image edge.
+    const scopeBounds = _pngScopeBounds();
+    if (scopeBounds) {
+      map.fitBounds(scopeBounds, { padding: [24, 24], animate: false });
+    }
+
+    // Apply the white mask AFTER fitting (mask uses polygon geometry so it
+    // re-projects correctly at the new zoom).
     maskLyr = _buildWhiteMask();
     if (maskLyr) {
       maskLyr.addTo(map);
       if (typeof boroughL !== 'undefined' && boroughL && boroughL.bringToFront) boroughL.bringToFront();
     }
-    // Hide the data-level badge so it doesn't end up in the capture
-    if (dlBadge) dlBadge.style.visibility = 'hidden';
 
     await waitForTiles();
-    await new Promise(r => setTimeout(r, 150));
+    // Give SVG overlays + CSS a tick to settle after the fit.
+    await new Promise(r => setTimeout(r, 220));
 
-    const canvas = await html2canvas(mapEl, {
+    const dpr = window.devicePixelRatio || 1;
+    const fullCanvas = await html2canvas(mapEl, {
       useCORS: true,
       allowTaint: true,
       logging: false,
       backgroundColor: '#ffffff',
-      scale: window.devicePixelRatio || 1,
+      scale: dpr,
       width: mapEl.clientWidth,
       height: mapEl.clientHeight,
     });
 
-    canvas.toBlob(blob => {
+    // Compute the tight-crop pixel box from the scope bounds, with a small
+    // padding so boundary strokes aren't clipped. Clamp to the canvas.
+    let cropCanvas = fullCanvas;
+    if (scopeBounds) {
+      const nw = map.latLngToContainerPoint(scopeBounds.getNorthWest());
+      const se = map.latLngToContainerPoint(scopeBounds.getSouthEast());
+      const padPx = 16;
+      const xCss = Math.max(0, Math.min(nw.x, se.x) - padPx);
+      const yCss = Math.max(0, Math.min(nw.y, se.y) - padPx);
+      const wCss = Math.min(mapEl.clientWidth  - xCss, Math.abs(se.x - nw.x) + padPx * 2);
+      const hCss = Math.min(mapEl.clientHeight - yCss, Math.abs(se.y - nw.y) + padPx * 2);
+      if (wCss > 40 && hCss > 40) {
+        const cx = Math.round(xCss * dpr);
+        const cy = Math.round(yCss * dpr);
+        const cw = Math.round(wCss * dpr);
+        const ch = Math.round(hCss * dpr);
+        cropCanvas = document.createElement('canvas');
+        cropCanvas.width  = cw;
+        cropCanvas.height = ch;
+        cropCanvas._nwlDpr = dpr;
+        const ctx = cropCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, cw, ch);
+        ctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
+      }
+    }
+    if (!cropCanvas._nwlDpr) cropCanvas._nwlDpr = dpr;
+
+    // Storytelling caption (scope · overlay · month YYYY).
+    try { _stampCaption(cropCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }
+
+    cropCanvas.toBlob(blob => {
       if (!blob) { alert('PNG export failed.'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const ts = new Date().toISOString().slice(0,16).replace(/[:T-]/g,'');
-      a.href = url; a.download = `nwl-map-${ts}.png`;
+      const scopeSlug = _pngScopeLabel().toLowerCase()
+        .replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+      a.href = url;
+      a.download = `nwl-map-${scopeSlug}-${ts}.png`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     }, 'image/png');
@@ -4272,6 +4415,9 @@ async function _downloadMapPng() {
   } finally {
     if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
+    if (zoomCtl) zoomCtl.style.visibility = zoomPrevVis;
+    // Restore the user's original view.
+    try { map.setView(savedCenter, savedZoom, { animate: false }); } catch (e) { /* ignore */ }
     if (btn) { btn.textContent = prev; btn.disabled = false; }
   }
 }

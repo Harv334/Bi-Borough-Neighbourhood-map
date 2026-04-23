@@ -91,6 +91,42 @@ UI additions in this push
   opens with an amber "Neighbourhoods — section in
   development" banner explaining that only Westminster's
   4-neighbourhood preview is wired in.
+
+PNG export — rewritten for PowerPoint-ready output
+--------------------------------------------------
+- `_downloadMapPng()` no longer captures the user's current
+  viewport. Flow is now:
+    1. save center/zoom,
+    2. hide dl-badge + zoom control,
+    3. fit-to-scope via `map.fitBounds(_pngScopeBounds(),
+       {padding:[24,24], animate:false})` — scope is
+       NW London or the focused borough,
+    4. apply white polygon mask (outer world ring +
+       borough holes) so everything outside NWL/borough
+       renders pure white,
+    5. wait for tiles + 220 ms settle,
+    6. html2canvas capture at devicePixelRatio,
+    7. tight-crop to the scope polygon's pixel bbox
+       (16 px pad) via `map.latLngToContainerPoint()` and
+       `ctx.drawImage(src, sx,sy,sw,sh, 0,0,dw,dh)`,
+    8. stamp a rounded-pill caption at bottom-left
+       (scope · overlay label · Month YYYY) with a red
+       accent bar,
+    9. download as blob,
+   10. restore the user's original center/zoom with
+       `map.setView(..., {animate:false})`.
+- New helpers: `_pngNormBorough`, `_pngScopeFeatures`,
+  `_pngScopeLabel`, `_pngScopeBounds`, `_pngCaption`,
+  `_stampCaption`; `_buildWhiteMask` rewritten to consume
+  `_pngScopeFeatures()` so NWL and borough-solo views share
+  one code path.
+- Filename now `nwl-map-<scope-slug>-<timestamp>.png`
+  (e.g. `nwl-map-nw-london-20260422-1730.png` or
+  `nwl-map-westminster-...`).
+- Net effect: a single click produces a consistent,
+  slide-ready image regardless of the user's current zoom
+  level, with the map chrome hidden, the background white,
+  and a caption that identifies the scope/overlay/date.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

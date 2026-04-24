@@ -516,7 +516,7 @@
               <option value="claimant_rate_pct">Claimant count rate % (NOMIS CLA01) · LSOA</option>
             </optgroup>
             <optgroup label="IMD 2025 domains">
-              <option value="imd_score_ward">IMD composite score (ICHT methodology) · Ward</option>
+              <option value="imd_score_ward">IMD composite score (ward, pop-weighted) · Ward</option>
               <option value="imd_score">IMD score (composite) · LSOA</option>
               <option value="imd_decile">IMD decile (1 = most deprived) · LSOA</option>
               <option value="income_score">Income deprivation score · LSOA</option>
@@ -560,7 +560,7 @@
                 <option value="census_unemployed_pct">Unemployed % · Ward</option>
               </optgroup>
               <optgroup label="Deprivation">
-                <option value="imd_score_ward">IMD composite (ICHT) · Ward</option>
+                <option value="imd_score_ward">IMD composite (pop-weighted) · Ward</option>
                 <option value="imd_score">IMD composite · LSOA</option>
               </optgroup>
               <optgroup label="Environment &amp; access">
@@ -794,9 +794,8 @@ const OV_CFG = {
   // for every score column. imd_decile is inverted (1 = most deprived), so wh:false
   // and the legend reads "more deprived -> less deprived".
   imd_score:                       { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:60   },
-  // Ward-level IMD composite, population-weighted on MHCLG mid-2022 denominators
-  // (matches ICHT NW London reference table). Aliases to each ward's imd_score
-  // field via OV_FIELD_ALIAS.
+  // Ward-level IMD composite, population-weighted on MHCLG mid-2022 denominators.
+  // Aliases to each ward's imd_score field via OV_FIELD_ALIAS.
   imd_score_ward:                  { lo:"Lower", hi:"Higher", wh:true,  min:5,    max:45   },
   imd_decile:                      { lo:"More deprived", hi:"Less deprived", wh:false, min:1, max:10 },
   income_score:                    { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:0.5  },
@@ -886,7 +885,7 @@ const CATS = [
     { k: "census_no_car_pct",                l: "No car/van (%)",                g: "ward" },
   ]},
   { key: "imd2025",      label: "IMD 2025 domains",    ico: "⚖", fields: [
-    { k: "imd_score_ward",                   l: "IMD composite score (ward, pop-weighted mid-2022 — ICHT methodology)", g: "ward" },
+    { k: "imd_score_ward",                   l: "IMD composite score (ward, pop-weighted mid-2022)", g: "ward" },
     { k: "imd_score",                        l: "IMD composite score",           g: "lsoa" },
     { k: "imd_decile",                       l: "IMD decile (1 = most deprived)",g: "lsoa" },
     { k: "income_score",                     l: "Income deprivation",            g: "lsoa" },
@@ -972,7 +971,7 @@ const OV_META = {
 
   // IMD 2025
   imd_score:                      { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Composite Index of Multiple Deprivation. Higher = more deprived." },
-  imd_score_ward:                 { src: "MHCLG IMD 2025 (pop-weighted, mid-2022)", yr: "2025", g: "Ward", u: "score",  desc: "Ward-aggregate IMD composite score. Population-weighted mean of constituent LSOA scores using MHCLG mid-2022 denominators, matching the Imperial College Healthcare Trust NW London reference methodology." },
+  imd_score_ward:                 { src: "MHCLG IMD 2025 (pop-weighted, mid-2022)", yr: "2025", g: "Ward", u: "score",  desc: "Ward-aggregate IMD composite score. Population-weighted mean of constituent LSOA scores using MHCLG File_7 mid-2022 denominators." },
   imd_decile:                     { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "decile", desc: "National deprivation decile. 1 = most deprived 10%." },
   income_score:                   { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Income Deprivation domain score." },
   employment_score:               { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Employment Deprivation domain score." },
@@ -1188,8 +1187,8 @@ function ovLabel(k) {
 }
 // Field aliases: an overlay key that doesn't exist in the data file but
 // should resolve to a different field. Used to expose the ward-aggregate
-// IMD score (pop-weighted on mid-2022, ICHT-matching) under a distinct key
-// from the LSOA-level imd_score, since both live in the same indicators bag.
+// IMD score (pop-weighted on mid-2022) under a distinct key from the
+// LSOA-level imd_score, since both live in the same indicators bag.
 const OV_FIELD_ALIAS = {
   imd_score_ward: 'imd_score',
 };
@@ -4239,7 +4238,7 @@ function _buildWhiteMask() {
   });
 }
 
-// Compose a one-line caption e.g. "NW London · IMD composite (ICHT) · April 2026".
+// Compose a one-line caption e.g. "NW London · IMD composite · April 2026".
 function _pngCaption() {
   const scope = _pngScopeLabel();
   let ovTxt = '';
@@ -4343,34 +4342,15 @@ async function _downloadMapPng() {
     if (dlBadge) dlBadge.style.visibility = 'hidden';
     ctrlCorners.forEach(el => { el.style.visibility = 'hidden'; });
 
-    // Fit to NWL scope so the PNG is always centred on NWL regardless of
-    // where the user currently has the map panned. Use setView with an
-    // explicit zoom computed from getBoundsZoom — more reliable than
-    // fitBounds, whose move is sometimes deferred to the next animation
-    // frame even with animate:false.
-    const scopeBounds = _pngScopeBounds();
-    if (scopeBounds) {
-      const targetCenter = scopeBounds.getCenter();
-      let targetZoom = savedZoom;
-      try {
-        targetZoom = map.getBoundsZoom(scopeBounds, false, L.point(24, 24));
-      } catch (e) { /* fall back to current zoom */ }
-      await new Promise(resolve => {
-        let done = false;
-        const finish = () => { if (!done) { done = true; resolve(); } };
-        try { map.once('moveend', finish); } catch (e) { /* no-op */ }
-        try {
-          map.setView(targetCenter, targetZoom, { animate: false });
-        } catch (e) { finish(); return; }
-        setTimeout(finish, 500);
-      });
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-      await new Promise(r => setTimeout(r, 150));
-    }
-
-    // Wait for tiles at the new view to load.
+    // WYSIWYG capture — we do NOT move the map. The user has already
+    // framed the view they want (NW London, a single borough, a zoomed-
+    // in neighbourhood, whatever). Any fit/setView gymnastics we've
+    // tried here introduce projection-state races that corrupt the
+    // mask bbox. So: capture the current viewport verbatim, apply a
+    // Canvas-2D mask using the current (stable) projection, and output
+    // the full canvas with no cropping.
     await waitForTiles();
-    await new Promise(r => setTimeout(r, 240));
+    await new Promise(r => setTimeout(r, 160));
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     const dpr = window.devicePixelRatio || 1;
@@ -4427,22 +4407,12 @@ async function _downloadMapPng() {
       mctx.restore();
     }
 
-    // ── Tight crop to the NWL pixel bbox with small padding ─────────────
-    let cropCanvas = fullCanvas;
-    if (isFinite(xMin) && (xMax - xMin) > 40 && (yMax - yMin) > 40) {
-      const padPx = 16 * ((xScale + yScale) / 2);
-      const cx = Math.max(0, Math.round(xMin - padPx));
-      const cy = Math.max(0, Math.round(yMin - padPx));
-      const cw = Math.min(fullCanvas.width  - cx, Math.round((xMax - xMin) + padPx * 2));
-      const ch = Math.min(fullCanvas.height - cy, Math.round((yMax - yMin) + padPx * 2));
-      cropCanvas = document.createElement('canvas');
-      cropCanvas.width  = cw;
-      cropCanvas.height = ch;
-      const cctx = cropCanvas.getContext('2d');
-      cctx.fillStyle = '#ffffff';
-      cctx.fillRect(0, 0, cw, ch);
-      cctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
-    }
+    // No cropping. Output the full viewport exactly as the user sees it,
+    // with non-NWL areas whited out by the mask above. Tight-cropping
+    // against the polygon pixel bbox introduced projection-state races
+    // that clipped off most of the map; keeping the full canvas is
+    // reliable and matches "the image on the user's screen".
+    const cropCanvas = fullCanvas;
     cropCanvas._nwlDpr = Math.max(xScale, yScale);
 
     // Caption pill (scope · overlay · month YYYY).
@@ -4467,8 +4437,9 @@ async function _downloadMapPng() {
     if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     ctrlCorners.forEach((el, i) => { el.style.visibility = ctrlPrevVis[i] || ''; });
-    // Restore the user's original view (we panned to NWL for capture).
-    try { map.setView(savedCenter, savedZoom, { animate: false }); } catch (e) { /* ignore */ }
+    // No view restore needed — we didn't move the map (WYSIWYG capture).
+    // savedCenter/savedZoom kept in scope as a defensive hook only.
+    void savedCenter; void savedZoom;
     if (btn) { btn.textContent = prev; btn.disabled = false; }
   }
 }

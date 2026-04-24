@@ -219,16 +219,60 @@ PNG export — Canvas-2D mask + fit-to-NWL + tight crop
     * Fill `rect(0,0,W,H) + nwlPath` with even-odd rule
       → everything outside NWL is whited out. No SVG
       clipping, no extreme-coord math, no timing games.
-- Re-added fit-to-NWL so the PNG is always centred on
-  NWL regardless of the user's current pan. Uses
-  `setView(center, getBoundsZoom(...))` instead of
-  `fitBounds` — more reliable, move completes within the
-  awaited `moveend`.
+- Initial re-add of fit-to-NWL via
+  `setView(center, getBoundsZoom(...))` + awaited
+  `moveend` + double-rAF — intended to centre the PNG
+  on NWL regardless of the user's current pan.
 - Tight-cropped to the NWL pixel bbox (+16 css-px pad)
   computed from the SAME projection pass used to build
   the mask, so the crop always matches the mask exactly.
-- User's original center/zoom restored in finally so
-  they're unaware the map moved during capture.
+
+PNG export — drop fit + crop (final WYSIWYG)
+--------------------------------------------
+- Even with setView + awaited moveend + double-rAF,
+  `latLngToContainerPoint` still read stale projection
+  state for a subset of calls, so the mask pixel bbox
+  clipped to a NW-corner slice of NWL instead of the
+  whole footprint. Tight-crop amplified the defect:
+  output was ~1/3 of NWL with the rest white.
+- Final flow is pure WYSIWYG. The user frames the view
+  they want (NWL-wide, single borough, zoomed neighbour-
+  hood), clicks PNG, and the output is EXACTLY the current
+  map viewport with:
+    * Canvas-2D mask applied (non-NWL → white, using
+      current-view projection, no movement race),
+    * Leaflet UI chrome hidden (zoom control, legend,
+      attribution),
+    * caption pill stamped at bottom-left (scope · overlay
+      · Month YYYY),
+    * no fit, no setView, no crop, no view restore.
+- savedCenter/savedZoom kept in scope as a defensive hook
+  but not applied — the map never moves during capture.
+
+ICHT methodology references scrubbed
+------------------------------------
+- Dropped all user-visible "ICHT methodology" /
+  "Imperial College Healthcare Trust" references from
+  the ward IMD composite overlay while keeping the
+  overlay itself (key `imd_score_ward`, pop-weighted
+  mid-2022 calculation) unchanged:
+    * <select id="ov">  option text:
+      "IMD composite score (ICHT methodology) · Ward"
+      → "IMD composite score (ward, pop-weighted) · Ward"
+    * <select id="ov2"> option text:
+      "IMD composite (ICHT) · Ward"
+      → "IMD composite (pop-weighted) · Ward"
+    * CATS label: dropped "— ICHT methodology" suffix.
+    * OV_META desc: replaced "matching the Imperial
+      College Healthcare Trust NW London reference
+      methodology" with "using MHCLG File_7 mid-2022
+      denominators".
+    * Code comments (OV_META header + OV_FIELD_ALIAS
+      + _pngCaption example) also scrubbed.
+- Factual ICHT hospital attributions for St Mary's,
+  Charing Cross, Hammersmith, and Queen Charlotte's &
+  Chelsea retained — those are trust operators, not
+  methodology claims.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

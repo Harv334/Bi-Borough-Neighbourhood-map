@@ -227,27 +227,105 @@ PNG export — Canvas-2D mask + fit-to-NWL + tight crop
   computed from the SAME projection pass used to build
   the mask, so the crop always matches the mask exactly.
 
-PNG export — drop fit + crop (final WYSIWYG)
+PNG export — drop mask too (pure screenshot)
 --------------------------------------------
-- Even with setView + awaited moveend + double-rAF,
-  `latLngToContainerPoint` still read stale projection
-  state for a subset of calls, so the mask pixel bbox
-  clipped to a NW-corner slice of NWL instead of the
-  whole footprint. Tight-crop amplified the defect:
-  output was ~1/3 of NWL with the rest white.
-- Final flow is pure WYSIWYG. The user frames the view
-  they want (NWL-wide, single borough, zoomed neighbour-
-  hood), clicks PNG, and the output is EXACTLY the current
-  map viewport with:
-    * Canvas-2D mask applied (non-NWL → white, using
-      current-view projection, no movement race),
-    * Leaflet UI chrome hidden (zoom control, legend,
-      attribution),
+- Canvas-2D mask failed in yet another way at large
+  zoom-outs: even-odd fill rule produced inverted output
+  (NWL whited out, surrounding basemap retained) when
+  polygon pixel coords went well beyond the canvas. Every
+  mask strategy tried (Leaflet SVG, Canvas-2D pre-
+  capture, Canvas-2D post-capture) has had a different
+  failure mode.
+- Dropped the mask entirely. Final PNG flow is a pure
+  screenshot of the map div:
+    * waitForTiles + 160 ms settle + double-rAF,
+    * html2canvas of the map element at devicePixelRatio,
+    * Leaflet UI chrome hidden during capture (zoom
+      control, legend, attribution, dl-badge),
     * caption pill stamped at bottom-left (scope · overlay
       · Month YYYY),
-    * no fit, no setView, no crop, no view restore.
-- savedCenter/savedZoom kept in scope as a defensive hook
-  but not applied — the map never moves during capture.
+    * no fit, no setView, no crop, no mask, no view
+      restore.
+- Framing is the user's responsibility: zoom/pan to
+  NWL (or a borough) first, then click PNG. This
+  matches exactly what's on their screen.
+
+Dental practices — expand to 730 + NHS/private filter
+------------------------------------------------------
+- `dental_practices.json` rebuilt from the CQC/NHSBSA
+  `practices_2025_26.xlsx` register (sheet `Practices`):
+    * National file: 10,098 rows. Filtered to the 8 NWL
+      LADs (Brent, Ealing, H&F, Harrow, Hillingdon,
+      Hounslow, K&C, Westminster) → 730 practices.
+    * Previous JSON had only 257; new file has 730.
+    * Every record has lat/lng: 254 reused from the
+      previous JSON (postcode match); 476 geocoded from
+      the local ONSPD cache (Feb 2026, incl. 6 recovered
+      from terminated-postcode rows).
+    * `imd_decile` preserved where available (254
+      records); omitted for the 476 new rows rather than
+      invented.
+- New per-record field: `nhs_contracted` — boolean
+  derived from the Excel `At Contract Postcode` column:
+    * `Yes` → `true`  (marked "NHS / mixed" in UI)
+    * `No`  → `false` (marked "Private / specialist
+                       services" in UI)
+  Distribution: 285 true / 445 false.
+- By LAD: Westminster 256, Ealing 79, Brent 77, Harrow
+  73, K&C 70, H&F 66, Hounslow 57, Hillingdon 52.
+
+Dental UI — contract-type filter in the sidebar
+-----------------------------------------------
+- New `<select id="dental-contract-filter">` rendered
+  directly below the "Dental practices" toggle row, with
+  options:
+    * All dental practices (default)
+    * NHS / mixed (at contract postcode)
+    * Private / specialist services
+- `loadDentalLayer()` rewritten to:
+    * read `nhs_contracted` off each record,
+    * attach it to the marker's record in `dentalData`,
+    * include a "Type" row in the marker popup + suffix
+      the tooltip with "NHS / mixed" or "Private /
+      specialist services",
+    * delegate cluster membership to a new
+      `_applyDentalFilter()` helper.
+- `_applyDentalFilter()` clears + repopulates
+  `dentalCluster` honouring the current
+  `dentalContractFilter` ('all' | 'nhs' | 'private'),
+  and updates the `#dental-count` badge to reflect the
+  filtered count.
+- `refreshPointVisibility()` updated to call
+  `_applyDentalFilter()` instead of blindly re-adding
+  every dental marker — so the NHS/private filter
+  survives neighbourhood-focus state changes.
+- Records with `nhs_contracted === null` are treated as
+  non-NHS for the 'private' view (defensive; current
+  dataset has no nulls).
+
+PNG export — drop mask entirely (pure screenshot)
+-------------------------------------------------
+- Canvas-2D mask failed in yet another way at large
+  zoom-outs: even-odd fill inverted on some views (NWL
+  whited out, surrounding basemap retained) when the
+  projected polygon coords went well beyond the canvas.
+  Every mask strategy tried (Leaflet SVG, Canvas-2D
+  pre-capture, Canvas-2D post-capture, with/without
+  fit, with/without crop) has had a distinct failure
+  mode.
+- Dropped the mask entirely. Final PNG is a pure
+  screenshot of the map div:
+    * waitForTiles + 160 ms settle + double-rAF,
+    * html2canvas at devicePixelRatio,
+    * Leaflet UI chrome hidden during capture (zoom
+      control, legend control, attribution, dl-badge),
+    * caption pill stamped at bottom-left (scope ·
+      overlay · Month YYYY),
+    * no fit, no setView, no crop, no mask, no view
+      restore.
+- Framing is the user's responsibility — zoom/pan to
+  NWL (or a single borough) first, then click PNG.
+  Output matches exactly what's on screen.
 
 ICHT methodology references scrubbed
 ------------------------------------

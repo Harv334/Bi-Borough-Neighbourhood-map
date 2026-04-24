@@ -352,6 +352,13 @@
           </div>
           <label class="lrow"><div class="ldot" style="background:#854F0B"></div><span class="lname">VCSE organisations <span class="lcount">...</span></span><input type="checkbox" id="tv"></label>
           <label class="lrow"><div class="ldot" style="background:#7B2D8E"></div><span class="lname">Dental practices <span class="lcount" id="dental-count">0</span></span><input type="checkbox" id="td"></label>
+          <div id="dental-filter-wrap" style="margin:2px 0 4px 16px">
+            <select id="dental-contract-filter" style="width:100%;padding:3px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
+              <option value="all" selected>All dental practices</option>
+              <option value="nhs">NHS / mixed (at contract postcode)</option>
+              <option value="private">Private / specialist services</option>
+            </select>
+          </div>
           <label class="lrow"><div class="ldot" style="background:#E89B1B"></div><span class="lname">Pharmacies <span class="lcount" id="pharm-count">0</span></span><input type="checkbox" id="tph"></label>
         </div>
         <div class="sb-sec" style="flex-shrink:0;border-bottom:1px solid #e5e5e0">
@@ -1593,21 +1600,44 @@ const dentalCluster = L.markerClusterGroup({
   }
 });
 let dentalData = [];
+let dentalContractFilter = 'all'; // 'all' | 'nhs' | 'private'
+function _dentalTypeLabel(nhs) {
+  if (nhs === true) return 'NHS / mixed';
+  if (nhs === false) return 'Private / specialist services';
+  return 'Unknown contract status';
+}
 function loadDentalLayer(practices) {
   dentalCluster.clearLayers();
   dentalData = [];
   practices.forEach(p => {
     if (!p.lat || !p.lng) return;
+    const nhs = (typeof p.nhs_contracted === 'boolean') ? p.nhs_contracted : null;
     const marker = L.marker([p.lat, p.lng], {icon: mkDentalIcon()});
     const imdBadge = p.imd_decile ? `<div class="pop-row"><span class="pop-key">IMD</span><span>Decile ${p.imd_decile}</span></div>` : '';
-    marker.bindPopup(`<div class="pop-hdr" style="background:#7B2D8E">${p.name||p.n}</div><div class="pop-body"><div class="pop-addr">${p.postcode||p.pc||'—'}</div>${imdBadge}</div>`);
-    marker.bindTooltip((p.name||p.n) + ' · Dental', { direction: 'top', className: 'marker-tip' });
-    dentalCluster.addLayer(marker);
-    dentalData.push({ name: p.name||p.n, postcode: p.postcode||p.pc, lat: p.lat, lng: p.lng, marker });
+    const typeBadge = `<div class="pop-row"><span class="pop-key">Type</span><span>${_dentalTypeLabel(nhs)}</span></div>`;
+    marker.bindPopup(`<div class="pop-hdr" style="background:#7B2D8E">${p.name||p.n}</div><div class="pop-body"><div class="pop-addr">${p.postcode||p.pc||'—'}</div>${typeBadge}${imdBadge}</div>`);
+    marker.bindTooltip((p.name||p.n) + ' · ' + _dentalTypeLabel(nhs), { direction: 'top', className: 'marker-tip' });
+    dentalData.push({ name: p.name||p.n, postcode: p.postcode||p.pc, lat: p.lat, lng: p.lng, nhs_contracted: nhs, marker });
   });
-  document.getElementById('dental-count').textContent = dentalData.length;
-  // dentalCluster not added by default (user toggles via sidebar)
+  _applyDentalFilter(); // loads markers into the cluster honouring the current filter
   console.log(`Loaded ${dentalData.length} dental practices`);
+}
+// Apply the current NHS/private filter. 'all' → every marker in the cluster;
+// 'nhs' → only nhs_contracted === true; 'private' → only nhs_contracted === false.
+// (Records with null nhs_contracted are treated as non-NHS for the private view.)
+function _applyDentalFilter() {
+  if (!Array.isArray(dentalData)) return;
+  dentalCluster.clearLayers();
+  let n = 0;
+  dentalData.forEach(d => {
+    const keep =
+      dentalContractFilter === 'all' ? true :
+      dentalContractFilter === 'nhs' ? d.nhs_contracted === true :
+      dentalContractFilter === 'private' ? d.nhs_contracted !== true : true;
+    if (keep) { dentalCluster.addLayer(d.marker); n++; }
+  });
+  const countEl = document.getElementById('dental-count');
+  if (countEl) countEl.textContent = n;
 }
 // Try loading dental_practices.json
 fetch('dental_practices.json').then(r => r.ok ? r.json() : []).then(data => {
@@ -2625,9 +2655,10 @@ function refreshPointVisibility() {
   if (typeof vcseData !== 'undefined') vcseData.forEach(o => {
     if (vcseCluster && !vcseCluster.hasLayer(o.marker)) vcseCluster.addLayer(o.marker);
   });
-  if (typeof dentalData !== 'undefined') dentalData.forEach(o => {
-    if (dentalCluster && !dentalCluster.hasLayer(o.marker)) dentalCluster.addLayer(o.marker);
-  });
+  // Dental: delegate to _applyDentalFilter so the NHS/private dropdown
+  // is respected (it clears + repopulates the cluster according to the
+  // current dentalContractFilter).
+  if (typeof _applyDentalFilter === 'function') _applyDentalFilter();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2860,6 +2891,18 @@ document.getElementById('tv').addEventListener('change', e => _setVcseLayerVisib
   if (vt) vt.addEventListener('change', e => _setVcseLayerVisible(e.target.checked));
 }
 document.getElementById('td').addEventListener('change',  e => e.target.checked ? dentalCluster.addTo(map) : map.removeLayer(dentalCluster));
+// Dental NHS / private filter. Updates `dentalContractFilter` + re-applies
+// cluster membership + count. Also ensures the cluster is on the map if the
+// user changes the filter while the 'td' toggle is off (so changing the
+// filter doesn't force the layer on) — we only re-apply, we don't toggle.
+(function(){
+  const sel = document.getElementById('dental-contract-filter');
+  if (!sel) return;
+  sel.addEventListener('change', e => {
+    dentalContractFilter = (e.target.value || 'all');
+    if (typeof _applyDentalFilter === 'function') _applyDentalFilter();
+  });
+})();
 document.getElementById('tph').addEventListener('change', e => e.target.checked ? pharmCluster.addTo(map) : map.removeLayer(pharmCluster));
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4342,13 +4385,14 @@ async function _downloadMapPng() {
     if (dlBadge) dlBadge.style.visibility = 'hidden';
     ctrlCorners.forEach(el => { el.style.visibility = 'hidden'; });
 
-    // WYSIWYG capture — we do NOT move the map. The user has already
-    // framed the view they want (NW London, a single borough, a zoomed-
-    // in neighbourhood, whatever). Any fit/setView gymnastics we've
-    // tried here introduce projection-state races that corrupt the
-    // mask bbox. So: capture the current viewport verbatim, apply a
-    // Canvas-2D mask using the current (stable) projection, and output
-    // the full canvas with no cropping.
+    // Pure screenshot — no mask, no fit, no crop. Every mask attempt
+    // has failed in a different way (Leaflet SVG clipping quirks at
+    // extreme coords, Canvas-2D even-odd fill inverting on some views,
+    // latLngToContainerPoint returning stale pixel coords after
+    // setView). The user just wants the map they see on screen. So we
+    // capture the map div verbatim, hide the Leaflet UI chrome, stamp
+    // the caption, and ship it. If they want an NWL-only image, they
+    // zoom to NWL first; the framing is theirs to control.
     await waitForTiles();
     await new Promise(r => setTimeout(r, 160));
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -4362,56 +4406,13 @@ async function _downloadMapPng() {
       scale: dpr,
     });
 
-    // Measure the true pixel ratio html2canvas actually used.
+    // Measure the true pixel ratio html2canvas actually used so the
+    // caption pill scales proportionally at any dpr.
     const xScale = mapEl.clientWidth
       ? (fullCanvas.width / mapEl.clientWidth)  : dpr;
     const yScale = mapEl.clientHeight
       ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
-    // ── Canvas-2D mask (replaces the Leaflet SVG mask) ─────────────────
-    // Project every NWL borough polygon to canvas-pixel coords, then fill
-    // the rectangle MINUS the NWL paths with white using the even-odd
-    // fill rule. This is bullet-proof: no Leaflet SVG clipping, no extreme
-    // lat/lng rendering quirks, no timing issues — we own the pixels.
-    const scopeFeats = _pngScopeFeatures();
-    let xMin = Infinity, yMin = Infinity, xMax = -Infinity, yMax = -Infinity;
-    const nwlPath = new Path2D();
-    const tracePoly = (ring) => {
-      ring.forEach((coord, i) => {
-        const pt = map.latLngToContainerPoint(L.latLng(coord[1], coord[0]));
-        const x = pt.x * xScale;
-        const y = pt.y * yScale;
-        if (i === 0) nwlPath.moveTo(x, y); else nwlPath.lineTo(x, y);
-        if (x < xMin) xMin = x;  if (y < yMin) yMin = y;
-        if (x > xMax) xMax = x;  if (y > yMax) yMax = y;
-      });
-      nwlPath.closePath();
-    };
-    scopeFeats.forEach(f => {
-      const g = f.geometry; if (!g) return;
-      if (g.type === 'Polygon') {
-        g.coordinates.forEach(ring => tracePoly(ring));
-      } else if (g.type === 'MultiPolygon') {
-        g.coordinates.forEach(poly => poly.forEach(ring => tracePoly(ring)));
-      }
-    });
-
-    if (isFinite(xMin)) {
-      const mctx = fullCanvas.getContext('2d');
-      const outsidePath = new Path2D();
-      outsidePath.rect(0, 0, fullCanvas.width, fullCanvas.height);
-      outsidePath.addPath(nwlPath);
-      mctx.save();
-      mctx.fillStyle = '#ffffff';
-      mctx.fill(outsidePath, 'evenodd');
-      mctx.restore();
-    }
-
-    // No cropping. Output the full viewport exactly as the user sees it,
-    // with non-NWL areas whited out by the mask above. Tight-cropping
-    // against the polygon pixel bbox introduced projection-state races
-    // that clipped off most of the map; keeping the full canvas is
-    // reliable and matches "the image on the user's screen".
     const cropCanvas = fullCanvas;
     cropCanvas._nwlDpr = Math.max(xScale, yScale);
 

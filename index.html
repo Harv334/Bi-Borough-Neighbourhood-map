@@ -4221,7 +4221,8 @@ function _pngScopeBounds() {
 function _buildWhiteMask() {
   const feats = _pngScopeFeatures();
   if (feats.length === 0) return null;
-  const outer = [[-2, 50], [-2, 53], [2, 53], [2, 50], [-2, 50]];
+  // World-covering outer ring so no basemap can peek through at any zoom.
+  const outer = [[-180, -85], [-180, 85], [180, 85], [180, -85], [-180, -85]];
   const holes = [];
   feats.forEach(f => {
     const g = f.geometry;
@@ -4338,9 +4339,28 @@ async function _downloadMapPng() {
 
     // Determine scope + fit the map to it. Padding keeps a little breathing
     // room so boundary strokes don't touch the image edge.
+    //
+    // IMPORTANT: `fitBounds({animate:false})` is NOT reliably synchronous.
+    // Leaflet often queues the move until the next animation frame, so if we
+    // call `latLngToContainerPoint` (or html2canvas) right after, we get the
+    // OLD view's pixel coords and the capture shows the pre-fit viewport with
+    // our mask applied on the wrong region. We await `moveend` with a safety
+    // timeout, then force two animation frames so the tile layout settles.
     const scopeBounds = _pngScopeBounds();
     if (scopeBounds) {
-      map.fitBounds(scopeBounds, { padding: [24, 24], animate: false });
+      await new Promise(resolve => {
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        try { map.once('moveend', finish); } catch (e) { /* no-op */ }
+        try {
+          map.fitBounds(scopeBounds, { padding: [24, 24], animate: false });
+        } catch (e) { finish(); return; }
+        // If the fit was a no-op (already at these bounds), moveend won't
+        // fire — flush after a short grace period.
+        setTimeout(finish, 400);
+      });
+      // Two rAFs → guaranteed that Leaflet has painted the new tile positions.
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     }
 
     // Apply the white mask AFTER fitting (mask uses polygon geometry so it
@@ -4352,8 +4372,9 @@ async function _downloadMapPng() {
     }
 
     await waitForTiles();
-    // Give SVG overlays + CSS a tick to settle after the fit.
-    await new Promise(r => setTimeout(r, 220));
+    // Give SVG overlays + CSS a tick to settle after the mask render.
+    await new Promise(r => setTimeout(r, 260));
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     const dpr = window.devicePixelRatio || 1;
     // NOTE: do NOT pass `width` / `height` here. When you pass both `width/height`

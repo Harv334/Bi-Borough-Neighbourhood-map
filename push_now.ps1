@@ -150,6 +150,29 @@ PNG export — dpr/scale crop fix
   - cy` so we never request out-of-bounds source pixels.
 - Result: full scope renders correctly across all dpr
   values (1x, 1.25x, 1.5x, 2x).
+
+PNG export — fit-to-scope timing + mask hardening
+-------------------------------------------------
+- Second pass fix after the dpr patch: export was still
+  cropping to the pre-fit viewport because
+  `map.fitBounds({animate:false})` is NOT reliably
+  synchronous. Leaflet defers the actual move to the next
+  animation frame, so `latLngToContainerPoint` and
+  html2canvas both read the OLD view and captured the
+  wrong region (user's previous pan/zoom, often showing
+  south-London basemap through gaps).
+- Fix:
+    * `await` the `moveend` event after fitBounds (with a
+      400 ms safety timeout for no-op fits).
+    * Then force two `requestAnimationFrame` ticks so
+      Leaflet has painted the new tile layout before the
+      mask is added.
+    * After the mask is added, another rAF pair + 260 ms
+      settle.
+- Mask outer ring expanded from the UK bbox
+  (-2/-2 to 2/53) to full WGS84 world bounds
+  (-180/-85 to 180/85) — belt-and-braces so no basemap
+  can leak through at any zoom.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

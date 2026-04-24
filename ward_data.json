@@ -66,7 +66,17 @@
         "crime_score": -0.1654,
         "barriers_score": 12.9485,
         "environment_score": 52.0013,
-        "imd_denominator_mid2022": 6756
+        "imd_denominator_mid2022": 6756,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.62,
+        "cst_number_and_proximity_of_libraries": 580.95,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.22,
+        "cst_number_and_proximity_of_community_centres": 402.15,
+        "cst_number_and_proximity_of_cultural_spaces": 5.43,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -178,7 +188,17 @@
         "crime_score": -0.0497,
         "barriers_score": 23.7674,
         "environment_score": 60.1536,
-        "imd_denominator_mid2022": 8655
+        "imd_denominator_mid2022": 8655,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 0.42,
+        "cst_number_and_proximity_of_libraries": 1075.52,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.16,
+        "cst_number_and_proximity_of_community_centres": 535.54,
+        "cst_number_and_proximity_of_cultural_spaces": 69.66,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -299,7 +319,17 @@
         "crime_score": 0.0418,
         "barriers_score": 9.5898,
         "environment_score": 54.6651,
-        "imd_denominator_mid2022": 8910
+        "imd_denominator_mid2022": 8910,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 1.1,
+        "cst_number_and_proximity_of_libraries": 424.25,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.24,
+        "cst_number_and_proximity_of_community_centres": 329.08,
+        "cst_number_and_proximity_of_cultural_spaces": 114.61,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -400,7 +430,17 @@
         "crime_score": 0.5798,
         "barriers_score": 27.6751,
         "environment_score": 52.7008,
-        "imd_denominator_mid2022": 6959
+        "imd_denominator_mid2022": 6959,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 4.86,
+        "cst_number_and_proximity_of_libraries": 800.68,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 143.27,
+        "cst_number_and_proximity_of_cultural_spaces": 36.3,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -522,7 +562,17 @@
         "crime_score": 0.9649,
         "barriers_score": 27.4262,
         "environment_score": 47.1832,
-        "imd_denominator_mid2022": 8597
+        "imd_denominator_mid2022": 8597,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 14,
+        "cst_gentrification_change_in_occupational_classes": -1.28,
+        "cst_number_and_proximity_of_libraries": 220.52,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 147.56,
+        "cst_number_and_proximity_of_cultural_spaces": 49.4,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -656,7 +706,17 @@
         "crime_score": 0.1038,
         "barriers_score": 15.6792,
         "environment_score": 75.0327,
-        "imd_denominator_mid2022": 6367
+        "imd_denominator_mid2022": 6367,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": -0.13,
+        "cst_number_and_proximity_of_libraries": 420.14,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.15,
+        "cst_number_and_proximity_of_community_centres": 737.55,
+        "cst_number_and_proximity_of_cultural_spaces": 91.17,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -773,7 +833,17 @@
         "crime_score": 0.557,
         "barriers_score": 31.9117,
         "environment_score": 33.3986,
-        "imd_denominator_mid2022": 7262
+        "imd_denominator_mid2022": 7262,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 6,
+        "cst_number_of_community_interest_companies_cics": 10,
+        "cst_gentrification_change_in_occupational_classes": 1.19,
+        "cst_number_and_proximity_of_libraries": 825.79,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.37,
+        "cst_number_and_proximity_of_community_centres": 258.75,
+        "cst_number_and_proximity_of_cultural_spaces": 156.44,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -880,7 +950,17 @@
         "crime_score": 0.7916,
         "barriers_score": 24.6174,
         "environment_score": 58.2758,
-        "imd_denominator_mid2022": 9817
+        "imd_denominator_mid2022": 9817,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.55,
+        "cst_number_and_proximity_of_libraries": 621.2,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.24,
+        "cst_number_and_proximity_of_community_centres": 242.28,
+        "cst_number_and_proximity_of_cultural_spaces": 164.85,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -992,7 +1072,17 @@
         "crime_score": 0.8748,
         "barriers_score": 39.191,
         "environment_score": 36.0102,
-        "imd_denominator_mid2022": 9128
+        "imd_denominator_mid2022": 9128,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 6,
+        "cst_number_of_community_interest_companies_cics": 40,
+        "cst_gentrification_change_in_occupational_classes": 1.42,
+        "cst_number_and_proximity_of_libraries": 231.1,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 249.02,
+        "cst_number_and_proximity_of_cultural_spaces": 75.14,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1114,7 +1204,17 @@
         "crime_score": 0.2315,
         "barriers_score": 17.4353,
         "environment_score": 44.2908,
-        "imd_denominator_mid2022": 10569
+        "imd_denominator_mid2022": 10569,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 1.39,
+        "cst_number_and_proximity_of_libraries": 961.43,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 568.04,
+        "cst_number_and_proximity_of_cultural_spaces": 117.03,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1208,7 +1308,17 @@
         "crime_score": 0.1579,
         "barriers_score": 14.9741,
         "environment_score": 55.0502,
-        "imd_denominator_mid2022": 5187
+        "imd_denominator_mid2022": 5187,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 0.38,
+        "cst_number_and_proximity_of_libraries": 687.62,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.39,
+        "cst_number_and_proximity_of_community_centres": 351.01,
+        "cst_number_and_proximity_of_cultural_spaces": 38.06,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1309,7 +1419,17 @@
         "crime_score": 0.4582,
         "barriers_score": 31.6183,
         "environment_score": 31.8955,
-        "imd_denominator_mid2022": 9379
+        "imd_denominator_mid2022": 9379,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 20,
+        "cst_number_of_community_interest_companies_cics": 32,
+        "cst_gentrification_change_in_occupational_classes": 4.23,
+        "cst_number_and_proximity_of_libraries": 662.58,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.32,
+        "cst_number_and_proximity_of_community_centres": 85.46,
+        "cst_number_and_proximity_of_cultural_spaces": 75.9,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1410,7 +1530,17 @@
         "crime_score": 0.3683,
         "barriers_score": 23.2373,
         "environment_score": 61.0734,
-        "imd_denominator_mid2022": 5669
+        "imd_denominator_mid2022": 5669,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 3.27,
+        "cst_number_and_proximity_of_libraries": 208.55,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.28,
+        "cst_number_and_proximity_of_community_centres": 439.07,
+        "cst_number_and_proximity_of_cultural_spaces": 87.9,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1516,7 +1646,17 @@
         "crime_score": -0.2861,
         "barriers_score": 13.2693,
         "environment_score": 55.687,
-        "imd_denominator_mid2022": 8600
+        "imd_denominator_mid2022": 8600,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 1.03,
+        "cst_number_and_proximity_of_libraries": 542.3,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.15,
+        "cst_number_and_proximity_of_community_centres": 725.76,
+        "cst_number_and_proximity_of_cultural_spaces": 64.59,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1623,7 +1763,17 @@
         "crime_score": 0.0148,
         "barriers_score": 18.2655,
         "environment_score": 54.8176,
-        "imd_denominator_mid2022": 11404
+        "imd_denominator_mid2022": 11404,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 0.35,
+        "cst_number_and_proximity_of_libraries": 334.38,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.26,
+        "cst_number_and_proximity_of_community_centres": 778.45,
+        "cst_number_and_proximity_of_cultural_spaces": 144.17,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1735,7 +1885,17 @@
         "crime_score": -0.1047,
         "barriers_score": 19.2814,
         "environment_score": 61.1719,
-        "imd_denominator_mid2022": 9276
+        "imd_denominator_mid2022": 9276,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": -0.92,
+        "cst_number_and_proximity_of_libraries": 529.57,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.22,
+        "cst_number_and_proximity_of_community_centres": 722.7,
+        "cst_number_and_proximity_of_cultural_spaces": 35.73,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1858,7 +2018,17 @@
         "crime_score": 0.5117,
         "barriers_score": 27.5956,
         "environment_score": 48.4205,
-        "imd_denominator_mid2022": 5364
+        "imd_denominator_mid2022": 5364,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 12,
+        "cst_gentrification_change_in_occupational_classes": -0.59,
+        "cst_number_and_proximity_of_libraries": 805.0,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.39,
+        "cst_number_and_proximity_of_community_centres": 538.49,
+        "cst_number_and_proximity_of_cultural_spaces": 49.23,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -1964,7 +2134,17 @@
         "crime_score": 0.0744,
         "barriers_score": 21.6578,
         "environment_score": 54.7615,
-        "imd_denominator_mid2022": 8493
+        "imd_denominator_mid2022": 8493,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 0.54,
+        "cst_number_and_proximity_of_libraries": 694.66,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.25,
+        "cst_number_and_proximity_of_community_centres": 416.21,
+        "cst_number_and_proximity_of_cultural_spaces": 76.91,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -2057,7 +2237,17 @@
         "crime_score": -0.0282,
         "barriers_score": 46.9123,
         "environment_score": 25.5533,
-        "imd_denominator_mid2022": 15960
+        "imd_denominator_mid2022": 15960,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": 2.23,
+        "cst_number_and_proximity_of_libraries": 960.76,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.26,
+        "cst_number_and_proximity_of_community_centres": 653.84,
+        "cst_number_and_proximity_of_cultural_spaces": 262.09,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -2164,7 +2354,17 @@
         "crime_score": 0.2106,
         "barriers_score": 40.9806,
         "environment_score": 24.6594,
-        "imd_denominator_mid2022": 9745
+        "imd_denominator_mid2022": 9745,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 1.37,
+        "cst_number_and_proximity_of_libraries": 1251.66,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.41,
+        "cst_number_and_proximity_of_community_centres": 611.68,
+        "cst_number_and_proximity_of_cultural_spaces": 363.01,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -2288,7 +2488,17 @@
         "crime_score": 0.2415,
         "barriers_score": 34.6229,
         "environment_score": 33.4275,
-        "imd_denominator_mid2022": 13241
+        "imd_denominator_mid2022": 13241,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 3.66,
+        "cst_number_and_proximity_of_libraries": 804.77,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.44,
+        "cst_number_and_proximity_of_community_centres": 999.73,
+        "cst_number_and_proximity_of_cultural_spaces": 509.97,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -2389,7 +2599,17 @@
         "crime_score": 0.4762,
         "barriers_score": 38.9308,
         "environment_score": 37.558,
-        "imd_denominator_mid2022": 14137
+        "imd_denominator_mid2022": 14137,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 1.61,
+        "cst_number_and_proximity_of_libraries": 626.69,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 574.33,
+        "cst_number_and_proximity_of_cultural_spaces": 42.52,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -2508,7 +2728,17 @@
         "crime_score": 0.4958,
         "barriers_score": 49.5027,
         "environment_score": 28.013,
-        "imd_denominator_mid2022": 21346
+        "imd_denominator_mid2022": 21346,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 15,
+        "cst_number_of_community_interest_companies_cics": 11,
+        "cst_gentrification_change_in_occupational_classes": 3.37,
+        "cst_number_and_proximity_of_libraries": 989.71,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 518.96,
+        "cst_number_and_proximity_of_cultural_spaces": 364.89,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -2652,7 +2882,17 @@
         "crime_score": 0.7921,
         "barriers_score": 44.9391,
         "environment_score": 40.8676,
-        "imd_denominator_mid2022": 19255
+        "imd_denominator_mid2022": 19255,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 18,
+        "cst_gentrification_change_in_occupational_classes": 5.58,
+        "cst_number_and_proximity_of_libraries": 544.78,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 286.82,
+        "cst_number_and_proximity_of_cultural_spaces": 283.73,
+        "cst_number_of_faith_centres": 9,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -2780,7 +3020,17 @@
         "crime_score": -0.2148,
         "barriers_score": 35.5689,
         "environment_score": 24.4735,
-        "imd_denominator_mid2022": 19928
+        "imd_denominator_mid2022": 19928,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": -1.25,
+        "cst_number_and_proximity_of_libraries": 1136.35,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.43,
+        "cst_number_and_proximity_of_community_centres": 1058.17,
+        "cst_number_and_proximity_of_cultural_spaces": 841.65,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -2914,7 +3164,17 @@
         "crime_score": 0.539,
         "barriers_score": 31.7487,
         "environment_score": 32.1373,
-        "imd_denominator_mid2022": 16676
+        "imd_denominator_mid2022": 16676,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 10,
+        "cst_gentrification_change_in_occupational_classes": 5.66,
+        "cst_number_and_proximity_of_libraries": 354.16,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 404.4,
+        "cst_number_and_proximity_of_cultural_spaces": 188.01,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -3041,7 +3301,17 @@
         "crime_score": 0.1469,
         "barriers_score": 34.5498,
         "environment_score": 27.9177,
-        "imd_denominator_mid2022": 10189
+        "imd_denominator_mid2022": 10189,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 7.43,
+        "cst_number_and_proximity_of_libraries": 1054.51,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 1592.25,
+        "cst_number_and_proximity_of_cultural_spaces": 195.8,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -3168,7 +3438,17 @@
         "crime_score": -0.4364,
         "barriers_score": 37.5002,
         "environment_score": 24.8109,
-        "imd_denominator_mid2022": 10683
+        "imd_denominator_mid2022": 10683,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 0.9,
+        "cst_number_and_proximity_of_libraries": 1624.87,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.42,
+        "cst_number_and_proximity_of_community_centres": 2084.34,
+        "cst_number_and_proximity_of_cultural_spaces": 298.95,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -3271,7 +3551,17 @@
         "crime_score": -0.3794,
         "barriers_score": 42.9753,
         "environment_score": 25.4351,
-        "imd_denominator_mid2022": 11287
+        "imd_denominator_mid2022": 11287,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": -3.11,
+        "cst_number_and_proximity_of_libraries": 118.67,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 1046.0,
+        "cst_number_and_proximity_of_cultural_spaces": 38.8,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -3414,7 +3704,17 @@
         "crime_score": 0.2335,
         "barriers_score": 35.6031,
         "environment_score": 41.4145,
-        "imd_denominator_mid2022": 17343
+        "imd_denominator_mid2022": 17343,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 8.5,
+        "cst_number_and_proximity_of_libraries": 882.68,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.28,
+        "cst_number_and_proximity_of_community_centres": 701.72,
+        "cst_number_and_proximity_of_cultural_spaces": 222.82,
+        "cst_number_of_faith_centres": 8,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -3530,7 +3830,17 @@
         "crime_score": -0.0314,
         "barriers_score": 37.63,
         "environment_score": 23.9609,
-        "imd_denominator_mid2022": 17655
+        "imd_denominator_mid2022": 17655,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 0.89,
+        "cst_number_and_proximity_of_libraries": 471.17,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 1548.72,
+        "cst_number_and_proximity_of_cultural_spaces": 325.29,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -3669,7 +3979,17 @@
         "crime_score": 0.8224,
         "barriers_score": 47.2261,
         "environment_score": 32.1024,
-        "imd_denominator_mid2022": 16728
+        "imd_denominator_mid2022": 16728,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 28,
+        "cst_number_of_community_interest_companies_cics": 16,
+        "cst_gentrification_change_in_occupational_classes": 5.78,
+        "cst_number_and_proximity_of_libraries": 906.16,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.26,
+        "cst_number_and_proximity_of_community_centres": 517.62,
+        "cst_number_and_proximity_of_cultural_spaces": 109.9,
+        "cst_number_of_faith_centres": 8,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -3797,7 +4117,17 @@
         "crime_score": 0.518,
         "barriers_score": 47.8814,
         "environment_score": 26.8434,
-        "imd_denominator_mid2022": 20698
+        "imd_denominator_mid2022": 20698,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 6,
+        "cst_number_of_community_interest_companies_cics": 20,
+        "cst_gentrification_change_in_occupational_classes": 10.26,
+        "cst_number_and_proximity_of_libraries": 1564.01,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.31,
+        "cst_number_and_proximity_of_community_centres": 367.55,
+        "cst_number_and_proximity_of_cultural_spaces": 190.33,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -3941,7 +4271,17 @@
         "crime_score": -0.1729,
         "barriers_score": 47.864,
         "environment_score": 27.6554,
-        "imd_denominator_mid2022": 14755
+        "imd_denominator_mid2022": 14755,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 31,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 1.62,
+        "cst_number_and_proximity_of_libraries": 799.19,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 1735.69,
+        "cst_number_and_proximity_of_cultural_spaces": 123.58,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -4047,7 +4387,17 @@
         "crime_score": -0.2024,
         "barriers_score": 44.576,
         "environment_score": 28.8302,
-        "imd_denominator_mid2022": 9627
+        "imd_denominator_mid2022": 9627,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 2.82,
+        "cst_number_and_proximity_of_libraries": 1070.25,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.31,
+        "cst_number_and_proximity_of_community_centres": 865.8,
+        "cst_number_and_proximity_of_cultural_spaces": 603.24,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -4159,7 +4509,17 @@
         "crime_score": 0.0507,
         "barriers_score": 41.1662,
         "environment_score": 28.0375,
-        "imd_denominator_mid2022": 18288
+        "imd_denominator_mid2022": 18288,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 9,
+        "cst_number_of_community_interest_companies_cics": 12,
+        "cst_gentrification_change_in_occupational_classes": 3.29,
+        "cst_number_and_proximity_of_libraries": 1762.34,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 1201.41,
+        "cst_number_and_proximity_of_cultural_spaces": 159.02,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -4265,7 +4625,17 @@
         "crime_score": 0.009,
         "barriers_score": 49.8475,
         "environment_score": 28.937,
-        "imd_denominator_mid2022": 16426
+        "imd_denominator_mid2022": 16426,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 1.55,
+        "cst_number_and_proximity_of_libraries": 356.46,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 1343.02,
+        "cst_number_and_proximity_of_cultural_spaces": 197.14,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -4421,7 +4791,17 @@
         "crime_score": 0.4775,
         "barriers_score": 46.0325,
         "environment_score": 28.5516,
-        "imd_denominator_mid2022": 16241
+        "imd_denominator_mid2022": 16241,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 10,
+        "cst_number_of_community_interest_companies_cics": 19,
+        "cst_gentrification_change_in_occupational_classes": -0.67,
+        "cst_number_and_proximity_of_libraries": 838.87,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 823.1,
+        "cst_number_and_proximity_of_cultural_spaces": 229.09,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -4528,7 +4908,17 @@
         "crime_score": 0.5333,
         "barriers_score": 29.2165,
         "environment_score": 21.1747,
-        "imd_denominator_mid2022": 11467
+        "imd_denominator_mid2022": 11467,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 15,
+        "cst_gentrification_change_in_occupational_classes": 14.45,
+        "cst_number_and_proximity_of_libraries": 280.34,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.12,
+        "cst_number_and_proximity_of_community_centres": 349.17,
+        "cst_number_and_proximity_of_cultural_spaces": 154.59,
+        "cst_number_of_faith_centres": 0,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -4622,7 +5012,17 @@
         "crime_score": 0.3792,
         "barriers_score": 40.9779,
         "environment_score": 36.8906,
-        "imd_denominator_mid2022": 19508
+        "imd_denominator_mid2022": 19508,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 11,
+        "cst_gentrification_change_in_occupational_classes": 3.01,
+        "cst_number_and_proximity_of_libraries": 697.42,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 468.38,
+        "cst_number_and_proximity_of_cultural_spaces": 185.77,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -4774,7 +5174,17 @@
         "crime_score": -0.0839,
         "barriers_score": 40.0392,
         "environment_score": 29.8651,
-        "imd_denominator_mid2022": 15567
+        "imd_denominator_mid2022": 15567,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 10,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 5.69,
+        "cst_number_and_proximity_of_libraries": 1290.48,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 623.65,
+        "cst_number_and_proximity_of_cultural_spaces": 346.09,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -4901,7 +5311,17 @@
         "crime_score": 0.2447,
         "barriers_score": 45.3509,
         "environment_score": 24.9135,
-        "imd_denominator_mid2022": 14800
+        "imd_denominator_mid2022": 14800,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 0.96,
+        "cst_number_and_proximity_of_libraries": 546.29,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 292.74,
+        "cst_number_and_proximity_of_cultural_spaces": 520.79,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -5030,7 +5450,17 @@
         "crime_score": 0.0383,
         "barriers_score": 26.0035,
         "environment_score": 39.3425,
-        "imd_denominator_mid2022": 14363
+        "imd_denominator_mid2022": 14363,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 22,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 2.05,
+        "cst_number_and_proximity_of_libraries": 851.81,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 966.28,
+        "cst_number_and_proximity_of_cultural_spaces": 127.09,
+        "cst_number_of_faith_centres": 10,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -5156,7 +5586,17 @@
         "crime_score": 0.1073,
         "barriers_score": 28.0809,
         "environment_score": 36.3725,
-        "imd_denominator_mid2022": 17097
+        "imd_denominator_mid2022": 17097,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 16,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 3.65,
+        "cst_number_and_proximity_of_libraries": 756.58,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.41,
+        "cst_number_and_proximity_of_community_centres": 1466.74,
+        "cst_number_and_proximity_of_cultural_spaces": 124.78,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "crime_by_category": {
         "anti-social-behaviour": 321,
@@ -5242,7 +5682,17 @@
         "crime_score": 0.2443,
         "barriers_score": 35.242,
         "environment_score": 31.7145,
-        "imd_denominator_mid2022": 13630
+        "imd_denominator_mid2022": 13630,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 10,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.73,
+        "cst_number_and_proximity_of_libraries": 1122.62,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.35,
+        "cst_number_and_proximity_of_community_centres": 480.55,
+        "cst_number_and_proximity_of_cultural_spaces": 533.57,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -5348,7 +5798,17 @@
         "crime_score": 0.3047,
         "barriers_score": 41.8955,
         "environment_score": 21.9682,
-        "imd_denominator_mid2022": 17723
+        "imd_denominator_mid2022": 17723,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 3.9,
+        "cst_number_and_proximity_of_libraries": 814.45,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 1035.13,
+        "cst_number_and_proximity_of_cultural_spaces": 165.49,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -5488,7 +5948,17 @@
         "crime_score": -0.262,
         "barriers_score": 31.2047,
         "environment_score": 38.6943,
-        "imd_denominator_mid2022": 16190
+        "imd_denominator_mid2022": 16190,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 10,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 2.62,
+        "cst_number_and_proximity_of_libraries": 1185.19,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.45,
+        "cst_number_and_proximity_of_community_centres": 1531.62,
+        "cst_number_and_proximity_of_cultural_spaces": 345.06,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -5606,7 +6076,17 @@
         "crime_score": 0.2253,
         "barriers_score": 36.9104,
         "environment_score": 37.0084,
-        "imd_denominator_mid2022": 16032
+        "imd_denominator_mid2022": 16032,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 8,
+        "cst_gentrification_change_in_occupational_classes": 5.4,
+        "cst_number_and_proximity_of_libraries": 571.71,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.28,
+        "cst_number_and_proximity_of_community_centres": 429.45,
+        "cst_number_and_proximity_of_cultural_spaces": 322.14,
+        "cst_number_of_faith_centres": 9,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -5739,7 +6219,17 @@
         "crime_score": -0.0256,
         "barriers_score": 45.031,
         "environment_score": 28.7286,
-        "imd_denominator_mid2022": 16186
+        "imd_denominator_mid2022": 16186,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 4.47,
+        "cst_number_and_proximity_of_libraries": 407.31,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.28,
+        "cst_number_and_proximity_of_community_centres": 1089.41,
+        "cst_number_and_proximity_of_cultural_spaces": 770.55,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -5891,7 +6381,17 @@
         "crime_score": 0.0627,
         "barriers_score": 37.8013,
         "environment_score": 36.1686,
-        "imd_denominator_mid2022": 18337
+        "imd_denominator_mid2022": 18337,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 12,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 4.5,
+        "cst_number_and_proximity_of_libraries": 1748.82,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.28,
+        "cst_number_and_proximity_of_community_centres": 516.08,
+        "cst_number_and_proximity_of_cultural_spaces": 448.75,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6007,7 +6507,17 @@
         "crime_score": -0.2912,
         "barriers_score": 38.2571,
         "environment_score": 23.95,
-        "imd_denominator_mid2022": 15817
+        "imd_denominator_mid2022": 15817,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 7.27,
+        "cst_number_and_proximity_of_libraries": 957.8,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 1253.39,
+        "cst_number_and_proximity_of_cultural_spaces": 331.11,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6119,7 +6629,17 @@
         "crime_score": 0.0144,
         "barriers_score": 44.2341,
         "environment_score": 27.7545,
-        "imd_denominator_mid2022": 14956
+        "imd_denominator_mid2022": 14956,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 9,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 7.79,
+        "cst_number_and_proximity_of_libraries": 1216.16,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.42,
+        "cst_number_and_proximity_of_community_centres": 370.81,
+        "cst_number_and_proximity_of_cultural_spaces": 377.08,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6236,7 +6756,17 @@
         "crime_score": -0.5363,
         "barriers_score": 28.0989,
         "environment_score": 39.6971,
-        "imd_denominator_mid2022": 13424
+        "imd_denominator_mid2022": 13424,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": 5.73,
+        "cst_number_and_proximity_of_libraries": 192.93,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.35,
+        "cst_number_and_proximity_of_community_centres": 386.74,
+        "cst_number_and_proximity_of_cultural_spaces": 31.15,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6363,7 +6893,17 @@
         "crime_score": 0.3183,
         "barriers_score": 46.1816,
         "environment_score": 24.8139,
-        "imd_denominator_mid2022": 16901
+        "imd_denominator_mid2022": 16901,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 6,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 5.12,
+        "cst_number_and_proximity_of_libraries": 508.79,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.43,
+        "cst_number_and_proximity_of_community_centres": 285.29,
+        "cst_number_and_proximity_of_cultural_spaces": 522.29,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6498,7 +7038,17 @@
         "crime_score": 0.4884,
         "barriers_score": 46.3095,
         "environment_score": 23.9031,
-        "imd_denominator_mid2022": 16793
+        "imd_denominator_mid2022": 16793,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 15,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": 4.18,
+        "cst_number_and_proximity_of_libraries": 920.65,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.42,
+        "cst_number_and_proximity_of_community_centres": 454.49,
+        "cst_number_and_proximity_of_cultural_spaces": 443.94,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6610,7 +7160,17 @@
         "crime_score": 0.3174,
         "barriers_score": 43.6056,
         "environment_score": 22.6845,
-        "imd_denominator_mid2022": 13994
+        "imd_denominator_mid2022": 13994,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 12,
+        "cst_gentrification_change_in_occupational_classes": 7.04,
+        "cst_number_and_proximity_of_libraries": 1191.38,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 366.4,
+        "cst_number_and_proximity_of_cultural_spaces": 200.7,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6723,7 +7283,17 @@
         "crime_score": 0.1313,
         "barriers_score": 37.9984,
         "environment_score": 29.3079,
-        "imd_denominator_mid2022": 16202
+        "imd_denominator_mid2022": 16202,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 9,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 3.9,
+        "cst_number_and_proximity_of_libraries": 474.71,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.32,
+        "cst_number_and_proximity_of_community_centres": 473.2,
+        "cst_number_and_proximity_of_cultural_spaces": 104.74,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6850,7 +7420,17 @@
         "crime_score": -0.1743,
         "barriers_score": 32.636,
         "environment_score": 31.9476,
-        "imd_denominator_mid2022": 14950
+        "imd_denominator_mid2022": 14950,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 12,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 2.72,
+        "cst_number_and_proximity_of_libraries": 803.98,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.41,
+        "cst_number_and_proximity_of_community_centres": 711.53,
+        "cst_number_and_proximity_of_cultural_spaces": 297.04,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -6956,7 +7536,17 @@
         "crime_score": 0.443,
         "barriers_score": 25.9689,
         "environment_score": 35.6869,
-        "imd_denominator_mid2022": 19431
+        "imd_denominator_mid2022": 19431,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 13,
+        "cst_gentrification_change_in_occupational_classes": 12.33,
+        "cst_number_and_proximity_of_libraries": 534.39,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 1318.15,
+        "cst_number_and_proximity_of_cultural_spaces": 245.58,
+        "cst_number_of_faith_centres": 8,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -7118,7 +7708,17 @@
         "crime_score": 0.6146,
         "barriers_score": 46.8562,
         "environment_score": 35.1976,
-        "imd_denominator_mid2022": 13756
+        "imd_denominator_mid2022": 13756,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": -0.03,
+        "cst_number_and_proximity_of_libraries": 1045.64,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.22,
+        "cst_number_and_proximity_of_community_centres": 1016.22,
+        "cst_number_and_proximity_of_cultural_spaces": 129.87,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -7246,7 +7846,17 @@
         "crime_score": 0.5223,
         "barriers_score": 50.3035,
         "environment_score": 31.8156,
-        "imd_denominator_mid2022": 17917
+        "imd_denominator_mid2022": 17917,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": 0.02,
+        "cst_number_and_proximity_of_libraries": 1004.57,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.21,
+        "cst_number_and_proximity_of_community_centres": 596.92,
+        "cst_number_and_proximity_of_cultural_spaces": 119.69,
+        "cst_number_of_faith_centres": 8,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -7379,7 +7989,17 @@
         "crime_score": -0.0045,
         "barriers_score": 46.5289,
         "environment_score": 28.77,
-        "imd_denominator_mid2022": 4656
+        "imd_denominator_mid2022": 4656,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 2.65,
+        "cst_number_and_proximity_of_libraries": 1235.17,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.23,
+        "cst_number_and_proximity_of_community_centres": 768.71,
+        "cst_number_and_proximity_of_cultural_spaces": 490.28,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -7480,7 +8100,17 @@
         "crime_score": -0.41,
         "barriers_score": 26.4283,
         "environment_score": 38.5646,
-        "imd_denominator_mid2022": 16503
+        "imd_denominator_mid2022": 16503,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 3.48,
+        "cst_number_and_proximity_of_libraries": 755.83,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.33,
+        "cst_number_and_proximity_of_community_centres": 906.62,
+        "cst_number_and_proximity_of_cultural_spaces": 173.09,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -7598,7 +8228,17 @@
         "crime_score": 0.017,
         "barriers_score": 27.6916,
         "environment_score": 41.2835,
-        "imd_denominator_mid2022": 14904
+        "imd_denominator_mid2022": 14904,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 11,
+        "cst_gentrification_change_in_occupational_classes": 4.95,
+        "cst_number_and_proximity_of_libraries": 478.96,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.31,
+        "cst_number_and_proximity_of_community_centres": 409.19,
+        "cst_number_and_proximity_of_cultural_spaces": 239.85,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -7727,7 +8367,17 @@
         "crime_score": -0.68,
         "barriers_score": 32.361,
         "environment_score": 18.9685,
-        "imd_denominator_mid2022": 7805
+        "imd_denominator_mid2022": 7805,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 3.25,
+        "cst_number_and_proximity_of_libraries": 1446.81,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 1653.15,
+        "cst_number_and_proximity_of_cultural_spaces": 467.41,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -7838,7 +8488,17 @@
         "crime_score": -0.4394,
         "barriers_score": 37.6319,
         "environment_score": 23.7691,
-        "imd_denominator_mid2022": 6494
+        "imd_denominator_mid2022": 6494,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 0.74,
+        "cst_number_and_proximity_of_libraries": 1156.92,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.47,
+        "cst_number_and_proximity_of_community_centres": 1955.66,
+        "cst_number_and_proximity_of_cultural_spaces": 17.86,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -7936,7 +8596,17 @@
         "crime_score": -0.7589,
         "barriers_score": 31.3859,
         "environment_score": 19.9864,
-        "imd_denominator_mid2022": 13582
+        "imd_denominator_mid2022": 13582,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 14,
+        "cst_number_of_community_interest_companies_cics": 16,
+        "cst_gentrification_change_in_occupational_classes": 4.5,
+        "cst_number_and_proximity_of_libraries": 1127.65,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 749.38,
+        "cst_number_and_proximity_of_cultural_spaces": 496.8,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8048,7 +8718,17 @@
         "crime_score": -0.0168,
         "barriers_score": 33.022,
         "environment_score": 26.9293,
-        "imd_denominator_mid2022": 16923
+        "imd_denominator_mid2022": 16923,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 2.19,
+        "cst_number_and_proximity_of_libraries": 1238.36,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.32,
+        "cst_number_and_proximity_of_community_centres": 569.8,
+        "cst_number_and_proximity_of_cultural_spaces": 506.72,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8175,7 +8855,17 @@
         "crime_score": 0.4519,
         "barriers_score": 31.6633,
         "environment_score": 25.7327,
-        "imd_denominator_mid2022": 15280
+        "imd_denominator_mid2022": 15280,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 12,
+        "cst_gentrification_change_in_occupational_classes": 3.25,
+        "cst_number_and_proximity_of_libraries": 198.82,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 1000.01,
+        "cst_number_and_proximity_of_cultural_spaces": 109.95,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8296,7 +8986,17 @@
         "crime_score": -0.1798,
         "barriers_score": 34.4348,
         "environment_score": 27.5021,
-        "imd_denominator_mid2022": 9326
+        "imd_denominator_mid2022": 9326,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 20,
+        "cst_number_of_community_interest_companies_cics": 10,
+        "cst_gentrification_change_in_occupational_classes": -1.75,
+        "cst_number_and_proximity_of_libraries": 1278.19,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.51,
+        "cst_number_and_proximity_of_community_centres": 684.15,
+        "cst_number_and_proximity_of_cultural_spaces": 101.12,
+        "cst_number_of_faith_centres": 9,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8407,7 +9107,17 @@
         "crime_score": -0.0464,
         "barriers_score": 25.7765,
         "environment_score": 24.2639,
-        "imd_denominator_mid2022": 15528
+        "imd_denominator_mid2022": 15528,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 18,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 3.37,
+        "cst_number_and_proximity_of_libraries": 2565.25,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.46,
+        "cst_number_and_proximity_of_community_centres": 1024.97,
+        "cst_number_and_proximity_of_cultural_spaces": 386.94,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8524,7 +9234,17 @@
         "crime_score": -1.1163,
         "barriers_score": 14.6045,
         "environment_score": 19.014,
-        "imd_denominator_mid2022": 9424
+        "imd_denominator_mid2022": 9424,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 13,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 4.17,
+        "cst_number_and_proximity_of_libraries": 2309.72,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.54,
+        "cst_number_and_proximity_of_community_centres": 1338.67,
+        "cst_number_and_proximity_of_cultural_spaces": 154.11,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8634,7 +9354,17 @@
         "crime_score": -0.4317,
         "barriers_score": 24.5949,
         "environment_score": 23.341,
-        "imd_denominator_mid2022": 16639
+        "imd_denominator_mid2022": 16639,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 16,
+        "cst_number_of_community_interest_companies_cics": 11,
+        "cst_gentrification_change_in_occupational_classes": 4.54,
+        "cst_number_and_proximity_of_libraries": 1519.29,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 800.4,
+        "cst_number_and_proximity_of_cultural_spaces": 169.97,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8751,7 +9481,17 @@
         "crime_score": -0.3834,
         "barriers_score": 33.0949,
         "environment_score": 21.7731,
-        "imd_denominator_mid2022": 15119
+        "imd_denominator_mid2022": 15119,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 2.54,
+        "cst_number_and_proximity_of_libraries": 914.68,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 280.22,
+        "cst_number_and_proximity_of_cultural_spaces": 466.23,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -8867,7 +9607,17 @@
         "crime_score": -0.5685,
         "barriers_score": 24.6698,
         "environment_score": 17.4154,
-        "imd_denominator_mid2022": 9866
+        "imd_denominator_mid2022": 9866,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 6,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 4.85,
+        "cst_number_and_proximity_of_libraries": 668.49,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 1123.55,
+        "cst_number_and_proximity_of_cultural_spaces": 480.93,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -8959,7 +9709,17 @@
         "crime_score": -0.0028,
         "barriers_score": 31.7685,
         "environment_score": 29.0631,
-        "imd_denominator_mid2022": 8348
+        "imd_denominator_mid2022": 8348,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 12,
+        "cst_number_of_community_interest_companies_cics": 10,
+        "cst_gentrification_change_in_occupational_classes": -0.93,
+        "cst_number_and_proximity_of_libraries": 621.56,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 306.86,
+        "cst_number_and_proximity_of_cultural_spaces": 423.28,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -9071,7 +9831,17 @@
         "crime_score": -0.8657,
         "barriers_score": 19.8727,
         "environment_score": 23.1347,
-        "imd_denominator_mid2022": 7309
+        "imd_denominator_mid2022": 7309,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 9,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 4.39,
+        "cst_number_and_proximity_of_libraries": 1569.35,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 441.55,
+        "cst_number_and_proximity_of_cultural_spaces": 446.3,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -9188,7 +9958,17 @@
         "crime_score": -0.5202,
         "barriers_score": 21.3152,
         "environment_score": 21.3459,
-        "imd_denominator_mid2022": 12356
+        "imd_denominator_mid2022": 12356,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 14,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 4.57,
+        "cst_number_and_proximity_of_libraries": 1234.8,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.49,
+        "cst_number_and_proximity_of_community_centres": 993.35,
+        "cst_number_and_proximity_of_cultural_spaces": 217.04,
+        "cst_number_of_faith_centres": 8,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -9303,7 +10083,17 @@
         "crime_score": -0.9581,
         "barriers_score": 15.6829,
         "environment_score": 18.6691,
-        "imd_denominator_mid2022": 15502
+        "imd_denominator_mid2022": 15502,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 34,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 7.86,
+        "cst_number_and_proximity_of_libraries": 816.3,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.49,
+        "cst_number_and_proximity_of_community_centres": 644.51,
+        "cst_number_and_proximity_of_cultural_spaces": 230.28,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -9406,7 +10196,17 @@
         "crime_score": -0.637,
         "barriers_score": 23.3078,
         "environment_score": 16.7432,
-        "imd_denominator_mid2022": 9849
+        "imd_denominator_mid2022": 9849,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.04,
+        "cst_number_and_proximity_of_libraries": 1662.46,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 984.97,
+        "cst_number_and_proximity_of_cultural_spaces": 526.13,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -9513,7 +10313,17 @@
         "crime_score": 0.2036,
         "barriers_score": 32.206,
         "environment_score": 18.5341,
-        "imd_denominator_mid2022": 9215
+        "imd_denominator_mid2022": 9215,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 11,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 5.7,
+        "cst_number_and_proximity_of_libraries": 1119.07,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.39,
+        "cst_number_and_proximity_of_community_centres": 741.01,
+        "cst_number_and_proximity_of_cultural_spaces": 635.16,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -9619,7 +10429,17 @@
         "crime_score": 0.0992,
         "barriers_score": 30.4947,
         "environment_score": 26.3847,
-        "imd_denominator_mid2022": 15613
+        "imd_denominator_mid2022": 15613,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 2.82,
+        "cst_number_and_proximity_of_libraries": 623.14,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 1074.2,
+        "cst_number_and_proximity_of_cultural_spaces": 403.21,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -9739,7 +10559,17 @@
         "crime_score": -0.4865,
         "barriers_score": 43.1474,
         "environment_score": 16.2983,
-        "imd_denominator_mid2022": 16936
+        "imd_denominator_mid2022": 16936,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 14,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 1.24,
+        "cst_number_and_proximity_of_libraries": 939.45,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.54,
+        "cst_number_and_proximity_of_community_centres": 1426.95,
+        "cst_number_and_proximity_of_cultural_spaces": 56.63,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -9836,7 +10666,17 @@
         "crime_score": 0.2198,
         "barriers_score": 35.3696,
         "environment_score": 21.6453,
-        "imd_denominator_mid2022": 10732
+        "imd_denominator_mid2022": 10732,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 0,
+        "cst_gentrification_change_in_occupational_classes": 5.46,
+        "cst_number_and_proximity_of_libraries": 635.56,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.33,
+        "cst_number_and_proximity_of_community_centres": 880.48,
+        "cst_number_and_proximity_of_cultural_spaces": 140.69,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -9928,7 +10768,17 @@
         "crime_score": 0.2931,
         "barriers_score": 41.2542,
         "environment_score": 31.7034,
-        "imd_denominator_mid2022": 8586
+        "imd_denominator_mid2022": 8586,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 26,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 1.95,
+        "cst_number_and_proximity_of_libraries": 312.33,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 614.38,
+        "cst_number_and_proximity_of_cultural_spaces": 188.38,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -10021,7 +10871,17 @@
         "crime_score": -0.2339,
         "barriers_score": 26.541,
         "environment_score": 31.3992,
-        "imd_denominator_mid2022": 11501
+        "imd_denominator_mid2022": 11501,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 1.44,
+        "cst_number_and_proximity_of_libraries": 1356.66,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 532.53,
+        "cst_number_and_proximity_of_cultural_spaces": 254.33,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10134,7 +10994,17 @@
         "crime_score": 0.289,
         "barriers_score": 30.578,
         "environment_score": 21.7936,
-        "imd_denominator_mid2022": 15703
+        "imd_denominator_mid2022": 15703,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 3.58,
+        "cst_number_and_proximity_of_libraries": 361.77,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 894.85,
+        "cst_number_and_proximity_of_cultural_spaces": 192.59,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10256,7 +11126,17 @@
         "crime_score": -0.0884,
         "barriers_score": 33.0668,
         "environment_score": 20.2727,
-        "imd_denominator_mid2022": 12032
+        "imd_denominator_mid2022": 12032,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 6.12,
+        "cst_number_and_proximity_of_libraries": 218.55,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 510.72,
+        "cst_number_and_proximity_of_cultural_spaces": 425.35,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10362,7 +11242,17 @@
         "crime_score": 0.2694,
         "barriers_score": 31.9529,
         "environment_score": 21.2927,
-        "imd_denominator_mid2022": 20981
+        "imd_denominator_mid2022": 20981,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 22,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 6.34,
+        "cst_number_and_proximity_of_libraries": 1353.12,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.42,
+        "cst_number_and_proximity_of_community_centres": 313.67,
+        "cst_number_and_proximity_of_cultural_spaces": 392.22,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10481,7 +11371,17 @@
         "crime_score": -0.5444,
         "barriers_score": 19.3334,
         "environment_score": 17.4373,
-        "imd_denominator_mid2022": 17112
+        "imd_denominator_mid2022": 17112,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 47,
+        "cst_number_of_community_interest_companies_cics": 8,
+        "cst_gentrification_change_in_occupational_classes": 9.45,
+        "cst_number_and_proximity_of_libraries": 278.82,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.47,
+        "cst_number_and_proximity_of_community_centres": 577.61,
+        "cst_number_and_proximity_of_cultural_spaces": 154.47,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10610,7 +11510,17 @@
         "crime_score": -0.1049,
         "barriers_score": 44.4529,
         "environment_score": 18.1093,
-        "imd_denominator_mid2022": 6119
+        "imd_denominator_mid2022": 6119,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 6.49,
+        "cst_number_and_proximity_of_libraries": 792.3,
+        "cst_public_transport_access_levels_ptals": "1a",
+        "cst_passive_green_space": 0.57,
+        "cst_number_and_proximity_of_community_centres": 2255.72,
+        "cst_number_and_proximity_of_cultural_spaces": 260.85,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10716,7 +11626,17 @@
         "crime_score": 0.5213,
         "barriers_score": 31.2016,
         "environment_score": 24.9347,
-        "imd_denominator_mid2022": 14507
+        "imd_denominator_mid2022": 14507,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 11,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": 9.57,
+        "cst_number_and_proximity_of_libraries": 825.31,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.28,
+        "cst_number_and_proximity_of_community_centres": 701.62,
+        "cst_number_and_proximity_of_cultural_spaces": 271.76,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10843,7 +11763,17 @@
         "crime_score": 0.3829,
         "barriers_score": 48.5629,
         "environment_score": 39.9153,
-        "imd_denominator_mid2022": 15628
+        "imd_denominator_mid2022": 15628,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 15,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 1.12,
+        "cst_number_and_proximity_of_libraries": 2760.55,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 659.98,
+        "cst_number_and_proximity_of_cultural_spaces": 695.58,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -10960,7 +11890,17 @@
         "crime_score": -0.17,
         "barriers_score": 27.3306,
         "environment_score": 21.3239,
-        "imd_denominator_mid2022": 16449
+        "imd_denominator_mid2022": 16449,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 9.81,
+        "cst_number_and_proximity_of_libraries": 723.3,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.41,
+        "cst_number_and_proximity_of_community_centres": 766.38,
+        "cst_number_and_proximity_of_cultural_spaces": 176.28,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -11092,7 +12032,17 @@
         "crime_score": -0.0405,
         "barriers_score": 23.082,
         "environment_score": 20.0122,
-        "imd_denominator_mid2022": 9262
+        "imd_denominator_mid2022": 9262,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 6,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 10.14,
+        "cst_number_and_proximity_of_libraries": 853.0,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.46,
+        "cst_number_and_proximity_of_community_centres": 1037.33,
+        "cst_number_and_proximity_of_cultural_spaces": 84.33,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -11185,7 +12135,17 @@
         "crime_score": -0.7018,
         "barriers_score": 24.0172,
         "environment_score": 15.0625,
-        "imd_denominator_mid2022": 14682
+        "imd_denominator_mid2022": 14682,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 9.28,
+        "cst_number_and_proximity_of_libraries": 1674.11,
+        "cst_public_transport_access_levels_ptals": "1a",
+        "cst_passive_green_space": 0.5,
+        "cst_number_and_proximity_of_community_centres": 1359.03,
+        "cst_number_and_proximity_of_cultural_spaces": 186.73,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -11291,7 +12251,17 @@
         "crime_score": -0.5945,
         "barriers_score": 21.3813,
         "environment_score": 18.5938,
-        "imd_denominator_mid2022": 11234
+        "imd_denominator_mid2022": 11234,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 18,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 3.66,
+        "cst_number_and_proximity_of_libraries": 1210.78,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.57,
+        "cst_number_and_proximity_of_community_centres": 1509.47,
+        "cst_number_and_proximity_of_cultural_spaces": 586.57,
+        "cst_number_of_faith_centres": 8,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -11407,7 +12377,17 @@
         "crime_score": -0.2886,
         "barriers_score": 25.8612,
         "environment_score": 19.1854,
-        "imd_denominator_mid2022": 12304
+        "imd_denominator_mid2022": 12304,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.54,
+        "cst_number_and_proximity_of_libraries": 143.3,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.51,
+        "cst_number_and_proximity_of_community_centres": 744.37,
+        "cst_number_and_proximity_of_cultural_spaces": 81.3,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -11519,7 +12499,17 @@
         "crime_score": 0.4141,
         "barriers_score": 32.4357,
         "environment_score": 31.2555,
-        "imd_denominator_mid2022": 18216
+        "imd_denominator_mid2022": 18216,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 4.32,
+        "cst_number_and_proximity_of_libraries": 497.03,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.33,
+        "cst_number_and_proximity_of_community_centres": 441.68,
+        "cst_number_and_proximity_of_cultural_spaces": 250.34,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -11637,7 +12627,17 @@
         "crime_score": -0.4384,
         "barriers_score": 22.1182,
         "environment_score": 19.0868,
-        "imd_denominator_mid2022": 16083
+        "imd_denominator_mid2022": 16083,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 15,
+        "cst_number_of_community_interest_companies_cics": 8,
+        "cst_gentrification_change_in_occupational_classes": 8.42,
+        "cst_number_and_proximity_of_libraries": 1066.03,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.48,
+        "cst_number_and_proximity_of_community_centres": 914.8,
+        "cst_number_and_proximity_of_cultural_spaces": 200.23,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -11776,7 +12776,17 @@
         "crime_score": -0.6911,
         "barriers_score": 16.5231,
         "environment_score": 22.2657,
-        "imd_denominator_mid2022": 9898
+        "imd_denominator_mid2022": 9898,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 8.81,
+        "cst_number_and_proximity_of_libraries": 584.85,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.39,
+        "cst_number_and_proximity_of_community_centres": 1154.1,
+        "cst_number_and_proximity_of_cultural_spaces": 162.62,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -11883,7 +12893,17 @@
         "crime_score": -0.3844,
         "barriers_score": 26.7581,
         "environment_score": 21.4312,
-        "imd_denominator_mid2022": 17012
+        "imd_denominator_mid2022": 17012,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 7.75,
+        "cst_number_and_proximity_of_libraries": 837.69,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.39,
+        "cst_number_and_proximity_of_community_centres": 1314.35,
+        "cst_number_and_proximity_of_cultural_spaces": 249.46,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -11996,7 +13016,17 @@
         "crime_score": 0.2894,
         "barriers_score": 27.9041,
         "environment_score": 26.392,
-        "imd_denominator_mid2022": 17848
+        "imd_denominator_mid2022": 17848,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 42,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 4.94,
+        "cst_number_and_proximity_of_libraries": 183.21,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 738.27,
+        "cst_number_and_proximity_of_cultural_spaces": 35.79,
+        "cst_number_of_faith_centres": 9,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -12118,7 +13148,17 @@
         "crime_score": 0.4574,
         "barriers_score": 41.1158,
         "environment_score": 21.6217,
-        "imd_denominator_mid2022": 18503
+        "imd_denominator_mid2022": 18503,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 10.02,
+        "cst_number_and_proximity_of_libraries": 385.17,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.42,
+        "cst_number_and_proximity_of_community_centres": 77.01,
+        "cst_number_and_proximity_of_cultural_spaces": 235.62,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -12234,7 +13274,17 @@
         "crime_score": 0.4014,
         "barriers_score": 31.9985,
         "environment_score": 23.3065,
-        "imd_denominator_mid2022": 19867
+        "imd_denominator_mid2022": 19867,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 18,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 4.9,
+        "cst_number_and_proximity_of_libraries": 759.5,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 236.57,
+        "cst_number_and_proximity_of_cultural_spaces": 214.05,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -12340,7 +13390,17 @@
         "crime_score": 0.547,
         "barriers_score": 35.984,
         "environment_score": 13.2234,
-        "imd_denominator_mid2022": 15083
+        "imd_denominator_mid2022": 15083,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 0.67,
+        "cst_number_and_proximity_of_libraries": 845.26,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.42,
+        "cst_number_and_proximity_of_community_centres": 630.21,
+        "cst_number_and_proximity_of_cultural_spaces": 447.69,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -12452,7 +13512,17 @@
         "crime_score": 0.4734,
         "barriers_score": 38.6289,
         "environment_score": 19.9125,
-        "imd_denominator_mid2022": 12371
+        "imd_denominator_mid2022": 12371,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 170,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 7.8,
+        "cst_number_and_proximity_of_libraries": 126.86,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 509.13,
+        "cst_number_and_proximity_of_cultural_spaces": 201.67,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -12575,7 +13645,17 @@
         "crime_score": 0.279,
         "barriers_score": 39.2221,
         "environment_score": 25.2161,
-        "imd_denominator_mid2022": 14534
+        "imd_denominator_mid2022": 14534,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 13,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 3.43,
+        "cst_number_and_proximity_of_libraries": 329.22,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 1575.97,
+        "cst_number_and_proximity_of_cultural_spaces": 212.08,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -12702,7 +13782,17 @@
         "crime_score": 0.5012,
         "barriers_score": 29.7164,
         "environment_score": 29.7201,
-        "imd_denominator_mid2022": 8601
+        "imd_denominator_mid2022": 8601,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 12.43,
+        "cst_number_and_proximity_of_libraries": 854.15,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.31,
+        "cst_number_and_proximity_of_community_centres": 374.87,
+        "cst_number_and_proximity_of_cultural_spaces": 258.49,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "crime_by_category": {
         "anti-social-behaviour": 246,
@@ -12787,7 +13877,17 @@
         "crime_score": -0.0069,
         "barriers_score": 30.6105,
         "environment_score": 37.8448,
-        "imd_denominator_mid2022": 6171
+        "imd_denominator_mid2022": 6171,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 6.49,
+        "cst_number_and_proximity_of_libraries": 765.39,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.32,
+        "cst_number_and_proximity_of_community_centres": 812.51,
+        "cst_number_and_proximity_of_cultural_spaces": 26.54,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -12880,7 +13980,17 @@
         "crime_score": 0.0317,
         "barriers_score": 29.1486,
         "environment_score": 41.9297,
-        "imd_denominator_mid2022": 13466
+        "imd_denominator_mid2022": 13466,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 21,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 3.64,
+        "cst_number_and_proximity_of_libraries": 1260.85,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 395.21,
+        "cst_number_and_proximity_of_cultural_spaces": 59.39,
+        "cst_number_of_faith_centres": 10,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13024,7 +14134,17 @@
         "crime_score": -0.0063,
         "barriers_score": 24.1865,
         "environment_score": 43.9663,
-        "imd_denominator_mid2022": 14742
+        "imd_denominator_mid2022": 14742,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 42,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 3.32,
+        "cst_number_and_proximity_of_libraries": 531.49,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.42,
+        "cst_number_and_proximity_of_community_centres": 267.54,
+        "cst_number_and_proximity_of_cultural_spaces": 47.61,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13135,7 +14255,17 @@
         "crime_score": 0.04,
         "barriers_score": 26.4138,
         "environment_score": 43.3927,
-        "imd_denominator_mid2022": 9479
+        "imd_denominator_mid2022": 9479,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 17,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": 3.21,
+        "cst_number_and_proximity_of_libraries": 1273.21,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.37,
+        "cst_number_and_proximity_of_community_centres": 651.62,
+        "cst_number_and_proximity_of_cultural_spaces": 262.32,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13236,7 +14366,17 @@
         "crime_score": 0.3172,
         "barriers_score": 47.6452,
         "environment_score": 32.2634,
-        "imd_denominator_mid2022": 14755
+        "imd_denominator_mid2022": 14755,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 25,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 1.82,
+        "cst_number_and_proximity_of_libraries": 215.81,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 847.07,
+        "cst_number_and_proximity_of_cultural_spaces": 265.27,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13347,7 +14487,17 @@
         "crime_score": 0.2833,
         "barriers_score": 36.5579,
         "environment_score": 31.4856,
-        "imd_denominator_mid2022": 14867
+        "imd_denominator_mid2022": 14867,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 5.79,
+        "cst_number_and_proximity_of_libraries": 1280.96,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 1001.63,
+        "cst_number_and_proximity_of_cultural_spaces": 67.35,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13447,7 +14597,17 @@
         "crime_score": 0.4239,
         "barriers_score": 37.6268,
         "environment_score": 17.1365,
-        "imd_denominator_mid2022": 16279
+        "imd_denominator_mid2022": 16279,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 4.11,
+        "cst_number_and_proximity_of_libraries": 1306.8,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 1228.24,
+        "cst_number_and_proximity_of_cultural_spaces": 548.12,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13565,7 +14725,17 @@
         "crime_score": 0.3593,
         "barriers_score": 35.5287,
         "environment_score": 26.6854,
-        "imd_denominator_mid2022": 11283
+        "imd_denominator_mid2022": 11283,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 14,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 5.13,
+        "cst_number_and_proximity_of_libraries": 589.63,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 715.69,
+        "cst_number_and_proximity_of_cultural_spaces": 195.8,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13666,7 +14836,17 @@
         "crime_score": 0.4678,
         "barriers_score": 36.6741,
         "environment_score": 26.8953,
-        "imd_denominator_mid2022": 15452
+        "imd_denominator_mid2022": 15452,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 14,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 5.91,
+        "cst_number_and_proximity_of_libraries": 643.82,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 300.17,
+        "cst_number_and_proximity_of_cultural_spaces": 127.52,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13772,7 +14952,17 @@
         "crime_score": 0.3205,
         "barriers_score": 40.8127,
         "environment_score": 36.1403,
-        "imd_denominator_mid2022": 15000
+        "imd_denominator_mid2022": 15000,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 1,
+        "cst_gentrification_change_in_occupational_classes": 1.69,
+        "cst_number_and_proximity_of_libraries": 861.68,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.35,
+        "cst_number_and_proximity_of_community_centres": 425.05,
+        "cst_number_and_proximity_of_cultural_spaces": 734.76,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -13870,7 +15060,17 @@
         "crime_score": 0.2182,
         "barriers_score": 34.602,
         "environment_score": 35.1198,
-        "imd_denominator_mid2022": 12167
+        "imd_denominator_mid2022": 12167,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.74,
+        "cst_number_and_proximity_of_libraries": 559.7,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.38,
+        "cst_number_and_proximity_of_community_centres": 653.9,
+        "cst_number_and_proximity_of_cultural_spaces": 404.0,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -13976,7 +15176,17 @@
         "crime_score": 0.2288,
         "barriers_score": 40.0174,
         "environment_score": 31.5967,
-        "imd_denominator_mid2022": 16029
+        "imd_denominator_mid2022": 16029,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.97,
+        "cst_number_and_proximity_of_libraries": 1358.17,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 698.94,
+        "cst_number_and_proximity_of_cultural_spaces": 269.93,
+        "cst_number_of_faith_centres": 0,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -14094,7 +15304,17 @@
         "crime_score": 0.8713,
         "barriers_score": 40.8748,
         "environment_score": 44.7181,
-        "imd_denominator_mid2022": 9477
+        "imd_denominator_mid2022": 9477,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": -1.42,
+        "cst_number_and_proximity_of_libraries": 251.39,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.23,
+        "cst_number_and_proximity_of_community_centres": 941.42,
+        "cst_number_and_proximity_of_cultural_spaces": 71.49,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -14221,7 +15441,17 @@
         "crime_score": 0.6978,
         "barriers_score": 32.2159,
         "environment_score": 37.2588,
-        "imd_denominator_mid2022": 10670
+        "imd_denominator_mid2022": 10670,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 2.14,
+        "cst_number_and_proximity_of_libraries": 807.3,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 863.06,
+        "cst_number_and_proximity_of_cultural_spaces": 61.59,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -14313,7 +15543,17 @@
         "crime_score": 0.5471,
         "barriers_score": 42.5031,
         "environment_score": 38.2778,
-        "imd_denominator_mid2022": 16084
+        "imd_denominator_mid2022": 16084,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 0.22,
+        "cst_number_and_proximity_of_libraries": 1519.93,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 1008.78,
+        "cst_number_and_proximity_of_cultural_spaces": 537.15,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -14416,7 +15656,17 @@
         "crime_score": -0.2752,
         "barriers_score": 27.8672,
         "environment_score": 36.5339,
-        "imd_denominator_mid2022": 13619
+        "imd_denominator_mid2022": 13619,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 5.76,
+        "cst_number_and_proximity_of_libraries": 706.49,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.39,
+        "cst_number_and_proximity_of_community_centres": 1030.1,
+        "cst_number_and_proximity_of_cultural_spaces": 415.08,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -14534,7 +15784,17 @@
         "crime_score": 0.3075,
         "barriers_score": 44.2573,
         "environment_score": 37.4365,
-        "imd_denominator_mid2022": 16258
+        "imd_denominator_mid2022": 16258,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": -0.34,
+        "cst_number_and_proximity_of_libraries": 1005.05,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 600.39,
+        "cst_number_and_proximity_of_cultural_spaces": 414.95,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -14670,7 +15930,17 @@
         "crime_score": -0.0686,
         "barriers_score": 30.3358,
         "environment_score": 34.5383,
-        "imd_denominator_mid2022": 13063
+        "imd_denominator_mid2022": 13063,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 5.86,
+        "cst_number_and_proximity_of_libraries": 202.18,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.32,
+        "cst_number_and_proximity_of_community_centres": 687.52,
+        "cst_number_and_proximity_of_cultural_spaces": 189.95,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -14791,7 +16061,17 @@
         "crime_score": -0.1119,
         "barriers_score": 29.4375,
         "environment_score": 38.2466,
-        "imd_denominator_mid2022": 14425
+        "imd_denominator_mid2022": 14425,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 29,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 3.53,
+        "cst_number_and_proximity_of_libraries": 466.53,
+        "cst_public_transport_access_levels_ptals": "1b",
+        "cst_passive_green_space": 0.41,
+        "cst_number_and_proximity_of_community_centres": 1639.44,
+        "cst_number_and_proximity_of_cultural_spaces": 528.36,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -14913,7 +16193,17 @@
         "crime_score": 0.3956,
         "barriers_score": 35.0388,
         "environment_score": 31.6362,
-        "imd_denominator_mid2022": 14778
+        "imd_denominator_mid2022": 14778,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 10,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 6.97,
+        "cst_number_and_proximity_of_libraries": 1076.1,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 214.61,
+        "cst_number_and_proximity_of_cultural_spaces": 126.21,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15026,7 +16316,17 @@
         "crime_score": 0.6196,
         "barriers_score": 22.29,
         "environment_score": 42.3379,
-        "imd_denominator_mid2022": 6414
+        "imd_denominator_mid2022": 6414,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": -0.14,
+        "cst_number_and_proximity_of_libraries": 611.02,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.25,
+        "cst_number_and_proximity_of_community_centres": 341.38,
+        "cst_number_and_proximity_of_cultural_spaces": 56.17,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15136,7 +16436,17 @@
         "crime_score": -0.0213,
         "barriers_score": 22.4815,
         "environment_score": 46.3669,
-        "imd_denominator_mid2022": 7420
+        "imd_denominator_mid2022": 7420,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 0.45,
+        "cst_number_and_proximity_of_libraries": 378.33,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.25,
+        "cst_number_and_proximity_of_community_centres": 151.97,
+        "cst_number_and_proximity_of_cultural_spaces": 67.06,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -15229,7 +16539,17 @@
         "crime_score": -0.1258,
         "barriers_score": 21.2838,
         "environment_score": 39.7109,
-        "imd_denominator_mid2022": 8962
+        "imd_denominator_mid2022": 8962,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 2.82,
+        "cst_number_and_proximity_of_libraries": 526.7,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 210.4,
+        "cst_number_and_proximity_of_cultural_spaces": 72.93,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15342,7 +16662,17 @@
         "crime_score": 0.277,
         "barriers_score": 35.631,
         "environment_score": 34.8734,
-        "imd_denominator_mid2022": 10673
+        "imd_denominator_mid2022": 10673,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 11,
+        "cst_number_of_community_interest_companies_cics": 11,
+        "cst_gentrification_change_in_occupational_classes": 8.87,
+        "cst_number_and_proximity_of_libraries": 1893.05,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.3,
+        "cst_number_and_proximity_of_community_centres": 575.66,
+        "cst_number_and_proximity_of_cultural_spaces": 513.07,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15454,7 +16784,17 @@
         "crime_score": 0.6634,
         "barriers_score": 22.1897,
         "environment_score": 37.7453,
-        "imd_denominator_mid2022": 13077
+        "imd_denominator_mid2022": 13077,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 4.38,
+        "cst_number_and_proximity_of_libraries": 319.4,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 204.82,
+        "cst_number_and_proximity_of_cultural_spaces": 40.94,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15570,7 +16910,17 @@
         "crime_score": 0.0592,
         "barriers_score": 25.0234,
         "environment_score": 40.7681,
-        "imd_denominator_mid2022": 14631
+        "imd_denominator_mid2022": 14631,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 11,
+        "cst_gentrification_change_in_occupational_classes": 5.44,
+        "cst_number_and_proximity_of_libraries": 1197.45,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.24,
+        "cst_number_and_proximity_of_community_centres": 148.36,
+        "cst_number_and_proximity_of_cultural_spaces": 242.6,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15671,7 +17021,17 @@
         "crime_score": -0.2397,
         "barriers_score": 23.7501,
         "environment_score": 53.4551,
-        "imd_denominator_mid2022": 7973
+        "imd_denominator_mid2022": 7973,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 0.8,
+        "cst_number_and_proximity_of_libraries": 439.14,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.19,
+        "cst_number_and_proximity_of_community_centres": 63.14,
+        "cst_number_and_proximity_of_cultural_spaces": 74.38,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15777,7 +17137,17 @@
         "crime_score": 0.2061,
         "barriers_score": 16.1534,
         "environment_score": 39.9254,
-        "imd_denominator_mid2022": 7783
+        "imd_denominator_mid2022": 7783,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 5.54,
+        "cst_number_and_proximity_of_libraries": 673.96,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 582.47,
+        "cst_number_and_proximity_of_cultural_spaces": 53.45,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15878,7 +17248,17 @@
         "crime_score": 0.6513,
         "barriers_score": 21.5352,
         "environment_score": 45.0918,
-        "imd_denominator_mid2022": 6160
+        "imd_denominator_mid2022": 6160,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 7.1,
+        "cst_number_and_proximity_of_libraries": 447.21,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.21,
+        "cst_number_and_proximity_of_community_centres": 16.82,
+        "cst_number_and_proximity_of_cultural_spaces": 25.67,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -15994,7 +17374,17 @@
         "crime_score": 0.4683,
         "barriers_score": 26.726,
         "environment_score": 38.5055,
-        "imd_denominator_mid2022": 5178
+        "imd_denominator_mid2022": 5178,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 4.84,
+        "cst_number_and_proximity_of_libraries": 853.26,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.22,
+        "cst_number_and_proximity_of_community_centres": 161.19,
+        "cst_number_and_proximity_of_cultural_spaces": 179.59,
+        "cst_number_of_faith_centres": 0,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16095,7 +17485,17 @@
         "crime_score": -0.2696,
         "barriers_score": 25.5014,
         "environment_score": 48.9226,
-        "imd_denominator_mid2022": 12099
+        "imd_denominator_mid2022": 12099,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": 5.12,
+        "cst_number_and_proximity_of_libraries": 740.32,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.19,
+        "cst_number_and_proximity_of_community_centres": 256.97,
+        "cst_number_and_proximity_of_cultural_spaces": 81.41,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16200,7 +17600,17 @@
         "crime_score": -0.2736,
         "barriers_score": 19.741,
         "environment_score": 44.0023,
-        "imd_denominator_mid2022": 10972
+        "imd_denominator_mid2022": 10972,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 20,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 3.46,
+        "cst_number_and_proximity_of_libraries": 479.51,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.31,
+        "cst_number_and_proximity_of_community_centres": 11.8,
+        "cst_number_and_proximity_of_cultural_spaces": 67.65,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16294,7 +17704,17 @@
         "crime_score": -0.1833,
         "barriers_score": 18.535,
         "environment_score": 52.8905,
-        "imd_denominator_mid2022": 7707
+        "imd_denominator_mid2022": 7707,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 10,
+        "cst_gentrification_change_in_occupational_classes": 5.17,
+        "cst_number_and_proximity_of_libraries": 625.41,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 469.27,
+        "cst_number_and_proximity_of_cultural_spaces": 88.4,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16394,7 +17814,17 @@
         "crime_score": 0.2135,
         "barriers_score": 21.9996,
         "environment_score": 46.3429,
-        "imd_denominator_mid2022": 8050
+        "imd_denominator_mid2022": 8050,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 9,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 5.24,
+        "cst_number_and_proximity_of_libraries": 958.67,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 752.93,
+        "cst_number_and_proximity_of_cultural_spaces": 80.41,
+        "cst_number_of_faith_centres": 6,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16488,7 +17918,17 @@
         "crime_score": 0.0056,
         "barriers_score": 21.4723,
         "environment_score": 31.8768,
-        "imd_denominator_mid2022": 11079
+        "imd_denominator_mid2022": 11079,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 0,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 5.39,
+        "cst_number_and_proximity_of_libraries": 805.56,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.21,
+        "cst_number_and_proximity_of_community_centres": 725.35,
+        "cst_number_and_proximity_of_cultural_spaces": 110.82,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16588,7 +18028,17 @@
         "crime_score": 1.2444,
         "barriers_score": 26.7767,
         "environment_score": 41.0981,
-        "imd_denominator_mid2022": 5535
+        "imd_denominator_mid2022": 5535,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 4,
+        "cst_gentrification_change_in_occupational_classes": 0.89,
+        "cst_number_and_proximity_of_libraries": 141.34,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.22,
+        "cst_number_and_proximity_of_community_centres": 482.51,
+        "cst_number_and_proximity_of_cultural_spaces": 101.64,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -16696,7 +18146,17 @@
         "crime_score": 0.6847,
         "barriers_score": 27.5917,
         "environment_score": 47.3421,
-        "imd_denominator_mid2022": 9398
+        "imd_denominator_mid2022": 9398,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 6,
+        "cst_number_of_community_interest_companies_cics": 15,
+        "cst_gentrification_change_in_occupational_classes": 4.88,
+        "cst_number_and_proximity_of_libraries": 407.44,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.2,
+        "cst_number_and_proximity_of_community_centres": 200.11,
+        "cst_number_and_proximity_of_cultural_spaces": 81.97,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16813,7 +18273,17 @@
         "crime_score": -0.6093,
         "barriers_score": 18.3129,
         "environment_score": 27.5747,
-        "imd_denominator_mid2022": 5581
+        "imd_denominator_mid2022": 5581,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 1,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 5.5,
+        "cst_number_and_proximity_of_libraries": 416.94,
+        "cst_public_transport_access_levels_ptals": 2,
+        "cst_passive_green_space": 0.33,
+        "cst_number_and_proximity_of_community_centres": 435.32,
+        "cst_number_and_proximity_of_cultural_spaces": 289.95,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -16913,7 +18383,17 @@
         "crime_score": 0.3187,
         "barriers_score": 23.3535,
         "environment_score": 42.7763,
-        "imd_denominator_mid2022": 9145
+        "imd_denominator_mid2022": 9145,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 8,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": -0.02,
+        "cst_number_and_proximity_of_libraries": 443.96,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.23,
+        "cst_number_and_proximity_of_community_centres": 42.16,
+        "cst_number_and_proximity_of_cultural_spaces": 62.03,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17025,7 +18505,17 @@
         "crime_score": 0.1256,
         "barriers_score": 25.8533,
         "environment_score": 33.782,
-        "imd_denominator_mid2022": 8568
+        "imd_denominator_mid2022": 8568,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 3,
+        "cst_number_of_community_interest_companies_cics": 8,
+        "cst_gentrification_change_in_occupational_classes": 6.87,
+        "cst_number_and_proximity_of_libraries": 694.49,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.36,
+        "cst_number_and_proximity_of_community_centres": 198.69,
+        "cst_number_and_proximity_of_cultural_spaces": 49.71,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17169,7 +18659,17 @@
         "crime_score": 0.382,
         "barriers_score": 26.9034,
         "environment_score": 37.504,
-        "imd_denominator_mid2022": 9101
+        "imd_denominator_mid2022": 9101,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 6,
+        "cst_gentrification_change_in_occupational_classes": 1.09,
+        "cst_number_and_proximity_of_libraries": 809.47,
+        "cst_public_transport_access_levels_ptals": 3,
+        "cst_passive_green_space": 0.33,
+        "cst_number_and_proximity_of_community_centres": 423.05,
+        "cst_number_and_proximity_of_cultural_spaces": 367.16,
+        "cst_number_of_faith_centres": 1,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17263,7 +18763,17 @@
         "crime_score": -0.4676,
         "barriers_score": 23.2493,
         "environment_score": 46.7107,
-        "imd_denominator_mid2022": 12569
+        "imd_denominator_mid2022": 12569,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 4.32,
+        "cst_number_and_proximity_of_libraries": 566.67,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.39,
+        "cst_number_and_proximity_of_community_centres": 684.52,
+        "cst_number_and_proximity_of_cultural_spaces": 4.97,
+        "cst_number_of_faith_centres": 5,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17380,7 +18890,17 @@
         "crime_score": 0.563,
         "barriers_score": 25.007,
         "environment_score": 50.8887,
-        "imd_denominator_mid2022": 13061
+        "imd_denominator_mid2022": 13061,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 8,
+        "cst_gentrification_change_in_occupational_classes": 0.7,
+        "cst_number_and_proximity_of_libraries": 340.43,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.2,
+        "cst_number_and_proximity_of_community_centres": 390.09,
+        "cst_number_and_proximity_of_cultural_spaces": 24.9,
+        "cst_number_of_faith_centres": 7,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17486,7 +19006,17 @@
         "crime_score": 0.6804,
         "barriers_score": 33.2254,
         "environment_score": 37.182,
-        "imd_denominator_mid2022": 11675
+        "imd_denominator_mid2022": 11675,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 17,
+        "cst_gentrification_change_in_occupational_classes": 3.06,
+        "cst_number_and_proximity_of_libraries": 220.09,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.21,
+        "cst_number_and_proximity_of_community_centres": 70.15,
+        "cst_number_and_proximity_of_cultural_spaces": 50.64,
+        "cst_number_of_faith_centres": 0,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17597,7 +19127,17 @@
         "crime_score": 0.7378,
         "barriers_score": 37.1515,
         "environment_score": 37.6059,
-        "imd_denominator_mid2022": 10559
+        "imd_denominator_mid2022": 10559,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 2,
+        "cst_number_of_community_interest_companies_cics": 9,
+        "cst_gentrification_change_in_occupational_classes": 0.96,
+        "cst_number_and_proximity_of_libraries": 683.24,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.29,
+        "cst_number_and_proximity_of_community_centres": 235.16,
+        "cst_number_and_proximity_of_cultural_spaces": 241.47,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17709,7 +19249,17 @@
         "crime_score": 0.6142,
         "barriers_score": 25.5621,
         "environment_score": 52.036,
-        "imd_denominator_mid2022": 9380
+        "imd_denominator_mid2022": 9380,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 11,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 2.63,
+        "cst_number_and_proximity_of_libraries": 1116.29,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.15,
+        "cst_number_and_proximity_of_community_centres": 1087.83,
+        "cst_number_and_proximity_of_cultural_spaces": 37.3,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17845,7 +19395,17 @@
         "crime_score": 0.1912,
         "barriers_score": 19.2955,
         "environment_score": 52.2825,
-        "imd_denominator_mid2022": 12140
+        "imd_denominator_mid2022": 12140,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 15,
+        "cst_number_of_community_interest_companies_cics": 14,
+        "cst_gentrification_change_in_occupational_classes": 3.1,
+        "cst_number_and_proximity_of_libraries": 1059.36,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.17,
+        "cst_number_and_proximity_of_community_centres": 658.41,
+        "cst_number_and_proximity_of_cultural_spaces": 34.64,
+        "cst_number_of_faith_centres": 9,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -17963,7 +19523,17 @@
         "crime_score": 0.5781,
         "barriers_score": 25.7475,
         "environment_score": 54.2486,
-        "imd_denominator_mid2022": 11732
+        "imd_denominator_mid2022": 11732,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 9,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 0.29,
+        "cst_number_and_proximity_of_libraries": 919.22,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.21,
+        "cst_number_and_proximity_of_community_centres": 718.3,
+        "cst_number_and_proximity_of_cultural_spaces": 117.74,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -18075,7 +19645,17 @@
         "crime_score": 0.0819,
         "barriers_score": 25.4539,
         "environment_score": 47.7707,
-        "imd_denominator_mid2022": 10768
+        "imd_denominator_mid2022": 10768,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": -1.37,
+        "cst_number_and_proximity_of_libraries": 397.55,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.34,
+        "cst_number_and_proximity_of_community_centres": 481.62,
+        "cst_number_and_proximity_of_cultural_spaces": 7.29,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -18203,7 +19783,17 @@
         "crime_score": 0.2329,
         "barriers_score": 28.3169,
         "environment_score": 37.9214,
-        "imd_denominator_mid2022": 13107
+        "imd_denominator_mid2022": 13107,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": -0.02,
+        "cst_number_and_proximity_of_libraries": 588.95,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 457.6,
+        "cst_number_and_proximity_of_cultural_spaces": 126.22,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -18321,7 +19911,17 @@
         "crime_score": 0.0457,
         "barriers_score": 17.0018,
         "environment_score": 60.9185,
-        "imd_denominator_mid2022": 14899
+        "imd_denominator_mid2022": 14899,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 17,
+        "cst_gentrification_change_in_occupational_classes": 3.28,
+        "cst_number_and_proximity_of_libraries": 446.13,
+        "cst_public_transport_access_levels_ptals": "6b",
+        "cst_passive_green_space": 0.1,
+        "cst_number_and_proximity_of_community_centres": 258.66,
+        "cst_number_and_proximity_of_cultural_spaces": 17.01,
+        "cst_number_of_faith_centres": 12,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -18494,7 +20094,17 @@
         "crime_score": 0.4336,
         "barriers_score": 28.039,
         "environment_score": 51.1051,
-        "imd_denominator_mid2022": 10836
+        "imd_denominator_mid2022": 10836,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 7,
+        "cst_number_of_community_interest_companies_cics": 2,
+        "cst_gentrification_change_in_occupational_classes": 2.26,
+        "cst_number_and_proximity_of_libraries": 398.42,
+        "cst_public_transport_access_levels_ptals": "6b",
+        "cst_passive_green_space": 0.18,
+        "cst_number_and_proximity_of_community_centres": 453.02,
+        "cst_number_and_proximity_of_cultural_spaces": 32.77,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -18635,7 +20245,17 @@
         "crime_score": 0.1915,
         "barriers_score": 27.0046,
         "environment_score": 46.5401,
-        "imd_denominator_mid2022": 9645
+        "imd_denominator_mid2022": 9645,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 5,
+        "cst_gentrification_change_in_occupational_classes": 0.91,
+        "cst_number_and_proximity_of_libraries": 198.85,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 338.01,
+        "cst_number_and_proximity_of_cultural_spaces": 134.13,
+        "cst_number_of_faith_centres": 3,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "pharmacy_list": [
         {
@@ -18728,7 +20348,17 @@
         "crime_score": 0.6288,
         "barriers_score": 38.8457,
         "environment_score": 33.9849,
-        "imd_denominator_mid2022": 12561
+        "imd_denominator_mid2022": 12561,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 10,
+        "cst_number_of_community_interest_companies_cics": 15,
+        "cst_gentrification_change_in_occupational_classes": 5.32,
+        "cst_number_and_proximity_of_libraries": 310.04,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.27,
+        "cst_number_and_proximity_of_community_centres": 123.14,
+        "cst_number_and_proximity_of_cultural_spaces": 180.94,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -18841,7 +20471,17 @@
         "crime_score": -0.1132,
         "barriers_score": 19.8762,
         "environment_score": 46.821,
-        "imd_denominator_mid2022": 12522
+        "imd_denominator_mid2022": 12522,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 32,
+        "cst_number_of_community_interest_companies_cics": 3,
+        "cst_gentrification_change_in_occupational_classes": 2.7,
+        "cst_number_and_proximity_of_libraries": 806.79,
+        "cst_public_transport_access_levels_ptals": 5,
+        "cst_passive_green_space": 0.25,
+        "cst_number_and_proximity_of_community_centres": 619.0,
+        "cst_number_and_proximity_of_cultural_spaces": 103.85,
+        "cst_number_of_faith_centres": 8,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -18962,7 +20602,17 @@
         "crime_score": 0.0393,
         "barriers_score": 19.9501,
         "environment_score": 48.6323,
-        "imd_denominator_mid2022": 11201
+        "imd_denominator_mid2022": 11201,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 51,
+        "cst_number_of_community_interest_companies_cics": 165,
+        "cst_gentrification_change_in_occupational_classes": 3.56,
+        "cst_number_and_proximity_of_libraries": 577.33,
+        "cst_public_transport_access_levels_ptals": "6b",
+        "cst_passive_green_space": 0.1,
+        "cst_number_and_proximity_of_community_centres": 676.89,
+        "cst_number_and_proximity_of_cultural_spaces": 32.88,
+        "cst_number_of_faith_centres": 21,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -19110,7 +20760,17 @@
         "crime_score": 0.0258,
         "barriers_score": 21.0276,
         "environment_score": 42.2989,
-        "imd_denominator_mid2022": 10426
+        "imd_denominator_mid2022": 10426,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 5,
+        "cst_number_of_community_interest_companies_cics": 7,
+        "cst_gentrification_change_in_occupational_classes": -0.55,
+        "cst_number_and_proximity_of_libraries": 589.81,
+        "cst_public_transport_access_levels_ptals": "6a",
+        "cst_passive_green_space": 0.17,
+        "cst_number_and_proximity_of_community_centres": 252.98,
+        "cst_number_and_proximity_of_cultural_spaces": 57.4,
+        "cst_number_of_faith_centres": 2,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -19221,7 +20881,17 @@
         "crime_score": 0.1473,
         "barriers_score": 19.1462,
         "environment_score": 57.7055,
-        "imd_denominator_mid2022": 11430
+        "imd_denominator_mid2022": 11430,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 14,
+        "cst_number_of_community_interest_companies_cics": 318,
+        "cst_gentrification_change_in_occupational_classes": 1.03,
+        "cst_number_and_proximity_of_libraries": 624.83,
+        "cst_public_transport_access_levels_ptals": "6b",
+        "cst_passive_green_space": 0.09,
+        "cst_number_and_proximity_of_community_centres": 842.41,
+        "cst_number_and_proximity_of_cultural_spaces": 32.21,
+        "cst_number_of_faith_centres": 17,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -19400,7 +21070,17 @@
         "crime_score": 0.6746,
         "barriers_score": 34.4113,
         "environment_score": 38.2858,
-        "imd_denominator_mid2022": 11355
+        "imd_denominator_mid2022": 11355,
+        "cst_number_of_community_sport_and_physical_activity_offerings": 4,
+        "cst_number_of_community_interest_companies_cics": 8,
+        "cst_gentrification_change_in_occupational_classes": 2.19,
+        "cst_number_and_proximity_of_libraries": 433.23,
+        "cst_public_transport_access_levels_ptals": 4,
+        "cst_passive_green_space": 0.4,
+        "cst_number_and_proximity_of_community_centres": 145.66,
+        "cst_number_and_proximity_of_cultural_spaces": 125.14,
+        "cst_number_of_faith_centres": 4,
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
       },
       "gp_list": [
         {
@@ -19483,6 +21163,18 @@
       "Hillingdon",
       "Hounslow",
       "Kensington & Chelsea"
+    ],
+    "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+    "cst_metrics_added": [
+      "cst_number_of_community_sport_and_physical_activity_offerings",
+      "cst_number_of_community_interest_companies_cics",
+      "cst_gentrification_change_in_occupational_classes",
+      "cst_number_and_proximity_of_libraries",
+      "cst_public_transport_access_levels_ptals",
+      "cst_passive_green_space",
+      "cst_number_and_proximity_of_community_centres",
+      "cst_number_and_proximity_of_cultural_spaces",
+      "cst_number_of_faith_centres"
     ]
   }
 }

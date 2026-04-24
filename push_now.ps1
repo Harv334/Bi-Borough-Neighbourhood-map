@@ -303,29 +303,110 @@ Dental UI — contract-type filter in the sidebar
   non-NHS for the 'private' view (defensive; current
   dataset has no nulls).
 
-PNG export — drop mask entirely (pure screenshot)
--------------------------------------------------
-- Canvas-2D mask failed in yet another way at large
-  zoom-outs: even-odd fill inverted on some views (NWL
-  whited out, surrounding basemap retained) when the
-  projected polygon coords went well beyond the canvas.
-  Every mask strategy tried (Leaflet SVG, Canvas-2D
-  pre-capture, Canvas-2D post-capture, with/without
-  fit, with/without crop) has had a distinct failure
-  mode.
-- Dropped the mask entirely. Final PNG is a pure
-  screenshot of the map div:
-    * waitForTiles + 160 ms settle + double-rAF,
-    * html2canvas at devicePixelRatio,
-    * Leaflet UI chrome hidden during capture (zoom
-      control, legend control, attribution, dl-badge),
-    * caption pill stamped at bottom-left (scope ·
-      overlay · Month YYYY),
-    * no fit, no setView, no crop, no mask, no view
-      restore.
-- Framing is the user's responsibility — zoom/pan to
-  NWL (or a single borough) first, then click PNG.
-  Output matches exactly what's on screen.
+PNG export — SVG-DOM overlay mask + fit + crop (final)
+------------------------------------------------------
+- Pure-screenshot version was too wide: users had to
+  pre-frame the viewport and still got all of London +
+  surrounds in the image. Restored fit-to-scope + mask +
+  tight-crop behaviour but rebuilt the mask on top of a
+  real SVG DOM element rather than Canvas-2D paths.
+- Flow:
+    1. Save current center/zoom.
+    2. Hide dl-badge + every Leaflet control corner
+       (.leaflet-top, .leaflet-bottom,
+       .leaflet-control-attribution).
+    3. fitBounds to _pngScopeBounds() (NWL or focused
+       borough) with padding:[24,24], animate:false.
+       Await 'moveend' (+ 500 ms safety timeout) then
+       double-rAF + 160 ms settle before touching
+       projection-dependent math.
+    4. waitForTiles + 220 ms + double-rAF.
+    5. Build an SVG element positioned absolute over
+       the map div. Single `<path>` contains:
+         * Outer rectangle (full map-div container
+           pixel coords: 0,0 -> W,H),
+         * Inner rings for every scope polygon (NWL
+           boroughs OR the focused borough) projected
+           via map.latLngToContainerPoint().
+       fill-rule='evenodd' fills the gap between outer
+       and inner rings white, so basemap outside
+       NWL/borough becomes white; inside stays
+       untouched.
+    6. Another double-rAF so the SVG paints.
+    7. html2canvas on the map div at devicePixelRatio,
+       backgroundColor:'#fff'. Because the SVG is now
+       a real DOM child, html2canvas rasterises the
+       mask together with the map tiles in one pass —
+       no inversion, no timing race, no SVG-clipping
+       quirks.
+    8. Measure actual xScale/yScale from
+       fullCanvas.width / mapEl.clientWidth.
+    9. Tight-crop to the polygon bbox (+14 css-px pad)
+       using the SAME container-pixel coords collected
+       in step 5 — crop and mask cannot drift because
+       they share one projection pass.
+   10. Stamp caption pill (scope · overlay · Month
+       YYYY), download as blob.
+   11. finally: remove mask SVG, restore dl-badge +
+       control corners, setView back to savedCenter/
+       savedZoom.
+- Result: single-click PNG, map tightly framed to NWL
+  or the selected borough, no basemap leakage around
+  the boundary, no reliance on the user pre-framing,
+  consistent across all devicePixelRatio values.
+
+Civic strength (London Datastore, Round 3)
+------------------------------------------
+- `ward_data.json` enriched with 9 new ward-level
+  indicators from the London Civic Strength Index
+  (Round 3) on the London Datastore. 168/168 NWL wards
+  matched on ward GSS code (E05xxxxxxx).
+- Excluded by user request: `Recorded crime` and
+  `Ballots cast in borough council elections 2022`.
+- Keys added per ward (under `indicators`), prefixed
+  with `cst_`:
+    * cst_number_of_community_sport_and_physical_activity_offerings  (count)
+    * cst_number_of_community_interest_companies_cics               (count)
+    * cst_gentrification_change_in_occupational_classes             (index)
+    * cst_number_and_proximity_of_libraries                         (score)
+    * cst_number_and_proximity_of_community_centres                 (score)
+    * cst_number_and_proximity_of_cultural_spaces                   (score)
+    * cst_number_of_faith_centres                                   (count)
+    * cst_passive_green_space                                       (proportion)
+    * cst_public_transport_access_levels_ptals                      (string;
+      retained in data but NOT wired into UI — PTAL is
+      already excluded per task 49 and is string-typed
+      so not choropleth-friendly).
+- New metadata fields in `ward_data.json`: `cst_source`
+  and `cst_metrics_added` noting the provenance
+  ("London Civic Strength Index (Round 3), London
+  Datastore").
+
+Civic strength — UI wiring
+--------------------------
+- `OV_DOMAIN`: 8 new entries with observed NW-London
+  min/max ranges and `wh:false` for the proximity /
+  count metrics (higher = more civic assets = better).
+  Gentrification is wh:false (descriptive, not
+  loaded).
+- `CATS`: new `civic_strength` category with icon 🏛,
+  label "Civic strength (London Datastore, Round 3)",
+  8 ward-level fields. Rendered in ward profiles.
+- `OV_META`: 8 entries with
+  `src: "London Civic Strength Index (Round 3),
+  London Datastore"`, `yr: "2024"`, `g: "Ward"`,
+  appropriate unit labels (count / index / score /
+  proportion) and human-readable descriptions.
+- `<select id="ov">` dropdown: new optgroup
+  "Civic strength (London Datastore, Round 3)" with
+  8 options tagged " · Ward".
+- `<select id="ov2">` bivariate dropdown: new
+  optgroup "Civic strength (London Datastore)" with
+  7 options (gentrification omitted — bivariate is
+  better kept to goal-aligned indicators).
+- `fmtOv()`: passive_green_space and gentrification
+  render with 2 decimals; count / proximity-score
+  indicators render as integers.
 
 ICHT methodology references scrubbed
 ------------------------------------

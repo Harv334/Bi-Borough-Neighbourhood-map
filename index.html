@@ -543,6 +543,16 @@
               <option value="census_public_transport_pct">Public transport to work % · Ward</option>
               <option value="census_car_to_work_pct">Car/van to work % · Ward</option>
             </optgroup>
+            <optgroup label="Civic strength (London Datastore, Round 3)">
+              <option value="cst_number_of_community_sport_and_physical_activity_offerings">Community sport &amp; physical-activity offerings · Ward</option>
+              <option value="cst_number_of_community_interest_companies_cics">Community Interest Companies (CICs) · Ward</option>
+              <option value="cst_number_and_proximity_of_libraries">Libraries — count &amp; proximity · Ward</option>
+              <option value="cst_number_and_proximity_of_community_centres">Community centres — count &amp; proximity · Ward</option>
+              <option value="cst_number_and_proximity_of_cultural_spaces">Cultural spaces — count &amp; proximity · Ward</option>
+              <option value="cst_number_of_faith_centres">Faith centres · Ward</option>
+              <option value="cst_passive_green_space">Passive green space (proportion) · Ward</option>
+              <option value="cst_gentrification_change_in_occupational_classes">Gentrification — change in occupational classes · Ward</option>
+            </optgroup>
           </select>
 
           <div class="scale-bar" id="scale">
@@ -581,6 +591,15 @@
                 <option value="census_no_car_pct">No car/van % · Ward</option>
                 <option value="census_over65_pct">65+ % · Ward</option>
                 <option value="census_under16_pct">Under 16 % · Ward</option>
+              </optgroup>
+              <optgroup label="Civic strength (London Datastore)">
+                <option value="cst_number_of_community_sport_and_physical_activity_offerings">Community sport &amp; activity · Ward</option>
+                <option value="cst_number_of_community_interest_companies_cics">CICs · Ward</option>
+                <option value="cst_number_and_proximity_of_libraries">Libraries proximity · Ward</option>
+                <option value="cst_number_and_proximity_of_community_centres">Community centres proximity · Ward</option>
+                <option value="cst_number_and_proximity_of_cultural_spaces">Cultural spaces proximity · Ward</option>
+                <option value="cst_number_of_faith_centres">Faith centres · Ward</option>
+                <option value="cst_passive_green_space">Passive green space · Ward</option>
               </optgroup>
             </select>
             <div id="biv-legend" style="display:none;margin-top:10px">
@@ -825,6 +844,24 @@ const OV_CFG = {
   census_active_travel_pct:        { lo:"Lower", hi:"Higher", wh:false, min:5,    max:40   },
   census_car_to_work_pct:          { lo:"Lower", hi:"Higher", wh:true,  min:10,   max:70   },
   census_public_transport_pct:     { lo:"Lower", hi:"Higher", wh:false, min:10,   max:60   },
+  // London Civic Strength Index (Round 3), London Datastore. Higher score / count =
+  // more civic assets / greater participation for most fields, so wh:false (lower is
+  // worse, higher is better). Gentrification is descriptive (wh:false) rather than
+  // loaded. Ranges chosen from the observed NW-London ward spread.
+  cst_number_of_community_sport_and_physical_activity_offerings:
+                                   { lo:"Fewer", hi:"More",   wh:false, min:0,    max:40   },
+  cst_number_of_community_interest_companies_cics:
+                                   { lo:"Fewer", hi:"More",   wh:false, min:0,    max:40   },
+  cst_gentrification_change_in_occupational_classes:
+                                   { lo:"Less change", hi:"More change", wh:false, min:-3, max:10 },
+  cst_number_and_proximity_of_libraries:
+                                   { lo:"Lower", hi:"Higher", wh:false, min:100,  max:1800 },
+  cst_passive_green_space:         { lo:"Lower", hi:"Higher", wh:false, min:0,    max:0.6  },
+  cst_number_and_proximity_of_community_centres:
+                                   { lo:"Lower", hi:"Higher", wh:false, min:0,    max:1700 },
+  cst_number_and_proximity_of_cultural_spaces:
+                                   { lo:"Lower", hi:"Higher", wh:false, min:0,    max:700  },
+  cst_number_of_faith_centres:     { lo:"Fewer", hi:"More",   wh:false, min:0,    max:15   },
 };
 
 // Transparency state — controlled by sliders
@@ -916,6 +953,16 @@ const CATS = [
     { k: "census_public_transport_pct",      l: "Public transport to work (%)",  g: "ward" },
     { k: "census_car_to_work_pct",           l: "Car/van to work (%)",           g: "ward" },
   ]},
+  { key: "civic_strength", label: "Civic strength (London Datastore, Round 3)", ico: "🏛", fields: [
+    { k: "cst_number_of_community_sport_and_physical_activity_offerings", l: "Community sport & physical activity offerings", g: "ward" },
+    { k: "cst_number_of_community_interest_companies_cics",               l: "Community Interest Companies (CICs)",           g: "ward" },
+    { k: "cst_number_and_proximity_of_libraries",                         l: "Libraries — count & proximity score",           g: "ward" },
+    { k: "cst_number_and_proximity_of_community_centres",                 l: "Community centres — count & proximity score",   g: "ward" },
+    { k: "cst_number_and_proximity_of_cultural_spaces",                   l: "Cultural spaces — count & proximity score",     g: "ward" },
+    { k: "cst_number_of_faith_centres",                                   l: "Faith centres",                                 g: "ward" },
+    { k: "cst_passive_green_space",                                       l: "Passive green space (proportion)",              g: "ward" },
+    { k: "cst_gentrification_change_in_occupational_classes",             l: "Gentrification — change in occupational classes", g: "ward" },
+  ]},
 ];
 
 // Set of overlay keys that only have LSOA-level data (no ward aggregate).
@@ -987,6 +1034,24 @@ const OV_META = {
   crime_score:                    { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Crime domain score." },
   barriers_score:                 { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Barriers to Housing & Services domain score." },
   environment_score:              { src: "MHCLG IMD 2025",       yr: "2025", g: "LSOA", u: "score",  desc: "Living Environment domain score." },
+
+  // London Civic Strength Index (Round 3), London Datastore — ward-level civic
+  // assets and participation indicators. Higher scores/counts generally indicate
+  // a stronger civic ecosystem; gentrification is descriptive only.
+  cst_number_of_community_sport_and_physical_activity_offerings:
+                                   { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "count",       desc: "Number of community sport and physical-activity offerings in the ward." },
+  cst_number_of_community_interest_companies_cics:
+                                   { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "count",       desc: "Number of registered Community Interest Companies (CICs) based in the ward." },
+  cst_gentrification_change_in_occupational_classes:
+                                   { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "index",       desc: "Change in occupational-class composition — a gentrification signal. Positive = shift toward higher occupational classes." },
+  cst_number_and_proximity_of_libraries:
+                                   { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "score",       desc: "Composite score reflecting the number of libraries and how close they are to residents in the ward. Higher = better access." },
+  cst_passive_green_space:         { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "proportion",  desc: "Proportion of ward area covered by passive green space (parks, commons, quiet gardens)." },
+  cst_number_and_proximity_of_community_centres:
+                                   { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "score",       desc: "Composite score reflecting the number of community centres and their proximity to residents. Higher = better access." },
+  cst_number_and_proximity_of_cultural_spaces:
+                                   { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "score",       desc: "Composite score reflecting the number of cultural spaces (museums, galleries, theatres) and their proximity to residents." },
+  cst_number_of_faith_centres:     { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "count",       desc: "Number of faith centres (churches, mosques, synagogues, temples and other places of worship) in the ward." },
 };
 function ovMeta(k) { return OV_META[k] || null; }
 
@@ -1216,6 +1281,11 @@ function fmtOv(v, k) {
   const key = k || '';
   if (/_pct$|_rate$/.test(key))  return fmtNum(v, 1) + '%';
   if (/_score$/.test(key))       return fmtNum(v, 2);           // IMD domain scores
+  // CST indicators that are proportions or small signed indices — two decimals.
+  if (key === 'cst_passive_green_space' ||
+      key === 'cst_gentrification_change_in_occupational_classes') {
+    return fmtNum(v, 2);
+  }
   return fmtNum(v, 0);                                          // decile / rank / count
 }
 function ovTooltipRows(valueForKey) {
@@ -4361,7 +4431,8 @@ async function _downloadMapPng() {
   ));
   const ctrlPrevVis = ctrlCorners.map(el => el.style.visibility);
 
-  let maskLyr = null;
+  let maskSvg = null;
+  let movedMap = false;
 
   // Wait until every tile layer finishes loading (cap at 3s).
   const waitForTiles = () => new Promise(resolve => {
@@ -4385,18 +4456,80 @@ async function _downloadMapPng() {
     if (dlBadge) dlBadge.style.visibility = 'hidden';
     ctrlCorners.forEach(el => { el.style.visibility = 'hidden'; });
 
-    // Pure screenshot — no mask, no fit, no crop. Every mask attempt
-    // has failed in a different way (Leaflet SVG clipping quirks at
-    // extreme coords, Canvas-2D even-odd fill inverting on some views,
-    // latLngToContainerPoint returning stale pixel coords after
-    // setView). The user just wants the map they see on screen. So we
-    // capture the map div verbatim, hide the Leaflet UI chrome, stamp
-    // the caption, and ship it. If they want an NWL-only image, they
-    // zoom to NWL first; the framing is theirs to control.
+    // Step 1: fit the map to the scope — all NWL boroughs, or just the
+    // focused borough if borough-focus is active. This IS a map move,
+    // unlike the previous WYSIWYG approach, because the user explicitly
+    // asked for an NWL-only download regardless of where they've panned.
+    // View is restored in finally.
+    const scopeBounds = _pngScopeBounds();
+    if (scopeBounds) {
+      await new Promise(resolve => {
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        try { map.once('moveend', finish); } catch (e) { /* no-op */ }
+        try {
+          map.fitBounds(scopeBounds, { padding: [24, 24], animate: false });
+          movedMap = true;
+        } catch (e) { finish(); return; }
+        setTimeout(finish, 500);
+      });
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise(r => setTimeout(r, 160));
+    }
+
+    // Wait for tiles to load at the new view.
     await waitForTiles();
-    await new Promise(r => setTimeout(r, 160));
+    await new Promise(r => setTimeout(r, 220));
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+    // Step 2: build the mask as a REAL SVG DOM element appended to the
+    // map div. Not Leaflet-SVG (which has clipping quirks at extreme
+    // coords), not programmatic Canvas-2D (which inverted at some zoom
+    // levels). Plain SVG with fill-rule="evenodd": outer rect covers the
+    // whole viewport, inner subpaths cut holes for each NWL borough, the
+    // fill whites out everything outside those holes. html2canvas reads
+    // this SVG directly during the capture, so the result is reliable
+    // regardless of Leaflet's projection state.
+    const feats = _pngScopeFeatures();
+    const w = mapEl.clientWidth;
+    const h = mapEl.clientHeight;
+    let bxMin = Infinity, byMin = Infinity, bxMax = -Infinity, byMax = -Infinity;
+    let pathD = `M0,0 L${w},0 L${w},${h} L0,${h} Z`;
+    (feats || []).forEach(f => {
+      const g = f && f.geometry; if (!g) return;
+      const rings = [];
+      if (g.type === 'Polygon') g.coordinates.forEach(r => rings.push(r));
+      else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(r => rings.push(r)));
+      rings.forEach(ring => {
+        if (!ring || !ring.length) return;
+        const pts = ring.map(c => map.latLngToContainerPoint(L.latLng(c[1], c[0])));
+        pts.forEach(p => {
+          if (p.x < bxMin) bxMin = p.x;
+          if (p.y < byMin) byMin = p.y;
+          if (p.x > bxMax) bxMax = p.x;
+          if (p.y > byMax) byMax = p.y;
+        });
+        pathD += ' M' + pts.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' L') + ' Z';
+      });
+    });
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    maskSvg = document.createElementNS(svgNS, 'svg');
+    maskSvg.setAttribute('width', String(w));
+    maskSvg.setAttribute('height', String(h));
+    maskSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    maskSvg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:500';
+    const maskPath = document.createElementNS(svgNS, 'path');
+    maskPath.setAttribute('d', pathD);
+    maskPath.setAttribute('fill', '#ffffff');
+    maskPath.setAttribute('fill-rule', 'evenodd');
+    maskSvg.appendChild(maskPath);
+    mapEl.appendChild(maskSvg);
+
+    // Let the SVG paint before we capture.
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    // Step 3: capture.
     const dpr = window.devicePixelRatio || 1;
     const fullCanvas = await html2canvas(mapEl, {
       useCORS: true,
@@ -4406,20 +4539,41 @@ async function _downloadMapPng() {
       scale: dpr,
     });
 
-    // Measure the true pixel ratio html2canvas actually used so the
-    // caption pill scales proportionally at any dpr.
+    // Measure the true pixel ratio html2canvas actually produced.
     const xScale = mapEl.clientWidth
       ? (fullCanvas.width / mapEl.clientWidth)  : dpr;
     const yScale = mapEl.clientHeight
       ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
-    const cropCanvas = fullCanvas;
-    cropCanvas._nwlDpr = Math.max(xScale, yScale);
+    // Step 4: tight-crop to the scope bbox, using the SAME container-pixel
+    // coords we projected above (no second projection pass → no stale-
+    // state race). Scale CSS-pixel coords by the measured html2canvas
+    // ratio to convert to canvas pixels, and clamp to the canvas extent.
+    let outCanvas = fullCanvas;
+    if (isFinite(bxMin) && (bxMax - bxMin) > 40 && (byMax - byMin) > 40) {
+      const padCss = 14;
+      const cx = Math.max(0, Math.round((bxMin - padCss) * xScale));
+      const cy = Math.max(0, Math.round((byMin - padCss) * yScale));
+      const cwRaw = Math.round((bxMax - bxMin + padCss * 2) * xScale);
+      const chRaw = Math.round((byMax - byMin + padCss * 2) * yScale);
+      const cw = Math.min(fullCanvas.width - cx, cwRaw);
+      const ch = Math.min(fullCanvas.height - cy, chRaw);
+      if (cw > 40 && ch > 40) {
+        outCanvas = document.createElement('canvas');
+        outCanvas.width = cw;
+        outCanvas.height = ch;
+        const cctx = outCanvas.getContext('2d');
+        cctx.fillStyle = '#ffffff';
+        cctx.fillRect(0, 0, cw, ch);
+        cctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
+      }
+    }
+    outCanvas._nwlDpr = Math.max(xScale, yScale);
 
     // Caption pill (scope · overlay · month YYYY).
-    try { _stampCaption(cropCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }
+    try { _stampCaption(outCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }
 
-    cropCanvas.toBlob(blob => {
+    outCanvas.toBlob(blob => {
       if (!blob) { alert('PNG export failed.'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -4435,12 +4589,15 @@ async function _downloadMapPng() {
     console.error('PNG export error', e);
     alert('PNG export failed — some basemap tiles may be blocked by CORS. Try again after the tiles finish loading.');
   } finally {
-    if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
+    if (maskSvg && maskSvg.parentNode) {
+      try { maskSvg.parentNode.removeChild(maskSvg); } catch (e) { /* ignore */ }
+    }
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     ctrlCorners.forEach((el, i) => { el.style.visibility = ctrlPrevVis[i] || ''; });
-    // No view restore needed — we didn't move the map (WYSIWYG capture).
-    // savedCenter/savedZoom kept in scope as a defensive hook only.
-    void savedCenter; void savedZoom;
+    // Restore the user's view — we fitted to the scope for capture.
+    if (movedMap) {
+      try { map.setView(savedCenter, savedZoom, { animate: false }); } catch (e) { /* ignore */ }
+    }
     if (btn) { btn.textContent = prev; btn.disabled = false; }
   }
 }

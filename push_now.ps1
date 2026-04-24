@@ -173,6 +173,26 @@ PNG export — fit-to-scope timing + mask hardening
   (-2/-2 to 2/53) to full WGS84 world bounds
   (-180/-85 to 180/85) — belt-and-braces so no basemap
   can leak through at any zoom.
+
+PNG export — simplified, capture-what-you-see
+---------------------------------------------
+- Dropped the fitBounds + polygon-bbox crop logic
+  entirely. Per user clarification ("it just needs to
+  show all the boroughs of NW London / the image on the
+  user's screen"), the export now captures EXACTLY what
+  the user is currently looking at in the map div, with
+  the white mask applied so outside-NWL becomes white.
+- Workflow: user zooms/pans to frame the view they want,
+  then clicks PNG. No more fitBounds, no more
+  latLngToContainerPoint math, no more tight-crop — the
+  output is the literal map viewport.
+- Caption pill still stamped at the bottom-left (scope ·
+  overlay · month YYYY). _nwlDpr is now measured from
+  `fullCanvas.width / mapEl.clientWidth` so caption text
+  scales correctly at any devicePixelRatio.
+- Map view no longer mutated: savedCenter/savedZoom are
+  kept in scope as a defensive hook for future re-fits
+  but are not applied.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

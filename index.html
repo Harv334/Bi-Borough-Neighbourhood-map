@@ -4337,34 +4337,10 @@ async function _downloadMapPng() {
     if (dlBadge)  dlBadge.style.visibility  = 'hidden';
     if (zoomCtl)  zoomCtl.style.visibility  = 'hidden';
 
-    // Determine scope + fit the map to it. Padding keeps a little breathing
-    // room so boundary strokes don't touch the image edge.
-    //
-    // IMPORTANT: `fitBounds({animate:false})` is NOT reliably synchronous.
-    // Leaflet often queues the move until the next animation frame, so if we
-    // call `latLngToContainerPoint` (or html2canvas) right after, we get the
-    // OLD view's pixel coords and the capture shows the pre-fit viewport with
-    // our mask applied on the wrong region. We await `moveend` with a safety
-    // timeout, then force two animation frames so the tile layout settles.
-    const scopeBounds = _pngScopeBounds();
-    if (scopeBounds) {
-      await new Promise(resolve => {
-        let done = false;
-        const finish = () => { if (!done) { done = true; resolve(); } };
-        try { map.once('moveend', finish); } catch (e) { /* no-op */ }
-        try {
-          map.fitBounds(scopeBounds, { padding: [24, 24], animate: false });
-        } catch (e) { finish(); return; }
-        // If the fit was a no-op (already at these bounds), moveend won't
-        // fire — flush after a short grace period.
-        setTimeout(finish, 400);
-      });
-      // Two rAFs → guaranteed that Leaflet has painted the new tile positions.
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    }
-
-    // Apply the white mask AFTER fitting (mask uses polygon geometry so it
-    // re-projects correctly at the new zoom).
+    // Apply the white mask over everything outside the scope. This is the
+    // ONLY map mutation — we do NOT fit/pan/zoom: the export should match
+    // what the user currently sees on their screen. If they want all of
+    // NWL in the frame, they zoom/pan to it first and then click PNG.
     maskLyr = _buildWhiteMask();
     if (maskLyr) {
       maskLyr.addTo(map);
@@ -4372,17 +4348,11 @@ async function _downloadMapPng() {
     }
 
     await waitForTiles();
-    // Give SVG overlays + CSS a tick to settle after the mask render.
-    await new Promise(r => setTimeout(r, 260));
+    // Let SVG overlays + mask paint.
+    await new Promise(r => setTimeout(r, 240));
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     const dpr = window.devicePixelRatio || 1;
-    // NOTE: do NOT pass `width` / `height` here. When you pass both `width/height`
-    // and `scale`, html2canvas produces a canvas at the LOGICAL size (width x
-    // height) instead of scaled-up pixels — which then mismatches any dpr-scaled
-    // crop rect and leaves the bottom-right of the output blank. Omitting them
-    // makes html2canvas output `clientWidth*scale` x `clientHeight*scale`, and
-    // we measure the true scale post-hoc via `fullCanvas.width / clientWidth`.
     const fullCanvas = await html2canvas(mapEl, {
       useCORS: true,
       allowTaint: true,
@@ -4391,45 +4361,13 @@ async function _downloadMapPng() {
       scale: dpr,
     });
 
-    // Measure the ACTUAL pixel ratio html2canvas used, rather than trusting
-    // `dpr` — some browsers / html2canvas versions diverge.
-    const xScale = mapEl.clientWidth  ? (fullCanvas.width  / mapEl.clientWidth)  : dpr;
-    const yScale = mapEl.clientHeight ? (fullCanvas.height / mapEl.clientHeight) : dpr;
+    // Stamp caption (scope · overlay · month YYYY). Record the true pixel
+    // ratio html2canvas actually used so _stampCaption scales text correctly.
+    fullCanvas._nwlDpr = mapEl.clientWidth
+      ? (fullCanvas.width / mapEl.clientWidth) : dpr;
+    try { _stampCaption(fullCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }
 
-    // Compute the tight-crop pixel box from the scope bounds, with a small
-    // padding so boundary strokes aren't clipped. Clamp to the canvas.
-    let cropCanvas = fullCanvas;
-    if (scopeBounds) {
-      const nw = map.latLngToContainerPoint(scopeBounds.getNorthWest());
-      const se = map.latLngToContainerPoint(scopeBounds.getSouthEast());
-      const padPx = 16;
-      const xCss = Math.max(0, Math.min(nw.x, se.x) - padPx);
-      const yCss = Math.max(0, Math.min(nw.y, se.y) - padPx);
-      const wCss = Math.min(mapEl.clientWidth  - xCss, Math.abs(se.x - nw.x) + padPx * 2);
-      const hCss = Math.min(mapEl.clientHeight - yCss, Math.abs(se.y - nw.y) + padPx * 2);
-      if (wCss > 40 && hCss > 40) {
-        const cx = Math.max(0, Math.round(xCss * xScale));
-        const cy = Math.max(0, Math.round(yCss * yScale));
-        const cw = Math.min(fullCanvas.width  - cx, Math.round(wCss * xScale));
-        const ch = Math.min(fullCanvas.height - cy, Math.round(hCss * yScale));
-        cropCanvas = document.createElement('canvas');
-        cropCanvas.width  = cw;
-        cropCanvas.height = ch;
-        cropCanvas._nwlDpr = Math.max(xScale, yScale);
-        const ctx = cropCanvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, cw, ch);
-        // Source rect uses canvas-pixel coords (scaled); destination rect matches
-        // the destination canvas size so we get a true 1:1 copy with no scaling.
-        ctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
-      }
-    }
-    if (!cropCanvas._nwlDpr) cropCanvas._nwlDpr = Math.max(xScale, yScale);
-
-    // Storytelling caption (scope · overlay · month YYYY).
-    try { _stampCaption(cropCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }
-
-    cropCanvas.toBlob(blob => {
+    fullCanvas.toBlob(blob => {
       if (!blob) { alert('PNG export failed.'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -4448,8 +4386,9 @@ async function _downloadMapPng() {
     if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     if (zoomCtl) zoomCtl.style.visibility = zoomPrevVis;
-    // Restore the user's original view.
-    try { map.setView(savedCenter, savedZoom, { animate: false }); } catch (e) { /* ignore */ }
+    // We no longer mutate center/zoom, but keep the saved values around
+    // defensively in case a future edit reintroduces a fit.
+    void savedCenter; void savedZoom;
     if (btn) { btn.textContent = prev; btn.disabled = false; }
   }
 }

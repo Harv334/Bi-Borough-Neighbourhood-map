@@ -203,6 +203,32 @@ PNG export — strip all Leaflet UI chrome from capture
   the attribution widget — so the PNG is clean map pixels
   only, with no overlaid UI. Previous visibility is
   stashed per-element and restored in finally.
+
+PNG export — Canvas-2D mask + fit-to-NWL + tight crop
+-----------------------------------------------------
+- Previous Leaflet-SVG mask failed at large zoom-out
+  views: with a world-sized outer ring and borough holes,
+  Leaflet's SVG clipping produced malformed paths and the
+  basemap leaked through for much of the image. Replaced
+  with a post-capture Canvas-2D mask:
+    * Project every NWL borough polygon to canvas-pixel
+      coords using `map.latLngToContainerPoint` scaled by
+      the measured html2canvas pixel ratio.
+    * Build a single Path2D aggregating all boroughs
+      (Polygon + MultiPolygon rings).
+    * Fill `rect(0,0,W,H) + nwlPath` with even-odd rule
+      → everything outside NWL is whited out. No SVG
+      clipping, no extreme-coord math, no timing games.
+- Re-added fit-to-NWL so the PNG is always centred on
+  NWL regardless of the user's current pan. Uses
+  `setView(center, getBoundsZoom(...))` instead of
+  `fitBounds` — more reliable, move completes within the
+  awaited `moveend`.
+- Tight-cropped to the NWL pixel bbox (+16 css-px pad)
+  computed from the SAME projection pass used to build
+  the mask, so the crop always matches the mask exactly.
+- User's original center/zoom restored in finally so
+  they're unaware the map moved during capture.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

@@ -4343,18 +4343,33 @@ async function _downloadMapPng() {
     if (dlBadge) dlBadge.style.visibility = 'hidden';
     ctrlCorners.forEach(el => { el.style.visibility = 'hidden'; });
 
-    // Apply the white mask over everything outside the scope. This is the
-    // ONLY map mutation — we do NOT fit/pan/zoom: the export should match
-    // what the user currently sees on their screen. If they want all of
-    // NWL in the frame, they zoom/pan to it first and then click PNG.
-    maskLyr = _buildWhiteMask();
-    if (maskLyr) {
-      maskLyr.addTo(map);
-      if (typeof boroughL !== 'undefined' && boroughL && boroughL.bringToFront) boroughL.bringToFront();
+    // Fit to NWL scope so the PNG is always centred on NWL regardless of
+    // where the user currently has the map panned. Use setView with an
+    // explicit zoom computed from getBoundsZoom — more reliable than
+    // fitBounds, whose move is sometimes deferred to the next animation
+    // frame even with animate:false.
+    const scopeBounds = _pngScopeBounds();
+    if (scopeBounds) {
+      const targetCenter = scopeBounds.getCenter();
+      let targetZoom = savedZoom;
+      try {
+        targetZoom = map.getBoundsZoom(scopeBounds, false, L.point(24, 24));
+      } catch (e) { /* fall back to current zoom */ }
+      await new Promise(resolve => {
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        try { map.once('moveend', finish); } catch (e) { /* no-op */ }
+        try {
+          map.setView(targetCenter, targetZoom, { animate: false });
+        } catch (e) { finish(); return; }
+        setTimeout(finish, 500);
+      });
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise(r => setTimeout(r, 150));
     }
 
+    // Wait for tiles at the new view to load.
     await waitForTiles();
-    // Let SVG overlays + mask paint.
     await new Promise(r => setTimeout(r, 240));
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
@@ -4367,13 +4382,73 @@ async function _downloadMapPng() {
       scale: dpr,
     });
 
-    // Stamp caption (scope · overlay · month YYYY). Record the true pixel
-    // ratio html2canvas actually used so _stampCaption scales text correctly.
-    fullCanvas._nwlDpr = mapEl.clientWidth
-      ? (fullCanvas.width / mapEl.clientWidth) : dpr;
-    try { _stampCaption(fullCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }
+    // Measure the true pixel ratio html2canvas actually used.
+    const xScale = mapEl.clientWidth
+      ? (fullCanvas.width / mapEl.clientWidth)  : dpr;
+    const yScale = mapEl.clientHeight
+      ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
-    fullCanvas.toBlob(blob => {
+    // ── Canvas-2D mask (replaces the Leaflet SVG mask) ─────────────────
+    // Project every NWL borough polygon to canvas-pixel coords, then fill
+    // the rectangle MINUS the NWL paths with white using the even-odd
+    // fill rule. This is bullet-proof: no Leaflet SVG clipping, no extreme
+    // lat/lng rendering quirks, no timing issues — we own the pixels.
+    const scopeFeats = _pngScopeFeatures();
+    let xMin = Infinity, yMin = Infinity, xMax = -Infinity, yMax = -Infinity;
+    const nwlPath = new Path2D();
+    const tracePoly = (ring) => {
+      ring.forEach((coord, i) => {
+        const pt = map.latLngToContainerPoint(L.latLng(coord[1], coord[0]));
+        const x = pt.x * xScale;
+        const y = pt.y * yScale;
+        if (i === 0) nwlPath.moveTo(x, y); else nwlPath.lineTo(x, y);
+        if (x < xMin) xMin = x;  if (y < yMin) yMin = y;
+        if (x > xMax) xMax = x;  if (y > yMax) yMax = y;
+      });
+      nwlPath.closePath();
+    };
+    scopeFeats.forEach(f => {
+      const g = f.geometry; if (!g) return;
+      if (g.type === 'Polygon') {
+        g.coordinates.forEach(ring => tracePoly(ring));
+      } else if (g.type === 'MultiPolygon') {
+        g.coordinates.forEach(poly => poly.forEach(ring => tracePoly(ring)));
+      }
+    });
+
+    if (isFinite(xMin)) {
+      const mctx = fullCanvas.getContext('2d');
+      const outsidePath = new Path2D();
+      outsidePath.rect(0, 0, fullCanvas.width, fullCanvas.height);
+      outsidePath.addPath(nwlPath);
+      mctx.save();
+      mctx.fillStyle = '#ffffff';
+      mctx.fill(outsidePath, 'evenodd');
+      mctx.restore();
+    }
+
+    // ── Tight crop to the NWL pixel bbox with small padding ─────────────
+    let cropCanvas = fullCanvas;
+    if (isFinite(xMin) && (xMax - xMin) > 40 && (yMax - yMin) > 40) {
+      const padPx = 16 * ((xScale + yScale) / 2);
+      const cx = Math.max(0, Math.round(xMin - padPx));
+      const cy = Math.max(0, Math.round(yMin - padPx));
+      const cw = Math.min(fullCanvas.width  - cx, Math.round((xMax - xMin) + padPx * 2));
+      const ch = Math.min(fullCanvas.height - cy, Math.round((yMax - yMin) + padPx * 2));
+      cropCanvas = document.createElement('canvas');
+      cropCanvas.width  = cw;
+      cropCanvas.height = ch;
+      const cctx = cropCanvas.getContext('2d');
+      cctx.fillStyle = '#ffffff';
+      cctx.fillRect(0, 0, cw, ch);
+      cctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
+    }
+    cropCanvas._nwlDpr = Math.max(xScale, yScale);
+
+    // Caption pill (scope · overlay · month YYYY).
+    try { _stampCaption(cropCanvas, _pngCaption()); } catch (e) { /* non-fatal */ }
+
+    cropCanvas.toBlob(blob => {
       if (!blob) { alert('PNG export failed.'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -4392,9 +4467,8 @@ async function _downloadMapPng() {
     if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     ctrlCorners.forEach((el, i) => { el.style.visibility = ctrlPrevVis[i] || ''; });
-    // We no longer mutate center/zoom, but keep the saved values around
-    // defensively in case a future edit reintroduces a fit.
-    void savedCenter; void savedZoom;
+    // Restore the user's original view (we panned to NWL for capture).
+    try { map.setView(savedCenter, savedZoom, { animate: false }); } catch (e) { /* ignore */ }
     if (btn) { btn.textContent = prev; btn.disabled = false; }
   }
 }

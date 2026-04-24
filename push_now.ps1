@@ -193,6 +193,16 @@ PNG export — simplified, capture-what-you-see
 - Map view no longer mutated: savedCenter/savedZoom are
   kept in scope as a defensive hook for future re-fits
   but are not applied.
+
+PNG export — strip all Leaflet UI chrome from capture
+-----------------------------------------------------
+- Hide every Leaflet control corner during html2canvas:
+  `.leaflet-top`, `.leaflet-bottom`, and
+  `.leaflet-control-attribution`. This sweeps up the
+  zoom control, the bottom-right legend control, and
+  the attribution widget — so the PNG is clean map pixels
+  only, with no overlaid UI. Previous visibility is
+  stashed per-element and restored in finally.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

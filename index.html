@@ -4311,8 +4311,13 @@ async function _downloadMapPng() {
   // the caption.
   const dlBadge = document.getElementById('dl-badge');
   const dlPrevVis = dlBadge ? dlBadge.style.visibility : '';
-  const zoomCtl = mapEl.querySelector('.leaflet-control-zoom');
-  const zoomPrevVis = zoomCtl ? zoomCtl.style.visibility : '';
+  // Hide ALL Leaflet control corners (top-left/top-right/bottom-left/bottom-right)
+  // so the capture excludes the zoom control, the legend control in the
+  // bottom-right, and the attribution — the user wants a clean map-only PNG.
+  const ctrlCorners = Array.from(mapEl.querySelectorAll(
+    '.leaflet-top, .leaflet-bottom, .leaflet-control-attribution'
+  ));
+  const ctrlPrevVis = ctrlCorners.map(el => el.style.visibility);
 
   let maskLyr = null;
 
@@ -4333,9 +4338,10 @@ async function _downloadMapPng() {
   });
 
   try {
-    // Hide UI chrome
-    if (dlBadge)  dlBadge.style.visibility  = 'hidden';
-    if (zoomCtl)  zoomCtl.style.visibility  = 'hidden';
+    // Hide ALL UI chrome so the PNG is map-only (no legend, no zoom
+    // control, no attribution, no data-level badge).
+    if (dlBadge) dlBadge.style.visibility = 'hidden';
+    ctrlCorners.forEach(el => { el.style.visibility = 'hidden'; });
 
     // Apply the white mask over everything outside the scope. This is the
     // ONLY map mutation — we do NOT fit/pan/zoom: the export should match
@@ -4385,7 +4391,7 @@ async function _downloadMapPng() {
   } finally {
     if (maskLyr && maskLyr._map) map.removeLayer(maskLyr);
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
-    if (zoomCtl) zoomCtl.style.visibility = zoomPrevVis;
+    ctrlCorners.forEach((el, i) => { el.style.visibility = ctrlPrevVis[i] || ''; });
     // We no longer mutate center/zoom, but keep the saved values around
     // defensively in case a future edit reintroduces a fit.
     void savedCenter; void savedZoom;

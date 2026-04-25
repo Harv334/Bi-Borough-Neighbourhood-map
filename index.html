@@ -484,6 +484,19 @@
               <option value="census_no_qual_pct">No qualifications % · Ward</option>
               <option value="census_no_car_pct">No car/van % · Ward</option>
             </optgroup>
+            <optgroup label="Crime — by category (MPS, last 12 months)">
+              <option value="crime_violence_12mo">Violence against the person · Ward</option>
+              <option value="crime_theft_12mo">Theft (incl. shoplifting &amp; bicycle) · Ward</option>
+              <option value="crime_burglary_12mo">Burglary · Ward</option>
+              <option value="crime_robbery_12mo">Robbery · Ward</option>
+              <option value="crime_vehicle_12mo">Vehicle offences · Ward</option>
+              <option value="crime_drug_offences_12mo">Drug offences · Ward</option>
+              <option value="crime_public_order_12mo">Public order · Ward</option>
+              <option value="crime_arson_12mo">Arson &amp; criminal damage · Ward</option>
+              <option value="crime_weapons_12mo">Possession of weapons · Ward</option>
+              <option value="crime_sexual_offences_12mo">Sexual offences · Ward</option>
+              <option value="crime_misc_society_12mo">Misc. crimes against society · Ward</option>
+            </optgroup>
             <optgroup label="Housing (Census)">
               <option value="census_social_rented_pct">Social rented % · Ward</option>
               <option value="census_private_rented_pct">Private rented % · Ward</option>
@@ -575,6 +588,14 @@
                 <option value="crime_total">Total crimes (12 months) · Ward</option>
                 <option value="core20_lsoa_count">Core20 LSOAs in ward · Ward</option>
                 <option value="census_unemployed_pct">Unemployed % · Ward</option>
+              </optgroup>
+              <optgroup label="Crime — by category (MPS, 12mo)">
+                <option value="crime_violence_12mo">Violence · Ward</option>
+                <option value="crime_theft_12mo">Theft · Ward</option>
+                <option value="crime_burglary_12mo">Burglary · Ward</option>
+                <option value="crime_robbery_12mo">Robbery · Ward</option>
+                <option value="crime_vehicle_12mo">Vehicle offences · Ward</option>
+                <option value="crime_drug_offences_12mo">Drug offences · Ward</option>
               </optgroup>
               <optgroup label="Deprivation">
                 <option value="imd_score_ward">IMD composite (pop-weighted) · Ward</option>
@@ -772,7 +793,23 @@ const OV_CFG = {
   census_disability_lot_pct:       { lo:"Lower", hi:"Higher", wh:true,  min:0,    max:10   },
   census_provides_unpaid_care_pct: { lo:"Lower", hi:"Higher", wh:true,  min:2,    max:10   },
   // Crime (ward total, 12 months)
-  crime_total:                     { lo:"Fewer", hi:"More",   wh:true,  min:500,  max:8000 },
+  crime_total:                     { lo:"Fewer", hi:"More",   wh:true,  min:200,  max:5000 },
+  // MPS 12-month crime breakdowns by Home Office major category. Higher = worse
+  // (more reported crimes), so wh:true. Ranges chosen at roughly the p95 of the
+  // observed NWL ward distribution to avoid extreme outliers (e.g. West End)
+  // crushing the colour ramp. Sexual offences is ward-only (data protection
+  // means it's not published at LSOA).
+  crime_arson_12mo:                { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:200  },
+  crime_burglary_12mo:             { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:200  },
+  crime_drug_offences_12mo:        { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:250  },
+  crime_misc_society_12mo:         { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:60   },
+  crime_weapons_12mo:              { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:30   },
+  crime_public_order_12mo:         { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:250  },
+  crime_robbery_12mo:              { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:150  },
+  crime_sexual_offences_12mo:      { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:100  },
+  crime_theft_12mo:                { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:1500 },
+  crime_vehicle_12mo:              { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:350  },
+  crime_violence_12mo:             { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:800  },
   // Core20 density (count of LSOAs in IMD deciles 1-2)
   core20_lsoa_count:               { lo:"Fewer", hi:"More",   wh:true,  min:0,    max:15   },
   // Population & demographics
@@ -953,6 +990,19 @@ const CATS = [
     { k: "census_public_transport_pct",      l: "Public transport to work (%)",  g: "ward" },
     { k: "census_car_to_work_pct",           l: "Car/van to work (%)",           g: "ward" },
   ]},
+  { key: "crime_breakdown", label: "Crime — by category (MPS, last 12 months)", ico: "🚨", fields: [
+    { k: "crime_violence_12mo",              l: "Violence against the person",       g: "ward" },
+    { k: "crime_theft_12mo",                 l: "Theft (incl. shoplifting & bicycle)", g: "ward" },
+    { k: "crime_burglary_12mo",              l: "Burglary (residential + business)", g: "ward" },
+    { k: "crime_robbery_12mo",               l: "Robbery (personal + business)",     g: "ward" },
+    { k: "crime_vehicle_12mo",               l: "Vehicle offences",                  g: "ward" },
+    { k: "crime_drug_offences_12mo",         l: "Drug offences",                     g: "ward" },
+    { k: "crime_public_order_12mo",          l: "Public order offences",             g: "ward" },
+    { k: "crime_arson_12mo",                 l: "Arson & criminal damage",           g: "ward" },
+    { k: "crime_weapons_12mo",               l: "Possession of weapons",             g: "ward" },
+    { k: "crime_sexual_offences_12mo",       l: "Sexual offences (ward only)",       g: "ward" },
+    { k: "crime_misc_society_12mo",          l: "Misc. crimes against society",      g: "ward" },
+  ]},
   { key: "civic_strength", label: "Civic strength (London Datastore, Round 3)", ico: "🏛", fields: [
     { k: "cst_number_of_community_sport_and_physical_activity_offerings", l: "Community sport & physical activity offerings", g: "ward" },
     { k: "cst_number_of_community_interest_companies_cics",               l: "Community Interest Companies (CICs)",           g: "ward" },
@@ -1010,7 +1060,18 @@ const OV_META = {
   census_car_to_work_pct:         { src: "Census 2021 (TS061)",  yr: "2021", g: "Ward", u: "%",       desc: "Residents commuting by car or van." },
 
   // Crime + deprivation flags
-  crime_total:                    { src: "data.police.uk",       yr: "Rolling 12 mo.", g: "Ward", u: "crimes", desc: "Total reported crimes in the last 12 months of data." },
+  crime_total:                    { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Total reported crimes in the latest 12 months. Sum across all Home Office major categories from MPS ward / LSOA monthly data." },
+  crime_arson_12mo:               { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Reported Arson & Criminal Damage offences (12 months)." },
+  crime_burglary_12mo:            { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Reported Burglary offences (residential + business & community) over 12 months." },
+  crime_drug_offences_12mo:       { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Reported Drug Offences (trafficking + possession) over 12 months." },
+  crime_misc_society_12mo:        { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Miscellaneous Crimes Against Society (handling stolen goods, perverting course of justice, etc.) over 12 months." },
+  crime_weapons_12mo:             { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Possession of Weapons offences (firearms, blades & other weapons) over 12 months." },
+  crime_public_order_12mo:        { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Public Order Offences (fear / alarm / distress, racial / religious aggravation, violent disorder) over 12 months." },
+  crime_robbery_12mo:             { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Robbery offences (personal + business property) over 12 months." },
+  crime_sexual_offences_12mo:     { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward",        u: "crimes", desc: "Sexual Offences (rape + other sexual offences) over 12 months. Ward-level only — not published at LSOA per data protection rules." },
+  crime_theft_12mo:               { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Theft (bicycle, shoplifting, theft from person, other theft) over 12 months." },
+  crime_vehicle_12mo:             { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Vehicle Offences (theft of/from vehicle, aggravated taking, interference) over 12 months." },
+  crime_violence_12mo:            { src: "Met Police MPS · London Datastore", yr: "Apr 2025 – Mar 2026", g: "Ward / LSOA", u: "crimes", desc: "Violence Against the Person (homicide, violence with/without injury) over 12 months." },
   core20_lsoa_count:              { src: "NHSE Core20PLUS5",     yr: "2024", g: "Ward", u: "LSOAs",  desc: "Count of LSOAs in the ward falling in the national IMD-decile 1–2 (Core20)." },
   claimant_rate_pct:              { src: "NOMIS CLA01",          yr: "Latest", g: "Ward/LSOA", u: "%", desc: "Claimant count rate (UC + JSA) as % of working-age population." },
 

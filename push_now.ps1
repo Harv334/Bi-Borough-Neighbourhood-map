@@ -14,7 +14,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue .git\HEAD.lock
 # mis-parsed as flags).
 $msgPath = Join-Path $env:TEMP "nwl_commit_msg.txt"
 $msg = @'
-data(scope,lookup): ONS WD24 best-fit lookup + drop Camden (NCL)
+data(crime,civic,ui): MPS 12mo crime breakdown + civic strength + UI
 
 Adopts the official ONS LSOA (2021) -> Electoral Ward (May 2024)
 best-fit lookup as the authoritative LSOA->ward mapping, replacing
@@ -432,6 +432,84 @@ ICHT methodology references scrubbed
   Charing Cross, Hammersmith, and Queen Charlotte's &
   Chelsea retained — those are trust operators, not
   methodology claims.
+
+MPS crime — 24-month CSVs aggregated to 12mo by category
+--------------------------------------------------------
+- Replaced the legacy `crime_total` field (previously
+  sourced from data.police.uk via `fetch_all_data.py`)
+  with a fresh aggregation from the Met Police MPS
+  "Ward Level Crime (most recent 24 months)" and "LSOA
+  Level Crime (most recent 24 months)" CSVs published
+  on the London Datastore. Window: latest 12 months
+  Apr 2025 – Mar 2026 (sum of monthly counts
+  202504..202603).
+- Eleven Home Office major categories carried at WARD
+  level, ten at LSOA level (Sexual Offences not
+  published at LSOA per data protection rules):
+    * Violence Against the Person
+    * Theft (incl. shoplifting + bicycle)
+    * Burglary (residential + business)
+    * Robbery (personal + business)
+    * Vehicle Offences
+    * Drug Offences
+    * Public Order Offences
+    * Arson & Criminal Damage
+    * Possession of Weapons
+    * Sexual Offences (ward only)
+    * Misc. Crimes Against Society
+  Fraud & Forgery / NFIB Fraud excluded per user spec
+  (transferred to NFIB nationally in 2013).
+- Coverage:
+    * Ward merge: 168/168 NWL wards matched in CSV.
+    * LSOA merge: 4,988 NWL LSOAs with non-zero crime
+      activity (out of 33,755 in the flat lsoa_data.json
+      schema London-wide).
+- `crime_total` is now overwritten as the sum of the 11
+  category counts (range across NWL: min ≈ 327, median
+  ≈ 1,087, max ≈ 29,923 for the busiest CBD wards).
+- Per-record fields injected:
+    * ward_data.json: indicators.crime_<cat>_12mo
+      (11 fields) + crime_total recomputed.
+    * lsoa_data.json (flat dict): crime_<cat>_12mo
+      written at top level (10 fields, no
+      sexual_offences) + crime_total recomputed.
+- Metadata in ward_data.json: crime_source ("Met Police
+  MPS · London Datastore"), crime_window ("Apr 2025 -
+  Mar 2026"), crime_metrics_added (UTC timestamp).
+
+MPS crime — UI wiring
+---------------------
+- `OV_DOMAIN`: 11 new entries (one per category) with
+  observed NW-London max ranges (e.g. theft 0..1500,
+  violence 0..800, weapons 0..30) and `wh:true`
+  (lower = better). Existing `crime_total` range
+  recalibrated to 200..5000 (was 500..8000) to reflect
+  the new MPS-derived totals.
+- `CATS`: new `crime_breakdown` category with icon 🚨,
+  label "Crime — by category (MPS, last 12 months)",
+  11 fields all tagged `g: "ward"`. Rendered in ward
+  profiles. (LSOA-level values are still readable via
+  the same key thanks to the `(d.indicators || d)`
+  fallback in `wardOvValue` / `lsoaOvValue`, so LSOA
+  choropleths render correctly without a duplicate
+  CATS row.)
+- `OV_META`: 11 new entries with
+  `src: "Met Police MPS · London Datastore"`,
+  `yr: "Apr 2025 – Mar 2026"`,
+  `g: "Ward / LSOA"` (or just "Ward" for sexual
+  offences), `u: "crimes"`, plus per-category desc
+  strings explaining the Home Office sub-categories
+  rolled up into each field. Existing `crime_total`
+  OV_META updated from data.police.uk to MPS source.
+- `<select id="ov">` dropdown: new optgroup
+  "Crime — by category (MPS, last 12 months)" with all
+  11 options tagged " · Ward", positioned right after
+  the existing "Crime & deprivation" optgroup.
+- `<select id="ov2">` bivariate dropdown: new optgroup
+  "Crime — by category (MPS, 12mo)" with 6 high-impact
+  options (violence, theft, burglary, robbery, vehicle,
+  drug offences) — bivariate kept compact to avoid
+  overwhelming the second-axis dropdown.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

@@ -7,7 +7,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1043,
+        "crime_total": 829,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -76,7 +76,18 @@
         "cst_number_and_proximity_of_community_centres": 402.15,
         "cst_number_and_proximity_of_cultural_spaces": 5.43,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 35,
+        "crime_burglary_12mo": 43,
+        "crime_drug_offences_12mo": 16,
+        "crime_misc_society_12mo": 4,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 43,
+        "crime_robbery_12mo": 25,
+        "crime_sexual_offences_12mo": 30,
+        "crime_theft_12mo": 302,
+        "crime_vehicle_12mo": 81,
+        "crime_violence_12mo": 244
       },
       "gp_list": [
         {
@@ -129,7 +140,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 5,
-        "crime_total": 3359,
+        "crime_total": 2585,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -198,7 +209,18 @@
         "cst_number_and_proximity_of_community_centres": 535.54,
         "cst_number_and_proximity_of_cultural_spaces": 69.66,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 83,
+        "crime_burglary_12mo": 97,
+        "crime_drug_offences_12mo": 50,
+        "crime_misc_society_12mo": 21,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 94,
+        "crime_robbery_12mo": 96,
+        "crime_sexual_offences_12mo": 40,
+        "crime_theft_12mo": 1414,
+        "crime_vehicle_12mo": 362,
+        "crime_violence_12mo": 322
       },
       "gp_list": [
         {
@@ -260,7 +282,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 1595,
+        "crime_total": 1193,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -329,7 +351,18 @@
         "cst_number_and_proximity_of_community_centres": 329.08,
         "cst_number_and_proximity_of_cultural_spaces": 114.61,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 69,
+        "crime_burglary_12mo": 91,
+        "crime_drug_offences_12mo": 17,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 83,
+        "crime_robbery_12mo": 22,
+        "crime_sexual_offences_12mo": 27,
+        "crime_theft_12mo": 517,
+        "crime_vehicle_12mo": 132,
+        "crime_violence_12mo": 222
       },
       "gp_list": [
         {
@@ -371,7 +404,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 4,
-        "crime_total": 1077,
+        "crime_total": 965,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -440,7 +473,18 @@
         "cst_number_and_proximity_of_community_centres": 143.27,
         "cst_number_and_proximity_of_cultural_spaces": 36.3,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 66,
+        "crime_burglary_12mo": 58,
+        "crime_drug_offences_12mo": 70,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 67,
+        "crime_robbery_12mo": 26,
+        "crime_sexual_offences_12mo": 21,
+        "crime_theft_12mo": 209,
+        "crime_vehicle_12mo": 158,
+        "crime_violence_12mo": 272
       },
       "gp_list": [
         {
@@ -503,7 +547,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 4,
-        "crime_total": 2305,
+        "crime_total": 1813,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -572,7 +616,18 @@
         "cst_number_and_proximity_of_community_centres": 147.56,
         "cst_number_and_proximity_of_cultural_spaces": 49.4,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 78,
+        "crime_burglary_12mo": 96,
+        "crime_drug_offences_12mo": 256,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 22,
+        "crime_public_order_12mo": 97,
+        "crime_robbery_12mo": 42,
+        "crime_sexual_offences_12mo": 41,
+        "crime_theft_12mo": 714,
+        "crime_vehicle_12mo": 91,
+        "crime_violence_12mo": 367
       },
       "gp_list": [
         {
@@ -647,7 +702,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 1461,
+        "crime_total": 1122,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -716,7 +771,18 @@
         "cst_number_and_proximity_of_community_centres": 737.55,
         "cst_number_and_proximity_of_cultural_spaces": 91.17,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 63,
+        "crime_burglary_12mo": 80,
+        "crime_drug_offences_12mo": 31,
+        "crime_misc_society_12mo": 6,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 66,
+        "crime_robbery_12mo": 27,
+        "crime_sexual_offences_12mo": 30,
+        "crime_theft_12mo": 430,
+        "crime_vehicle_12mo": 196,
+        "crime_violence_12mo": 190
       },
       "gp_list": [
         {
@@ -774,7 +840,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 1,
-        "crime_total": 1195,
+        "crime_total": 943,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -843,7 +909,18 @@
         "cst_number_and_proximity_of_community_centres": 258.75,
         "cst_number_and_proximity_of_cultural_spaces": 156.44,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 62,
+        "crime_burglary_12mo": 40,
+        "crime_drug_offences_12mo": 72,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 63,
+        "crime_robbery_12mo": 23,
+        "crime_sexual_offences_12mo": 52,
+        "crime_theft_12mo": 143,
+        "crime_vehicle_12mo": 70,
+        "crime_violence_12mo": 403
       },
       "gp_list": [
         {
@@ -891,7 +968,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 2163,
+        "crime_total": 1338,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -960,7 +1037,18 @@
         "cst_number_and_proximity_of_community_centres": 242.28,
         "cst_number_and_proximity_of_cultural_spaces": 164.85,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 70,
+        "crime_burglary_12mo": 109,
+        "crime_drug_offences_12mo": 80,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 120,
+        "crime_robbery_12mo": 50,
+        "crime_sexual_offences_12mo": 46,
+        "crime_theft_12mo": 439,
+        "crime_vehicle_12mo": 62,
+        "crime_violence_12mo": 350
       },
       "gp_list": [
         {
@@ -1013,7 +1101,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 3,
-        "crime_total": 1708,
+        "crime_total": 1226,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1082,7 +1170,18 @@
         "cst_number_and_proximity_of_community_centres": 249.02,
         "cst_number_and_proximity_of_cultural_spaces": 75.14,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 66,
+        "crime_burglary_12mo": 79,
+        "crime_drug_offences_12mo": 156,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 20,
+        "crime_public_order_12mo": 88,
+        "crime_robbery_12mo": 42,
+        "crime_sexual_offences_12mo": 47,
+        "crime_theft_12mo": 257,
+        "crime_vehicle_12mo": 86,
+        "crime_violence_12mo": 372
       },
       "gp_list": [
         {
@@ -1145,7 +1244,7 @@
       "lad_code": "E09000020",
       "indicators": {
         "gp_practice_count": 1,
-        "crime_total": 845,
+        "crime_total": 760,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1214,7 +1313,18 @@
         "cst_number_and_proximity_of_community_centres": 568.04,
         "cst_number_and_proximity_of_cultural_spaces": 117.03,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 49,
+        "crime_burglary_12mo": 60,
+        "crime_drug_offences_12mo": 47,
+        "crime_misc_society_12mo": 3,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 68,
+        "crime_robbery_12mo": 16,
+        "crime_sexual_offences_12mo": 37,
+        "crime_theft_12mo": 166,
+        "crime_vehicle_12mo": 103,
+        "crime_violence_12mo": 202
       },
       "gp_list": [
         {
@@ -1249,7 +1359,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 813,
+        "crime_total": 592,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1318,7 +1428,18 @@
         "cst_number_and_proximity_of_community_centres": 351.01,
         "cst_number_and_proximity_of_cultural_spaces": 38.06,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 42,
+        "crime_burglary_12mo": 54,
+        "crime_drug_offences_12mo": 33,
+        "crime_misc_society_12mo": 3,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 45,
+        "crime_robbery_12mo": 17,
+        "crime_sexual_offences_12mo": 12,
+        "crime_theft_12mo": 176,
+        "crime_vehicle_12mo": 99,
+        "crime_violence_12mo": 106
       },
       "gp_list": [
         {
@@ -1360,7 +1481,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 2393,
+        "crime_total": 2130,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1429,7 +1550,18 @@
         "cst_number_and_proximity_of_community_centres": 85.46,
         "cst_number_and_proximity_of_cultural_spaces": 75.9,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 66,
+        "crime_burglary_12mo": 45,
+        "crime_drug_offences_12mo": 96,
+        "crime_misc_society_12mo": 16,
+        "crime_weapons_12mo": 12,
+        "crime_public_order_12mo": 83,
+        "crime_robbery_12mo": 53,
+        "crime_sexual_offences_12mo": 32,
+        "crime_theft_12mo": 1317,
+        "crime_vehicle_12mo": 88,
+        "crime_violence_12mo": 322
       },
       "gp_list": [
         {
@@ -1471,7 +1603,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 1125,
+        "crime_total": 1049,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1540,7 +1672,18 @@
         "cst_number_and_proximity_of_community_centres": 439.07,
         "cst_number_and_proximity_of_cultural_spaces": 87.9,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 48,
+        "crime_burglary_12mo": 92,
+        "crime_drug_offences_12mo": 95,
+        "crime_misc_society_12mo": 4,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 61,
+        "crime_robbery_12mo": 26,
+        "crime_sexual_offences_12mo": 35,
+        "crime_theft_12mo": 476,
+        "crime_vehicle_12mo": 46,
+        "crime_violence_12mo": 160
       },
       "gp_list": [
         {
@@ -1587,7 +1730,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 1,
-        "crime_total": 956,
+        "crime_total": 769,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1656,7 +1799,18 @@
         "cst_number_and_proximity_of_community_centres": 725.76,
         "cst_number_and_proximity_of_cultural_spaces": 64.59,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 44,
+        "crime_burglary_12mo": 63,
+        "crime_drug_offences_12mo": 15,
+        "crime_misc_society_12mo": 3,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 39,
+        "crime_robbery_12mo": 12,
+        "crime_sexual_offences_12mo": 15,
+        "crime_theft_12mo": 299,
+        "crime_vehicle_12mo": 105,
+        "crime_violence_12mo": 171
       },
       "gp_list": [
         {
@@ -1704,7 +1858,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1095,
+        "crime_total": 846,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1773,7 +1927,18 @@
         "cst_number_and_proximity_of_community_centres": 778.45,
         "cst_number_and_proximity_of_cultural_spaces": 144.17,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 41,
+        "crime_burglary_12mo": 58,
+        "crime_drug_offences_12mo": 27,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 0,
+        "crime_public_order_12mo": 47,
+        "crime_robbery_12mo": 24,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 358,
+        "crime_vehicle_12mo": 89,
+        "crime_violence_12mo": 167
       },
       "gp_list": [
         {
@@ -1826,7 +1991,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 3,
-        "crime_total": 1807,
+        "crime_total": 1610,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -1895,7 +2060,18 @@
         "cst_number_and_proximity_of_community_centres": 722.7,
         "cst_number_and_proximity_of_cultural_spaces": 35.73,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 68,
+        "crime_burglary_12mo": 50,
+        "crime_drug_offences_12mo": 20,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 11,
+        "crime_public_order_12mo": 61,
+        "crime_robbery_12mo": 59,
+        "crime_sexual_offences_12mo": 19,
+        "crime_theft_12mo": 963,
+        "crime_vehicle_12mo": 169,
+        "crime_violence_12mo": 181
       },
       "gp_list": [
         {
@@ -1959,7 +2135,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 1,
-        "crime_total": 987,
+        "crime_total": 662,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -2028,7 +2204,18 @@
         "cst_number_and_proximity_of_community_centres": 538.49,
         "cst_number_and_proximity_of_cultural_spaces": 49.23,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 43,
+        "crime_burglary_12mo": 28,
+        "crime_drug_offences_12mo": 43,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 50,
+        "crime_robbery_12mo": 17,
+        "crime_sexual_offences_12mo": 15,
+        "crime_theft_12mo": 171,
+        "crime_vehicle_12mo": 81,
+        "crime_violence_12mo": 201
       },
       "gp_list": [
         {
@@ -2075,7 +2262,7 @@
       "lad_code": "E09000020",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 1723,
+        "crime_total": 1407,
         "ft_life_expectancy_male": 82.8,
         "ft_healthy_life_expectancy_male": 13.8583380395507,
         "ft_smoking_prevalence_adults": 9.429491958,
@@ -2144,7 +2331,18 @@
         "cst_number_and_proximity_of_community_centres": 416.21,
         "cst_number_and_proximity_of_cultural_spaces": 76.91,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 67,
+        "crime_burglary_12mo": 81,
+        "crime_drug_offences_12mo": 40,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 75,
+        "crime_robbery_12mo": 49,
+        "crime_sexual_offences_12mo": 42,
+        "crime_theft_12mo": 452,
+        "crime_vehicle_12mo": 239,
+        "crime_violence_12mo": 351
       },
       "pharmacy_list": [
         {
@@ -2178,7 +2376,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 1,
-        "crime_total": 1962,
+        "crime_total": 1533,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -2247,7 +2445,18 @@
         "cst_number_and_proximity_of_community_centres": 653.84,
         "cst_number_and_proximity_of_cultural_spaces": 262.09,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 81,
+        "crime_burglary_12mo": 90,
+        "crime_drug_offences_12mo": 281,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 88,
+        "crime_robbery_12mo": 48,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 432,
+        "crime_vehicle_12mo": 98,
+        "crime_violence_12mo": 363
       },
       "gp_list": [
         {
@@ -2295,7 +2504,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 2,
-        "crime_total": 1758,
+        "crime_total": 1303,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -2364,7 +2573,18 @@
         "cst_number_and_proximity_of_community_centres": 611.68,
         "cst_number_and_proximity_of_cultural_spaces": 363.01,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 59,
+        "crime_burglary_12mo": 61,
+        "crime_drug_offences_12mo": 242,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 11,
+        "crime_public_order_12mo": 83,
+        "crime_robbery_12mo": 65,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 309,
+        "crime_vehicle_12mo": 90,
+        "crime_violence_12mo": 343
       },
       "gp_list": [
         {
@@ -2429,7 +2649,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 1358,
+        "crime_total": 949,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -2498,7 +2718,18 @@
         "cst_number_and_proximity_of_community_centres": 999.73,
         "cst_number_and_proximity_of_cultural_spaces": 509.97,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 67,
+        "crime_burglary_12mo": 85,
+        "crime_drug_offences_12mo": 42,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 56,
+        "crime_robbery_12mo": 39,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 241,
+        "crime_vehicle_12mo": 120,
+        "crime_violence_12mo": 253
       },
       "gp_list": [
         {
@@ -2540,7 +2771,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 1,
-        "crime_total": 1232,
+        "crime_total": 972,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -2609,7 +2840,18 @@
         "cst_number_and_proximity_of_community_centres": 574.33,
         "cst_number_and_proximity_of_cultural_spaces": 42.52,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 56,
+        "crime_burglary_12mo": 62,
+        "crime_drug_offences_12mo": 64,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 75,
+        "crime_robbery_12mo": 22,
+        "crime_sexual_offences_12mo": 25,
+        "crime_theft_12mo": 187,
+        "crime_vehicle_12mo": 154,
+        "crime_violence_12mo": 304
       },
       "gp_list": [
         {
@@ -2669,7 +2911,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 6,
-        "crime_total": 2497,
+        "crime_total": 2004,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -2738,7 +2980,18 @@
         "cst_number_and_proximity_of_community_centres": 518.96,
         "cst_number_and_proximity_of_cultural_spaces": 364.89,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 164,
+        "crime_burglary_12mo": 117,
+        "crime_drug_offences_12mo": 146,
+        "crime_misc_society_12mo": 33,
+        "crime_weapons_12mo": 18,
+        "crime_public_order_12mo": 139,
+        "crime_robbery_12mo": 72,
+        "crime_sexual_offences_12mo": 62,
+        "crime_theft_12mo": 352,
+        "crime_vehicle_12mo": 221,
+        "crime_violence_12mo": 680
       },
       "gp_list": [
         {
@@ -2823,7 +3076,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 4,
-        "crime_total": 3439,
+        "crime_total": 2384,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -2892,7 +3145,18 @@
         "cst_number_and_proximity_of_community_centres": 286.82,
         "cst_number_and_proximity_of_cultural_spaces": 283.73,
         "cst_number_of_faith_centres": 9,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 142,
+        "crime_burglary_12mo": 102,
+        "crime_drug_offences_12mo": 184,
+        "crime_misc_society_12mo": 38,
+        "crime_weapons_12mo": 20,
+        "crime_public_order_12mo": 166,
+        "crime_robbery_12mo": 144,
+        "crime_sexual_offences_12mo": 62,
+        "crime_theft_12mo": 588,
+        "crime_vehicle_12mo": 215,
+        "crime_violence_12mo": 723
       },
       "gp_list": [
         {
@@ -2961,7 +3225,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 4,
-        "crime_total": 1109,
+        "crime_total": 933,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3030,7 +3294,18 @@
         "cst_number_and_proximity_of_community_centres": 1058.17,
         "cst_number_and_proximity_of_cultural_spaces": 841.65,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 69,
+        "crime_burglary_12mo": 51,
+        "crime_drug_offences_12mo": 64,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 46,
+        "crime_robbery_12mo": 31,
+        "crime_sexual_offences_12mo": 20,
+        "crime_theft_12mo": 231,
+        "crime_vehicle_12mo": 98,
+        "crime_violence_12mo": 299
       },
       "gp_list": [
         {
@@ -3105,7 +3380,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 5,
-        "crime_total": 900,
+        "crime_total": 1942,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3174,7 +3449,18 @@
         "cst_number_and_proximity_of_community_centres": 404.4,
         "cst_number_and_proximity_of_cultural_spaces": 188.01,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 139,
+        "crime_burglary_12mo": 137,
+        "crime_drug_offences_12mo": 122,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 28,
+        "crime_public_order_12mo": 118,
+        "crime_robbery_12mo": 91,
+        "crime_sexual_offences_12mo": 46,
+        "crime_theft_12mo": 514,
+        "crime_vehicle_12mo": 171,
+        "crime_violence_12mo": 556
       },
       "gp_list": [
         {
@@ -3242,7 +3528,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 4,
-        "crime_total": 986,
+        "crime_total": 893,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3311,7 +3597,18 @@
         "cst_number_and_proximity_of_community_centres": 1592.25,
         "cst_number_and_proximity_of_cultural_spaces": 195.8,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 63,
+        "crime_burglary_12mo": 54,
+        "crime_drug_offences_12mo": 20,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 61,
+        "crime_robbery_12mo": 44,
+        "crime_sexual_offences_12mo": 42,
+        "crime_theft_12mo": 257,
+        "crime_vehicle_12mo": 93,
+        "crime_violence_12mo": 248
       },
       "gp_list": [
         {
@@ -3379,7 +3676,7 @@
       "lad_code": "E09000005",
       "indicators": {
         "pharmacy_count": 3,
-        "crime_total": 1143,
+        "crime_total": 1025,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3448,7 +3745,18 @@
         "cst_number_and_proximity_of_community_centres": 2084.34,
         "cst_number_and_proximity_of_cultural_spaces": 298.95,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 65,
+        "crime_burglary_12mo": 31,
+        "crime_drug_offences_12mo": 46,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 87,
+        "crime_robbery_12mo": 25,
+        "crime_sexual_offences_12mo": 48,
+        "crime_theft_12mo": 177,
+        "crime_vehicle_12mo": 93,
+        "crime_violence_12mo": 437
       },
       "pharmacy_list": [
         {
@@ -3492,7 +3800,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 7,
-        "crime_total": 984,
+        "crime_total": 763,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3561,7 +3869,18 @@
         "cst_number_and_proximity_of_community_centres": 1046.0,
         "cst_number_and_proximity_of_cultural_spaces": 38.8,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 49,
+        "crime_burglary_12mo": 41,
+        "crime_drug_offences_12mo": 72,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 28,
+        "crime_robbery_12mo": 28,
+        "crime_sexual_offences_12mo": 35,
+        "crime_theft_12mo": 167,
+        "crime_vehicle_12mo": 82,
+        "crime_violence_12mo": 251
       },
       "gp_list": [
         {
@@ -3645,7 +3964,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 4,
-        "crime_total": 1670,
+        "crime_total": 1608,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3714,7 +4033,18 @@
         "cst_number_and_proximity_of_community_centres": 701.72,
         "cst_number_and_proximity_of_cultural_spaces": 222.82,
         "cst_number_of_faith_centres": 8,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 92,
+        "crime_burglary_12mo": 110,
+        "crime_drug_offences_12mo": 111,
+        "crime_misc_society_12mo": 15,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 75,
+        "crime_robbery_12mo": 63,
+        "crime_sexual_offences_12mo": 33,
+        "crime_theft_12mo": 531,
+        "crime_vehicle_12mo": 173,
+        "crime_violence_12mo": 395
       },
       "gp_list": [
         {
@@ -3771,7 +4101,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 5,
-        "crime_total": 1831,
+        "crime_total": 1377,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3840,7 +4170,18 @@
         "cst_number_and_proximity_of_community_centres": 1548.72,
         "cst_number_and_proximity_of_cultural_spaces": 325.29,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 86,
+        "crime_burglary_12mo": 134,
+        "crime_drug_offences_12mo": 43,
+        "crime_misc_society_12mo": 24,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 91,
+        "crime_robbery_12mo": 57,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 429,
+        "crime_vehicle_12mo": 150,
+        "crime_violence_12mo": 329
       },
       "gp_list": [
         {
@@ -3920,7 +4261,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 4,
-        "crime_total": 2386,
+        "crime_total": 1689,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -3989,7 +4330,18 @@
         "cst_number_and_proximity_of_community_centres": 517.62,
         "cst_number_and_proximity_of_cultural_spaces": 109.9,
         "cst_number_of_faith_centres": 8,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 111,
+        "crime_burglary_12mo": 63,
+        "crime_drug_offences_12mo": 181,
+        "crime_misc_society_12mo": 33,
+        "crime_weapons_12mo": 14,
+        "crime_public_order_12mo": 128,
+        "crime_robbery_12mo": 66,
+        "crime_sexual_offences_12mo": 55,
+        "crime_theft_12mo": 225,
+        "crime_vehicle_12mo": 182,
+        "crime_violence_12mo": 631
       },
       "gp_list": [
         {
@@ -4058,7 +4410,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 6,
-        "crime_total": 3271,
+        "crime_total": 2806,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -4127,7 +4479,18 @@
         "cst_number_and_proximity_of_community_centres": 367.55,
         "cst_number_and_proximity_of_cultural_spaces": 190.33,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 227,
+        "crime_burglary_12mo": 150,
+        "crime_drug_offences_12mo": 145,
+        "crime_misc_society_12mo": 35,
+        "crime_weapons_12mo": 18,
+        "crime_public_order_12mo": 157,
+        "crime_robbery_12mo": 78,
+        "crime_sexual_offences_12mo": 83,
+        "crime_theft_12mo": 784,
+        "crime_vehicle_12mo": 305,
+        "crime_violence_12mo": 824
       },
       "gp_list": [
         {
@@ -4212,7 +4575,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 942,
+        "crime_total": 678,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -4281,7 +4644,18 @@
         "cst_number_and_proximity_of_community_centres": 1735.69,
         "cst_number_and_proximity_of_cultural_spaces": 123.58,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 56,
+        "crime_burglary_12mo": 30,
+        "crime_drug_offences_12mo": 39,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 49,
+        "crime_robbery_12mo": 42,
+        "crime_sexual_offences_12mo": 18,
+        "crime_theft_12mo": 108,
+        "crime_vehicle_12mo": 67,
+        "crime_violence_12mo": 251
       },
       "gp_list": [
         {
@@ -4328,7 +4702,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 774,
+        "crime_total": 575,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -4397,7 +4771,18 @@
         "cst_number_and_proximity_of_community_centres": 865.8,
         "cst_number_and_proximity_of_cultural_spaces": 603.24,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 32,
+        "crime_burglary_12mo": 18,
+        "crime_drug_offences_12mo": 99,
+        "crime_misc_society_12mo": 4,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 34,
+        "crime_robbery_12mo": 20,
+        "crime_sexual_offences_12mo": 15,
+        "crime_theft_12mo": 94,
+        "crime_vehicle_12mo": 77,
+        "crime_violence_12mo": 176
       },
       "gp_list": [
         {
@@ -4450,7 +4835,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 1340,
+        "crime_total": 1087,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -4519,7 +4904,18 @@
         "cst_number_and_proximity_of_community_centres": 1201.41,
         "cst_number_and_proximity_of_cultural_spaces": 159.02,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 65,
+        "crime_burglary_12mo": 112,
+        "crime_drug_offences_12mo": 80,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 66,
+        "crime_robbery_12mo": 29,
+        "crime_sexual_offences_12mo": 25,
+        "crime_theft_12mo": 207,
+        "crime_vehicle_12mo": 132,
+        "crime_violence_12mo": 349
       },
       "gp_list": [
         {
@@ -4566,7 +4962,7 @@
       "indicators": {
         "gp_practice_count": 7,
         "pharmacy_count": 5,
-        "crime_total": 2104,
+        "crime_total": 1704,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -4635,7 +5031,18 @@
         "cst_number_and_proximity_of_community_centres": 1343.02,
         "cst_number_and_proximity_of_cultural_spaces": 197.14,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 122,
+        "crime_burglary_12mo": 30,
+        "crime_drug_offences_12mo": 204,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 12,
+        "crime_public_order_12mo": 156,
+        "crime_robbery_12mo": 84,
+        "crime_sexual_offences_12mo": 36,
+        "crime_theft_12mo": 439,
+        "crime_vehicle_12mo": 72,
+        "crime_violence_12mo": 529
       },
       "gp_list": [
         {
@@ -4732,7 +5139,7 @@
       "lad_code": "E09000005",
       "indicators": {
         "pharmacy_count": 4,
-        "crime_total": 2731,
+        "crime_total": 1965,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -4801,7 +5208,18 @@
         "cst_number_and_proximity_of_community_centres": 823.1,
         "cst_number_and_proximity_of_cultural_spaces": 229.09,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 92,
+        "crime_burglary_12mo": 64,
+        "crime_drug_offences_12mo": 164,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 13,
+        "crime_public_order_12mo": 117,
+        "crime_robbery_12mo": 94,
+        "crime_sexual_offences_12mo": 50,
+        "crime_theft_12mo": 845,
+        "crime_vehicle_12mo": 82,
+        "crime_violence_12mo": 427
       },
       "pharmacy_list": [
         {
@@ -4849,7 +5267,7 @@
       "lad_code": "E09000005",
       "indicators": {
         "gp_practice_count": 1,
-        "crime_total": 2656,
+        "crime_total": 2364,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -4918,7 +5336,18 @@
         "cst_number_and_proximity_of_community_centres": 349.17,
         "cst_number_and_proximity_of_cultural_spaces": 154.59,
         "cst_number_of_faith_centres": 0,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 80,
+        "crime_burglary_12mo": 71,
+        "crime_drug_offences_12mo": 166,
+        "crime_misc_society_12mo": 19,
+        "crime_weapons_12mo": 17,
+        "crime_public_order_12mo": 175,
+        "crime_robbery_12mo": 97,
+        "crime_sexual_offences_12mo": 64,
+        "crime_theft_12mo": 878,
+        "crime_vehicle_12mo": 73,
+        "crime_violence_12mo": 724
       },
       "gp_list": [
         {
@@ -4953,7 +5382,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 10,
-        "crime_total": 2976,
+        "crime_total": 2019,
         "ft_life_expectancy_male": 79.9,
         "ft_healthy_life_expectancy_male": 75.4105700560408,
         "ft_smoking_prevalence_adults": 10.82081347,
@@ -5022,7 +5451,18 @@
         "cst_number_and_proximity_of_community_centres": 468.38,
         "cst_number_and_proximity_of_cultural_spaces": 185.77,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 143,
+        "crime_burglary_12mo": 84,
+        "crime_drug_offences_12mo": 176,
+        "crime_misc_society_12mo": 27,
+        "crime_weapons_12mo": 23,
+        "crime_public_order_12mo": 135,
+        "crime_robbery_12mo": 85,
+        "crime_sexual_offences_12mo": 49,
+        "crime_theft_12mo": 429,
+        "crime_vehicle_12mo": 202,
+        "crime_violence_12mo": 666
       },
       "gp_list": [
         {
@@ -5115,7 +5555,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 5,
-        "crime_total": 1608,
+        "crime_total": 1172,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -5184,7 +5624,18 @@
         "cst_number_and_proximity_of_community_centres": 623.65,
         "cst_number_and_proximity_of_cultural_spaces": 346.09,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 66,
+        "crime_burglary_12mo": 82,
+        "crime_drug_offences_12mo": 82,
+        "crime_misc_society_12mo": 19,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 75,
+        "crime_robbery_12mo": 31,
+        "crime_sexual_offences_12mo": 41,
+        "crime_theft_12mo": 253,
+        "crime_vehicle_12mo": 139,
+        "crime_violence_12mo": 375
       },
       "gp_list": [
         {
@@ -5252,7 +5703,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 3,
-        "crime_total": 1403,
+        "crime_total": 1173,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -5321,7 +5772,18 @@
         "cst_number_and_proximity_of_community_centres": 292.74,
         "cst_number_and_proximity_of_cultural_spaces": 520.79,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 81,
+        "crime_burglary_12mo": 53,
+        "crime_drug_offences_12mo": 74,
+        "crime_misc_society_12mo": 19,
+        "crime_weapons_12mo": 11,
+        "crime_public_order_12mo": 77,
+        "crime_robbery_12mo": 28,
+        "crime_sexual_offences_12mo": 46,
+        "crime_theft_12mo": 165,
+        "crime_vehicle_12mo": 126,
+        "crime_violence_12mo": 493
       },
       "gp_list": [
         {
@@ -5391,7 +5853,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 4,
-        "crime_total": 2952,
+        "crime_total": 2299,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -5460,7 +5922,18 @@
         "cst_number_and_proximity_of_community_centres": 966.28,
         "cst_number_and_proximity_of_cultural_spaces": 127.09,
         "cst_number_of_faith_centres": 10,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 100,
+        "crime_burglary_12mo": 131,
+        "crime_drug_offences_12mo": 123,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 14,
+        "crime_public_order_12mo": 168,
+        "crime_robbery_12mo": 49,
+        "crime_sexual_offences_12mo": 45,
+        "crime_theft_12mo": 1046,
+        "crime_vehicle_12mo": 132,
+        "crime_violence_12mo": 471
       },
       "gp_list": [
         {
@@ -5527,7 +6000,7 @@
       "lad": "Ealing",
       "lad_code": "E09000009",
       "indicators": {
-        "crime_total": 1419,
+        "crime_total": 1053,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -5596,7 +6069,18 @@
         "cst_number_and_proximity_of_community_centres": 1466.74,
         "cst_number_and_proximity_of_cultural_spaces": 124.78,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 80,
+        "crime_burglary_12mo": 63,
+        "crime_drug_offences_12mo": 70,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 72,
+        "crime_robbery_12mo": 19,
+        "crime_sexual_offences_12mo": 38,
+        "crime_theft_12mo": 213,
+        "crime_vehicle_12mo": 212,
+        "crime_violence_12mo": 270
       },
       "crime_by_category": {
         "anti-social-behaviour": 321,
@@ -5623,7 +6107,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 1682,
+        "crime_total": 1223,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -5692,7 +6176,18 @@
         "cst_number_and_proximity_of_community_centres": 480.55,
         "cst_number_and_proximity_of_cultural_spaces": 533.57,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 78,
+        "crime_burglary_12mo": 83,
+        "crime_drug_offences_12mo": 123,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 96,
+        "crime_robbery_12mo": 22,
+        "crime_sexual_offences_12mo": 34,
+        "crime_theft_12mo": 212,
+        "crime_vehicle_12mo": 129,
+        "crime_violence_12mo": 426
       },
       "gp_list": [
         {
@@ -5739,7 +6234,7 @@
       "indicators": {
         "gp_practice_count": 5,
         "pharmacy_count": 4,
-        "crime_total": 1918,
+        "crime_total": 1469,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -5808,7 +6303,18 @@
         "cst_number_and_proximity_of_community_centres": 1035.13,
         "cst_number_and_proximity_of_cultural_spaces": 165.49,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 98,
+        "crime_burglary_12mo": 97,
+        "crime_drug_offences_12mo": 110,
+        "crime_misc_society_12mo": 15,
+        "crime_weapons_12mo": 18,
+        "crime_public_order_12mo": 99,
+        "crime_robbery_12mo": 47,
+        "crime_sexual_offences_12mo": 66,
+        "crime_theft_12mo": 305,
+        "crime_vehicle_12mo": 173,
+        "crime_violence_12mo": 441
       },
       "gp_list": [
         {
@@ -5889,7 +6395,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 1699,
+        "crime_total": 1227,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -5958,7 +6464,18 @@
         "cst_number_and_proximity_of_community_centres": 1531.62,
         "cst_number_and_proximity_of_cultural_spaces": 345.06,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 85,
+        "crime_burglary_12mo": 102,
+        "crime_drug_offences_12mo": 61,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 88,
+        "crime_robbery_12mo": 29,
+        "crime_sexual_offences_12mo": 54,
+        "crime_theft_12mo": 193,
+        "crime_vehicle_12mo": 284,
+        "crime_violence_12mo": 306
       },
       "gp_list": [
         {
@@ -6017,7 +6534,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 5,
-        "crime_total": 2480,
+        "crime_total": 1401,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -6086,7 +6603,18 @@
         "cst_number_and_proximity_of_community_centres": 429.45,
         "cst_number_and_proximity_of_cultural_spaces": 322.14,
         "cst_number_of_faith_centres": 9,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 107,
+        "crime_burglary_12mo": 79,
+        "crime_drug_offences_12mo": 89,
+        "crime_misc_society_12mo": 16,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 107,
+        "crime_robbery_12mo": 40,
+        "crime_sexual_offences_12mo": 38,
+        "crime_theft_12mo": 279,
+        "crime_vehicle_12mo": 154,
+        "crime_violence_12mo": 485
       },
       "gp_list": [
         {
@@ -6160,7 +6688,7 @@
       "indicators": {
         "gp_practice_count": 7,
         "pharmacy_count": 4,
-        "crime_total": 1385,
+        "crime_total": 1046,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -6229,7 +6757,18 @@
         "cst_number_and_proximity_of_community_centres": 1089.41,
         "cst_number_and_proximity_of_cultural_spaces": 770.55,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 49,
+        "crime_burglary_12mo": 42,
+        "crime_drug_offences_12mo": 145,
+        "crime_misc_society_12mo": 16,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 62,
+        "crime_robbery_12mo": 34,
+        "crime_sexual_offences_12mo": 37,
+        "crime_theft_12mo": 140,
+        "crime_vehicle_12mo": 135,
+        "crime_violence_12mo": 382
       },
       "gp_list": [
         {
@@ -6322,7 +6861,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 4,
-        "crime_total": 3051,
+        "crime_total": 2085,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -6391,7 +6930,18 @@
         "cst_number_and_proximity_of_community_centres": 516.08,
         "cst_number_and_proximity_of_cultural_spaces": 448.75,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 145,
+        "crime_burglary_12mo": 121,
+        "crime_drug_offences_12mo": 91,
+        "crime_misc_society_12mo": 28,
+        "crime_weapons_12mo": 11,
+        "crime_public_order_12mo": 147,
+        "crime_robbery_12mo": 57,
+        "crime_sexual_offences_12mo": 54,
+        "crime_theft_12mo": 390,
+        "crime_vehicle_12mo": 377,
+        "crime_violence_12mo": 664
       },
       "gp_list": [
         {
@@ -6448,7 +6998,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 930,
+        "crime_total": 803,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -6517,7 +7067,18 @@
         "cst_number_and_proximity_of_community_centres": 1253.39,
         "cst_number_and_proximity_of_cultural_spaces": 331.11,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 65,
+        "crime_burglary_12mo": 50,
+        "crime_drug_offences_12mo": 36,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 54,
+        "crime_robbery_12mo": 13,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 126,
+        "crime_vehicle_12mo": 100,
+        "crime_violence_12mo": 322
       },
       "gp_list": [
         {
@@ -6570,7 +7131,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 1068,
+        "crime_total": 809,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -6639,7 +7200,18 @@
         "cst_number_and_proximity_of_community_centres": 370.81,
         "cst_number_and_proximity_of_cultural_spaces": 377.08,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 66,
+        "crime_burglary_12mo": 63,
+        "crime_drug_offences_12mo": 34,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 64,
+        "crime_robbery_12mo": 21,
+        "crime_sexual_offences_12mo": 45,
+        "crime_theft_12mo": 89,
+        "crime_vehicle_12mo": 97,
+        "crime_violence_12mo": 311
       },
       "gp_list": [
         {
@@ -6697,7 +7269,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 5,
-        "crime_total": 829,
+        "crime_total": 638,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -6766,7 +7338,18 @@
         "cst_number_and_proximity_of_community_centres": 386.74,
         "cst_number_and_proximity_of_cultural_spaces": 31.15,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 45,
+        "crime_burglary_12mo": 52,
+        "crime_drug_offences_12mo": 42,
+        "crime_misc_society_12mo": 6,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 38,
+        "crime_robbery_12mo": 16,
+        "crime_sexual_offences_12mo": 31,
+        "crime_theft_12mo": 132,
+        "crime_vehicle_12mo": 115,
+        "crime_violence_12mo": 158
       },
       "gp_list": [
         {
@@ -6834,7 +7417,7 @@
       "indicators": {
         "gp_practice_count": 5,
         "pharmacy_count": 3,
-        "crime_total": 1543,
+        "crime_total": 1211,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -6903,7 +7486,18 @@
         "cst_number_and_proximity_of_community_centres": 285.29,
         "cst_number_and_proximity_of_cultural_spaces": 522.29,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 75,
+        "crime_burglary_12mo": 68,
+        "crime_drug_offences_12mo": 80,
+        "crime_misc_society_12mo": 27,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 75,
+        "crime_robbery_12mo": 44,
+        "crime_sexual_offences_12mo": 53,
+        "crime_theft_12mo": 228,
+        "crime_vehicle_12mo": 144,
+        "crime_violence_12mo": 408
       },
       "gp_list": [
         {
@@ -6979,7 +7573,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1651,
+        "crime_total": 1318,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7048,7 +7642,18 @@
         "cst_number_and_proximity_of_community_centres": 454.49,
         "cst_number_and_proximity_of_cultural_spaces": 443.94,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 95,
+        "crime_burglary_12mo": 53,
+        "crime_drug_offences_12mo": 87,
+        "crime_misc_society_12mo": 19,
+        "crime_weapons_12mo": 12,
+        "crime_public_order_12mo": 87,
+        "crime_robbery_12mo": 47,
+        "crime_sexual_offences_12mo": 49,
+        "crime_theft_12mo": 195,
+        "crime_vehicle_12mo": 207,
+        "crime_violence_12mo": 467
       },
       "gp_list": [
         {
@@ -7101,7 +7706,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 1,
-        "crime_total": 1994,
+        "crime_total": 1632,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7170,7 +7775,18 @@
         "cst_number_and_proximity_of_community_centres": 366.4,
         "cst_number_and_proximity_of_cultural_spaces": 200.7,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 138,
+        "crime_burglary_12mo": 76,
+        "crime_drug_offences_12mo": 86,
+        "crime_misc_society_12mo": 21,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 108,
+        "crime_robbery_12mo": 43,
+        "crime_sexual_offences_12mo": 53,
+        "crime_theft_12mo": 226,
+        "crime_vehicle_12mo": 162,
+        "crime_violence_12mo": 710
       },
       "gp_list": [
         {
@@ -7224,7 +7840,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 5,
-        "crime_total": 1849,
+        "crime_total": 1346,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7293,7 +7909,18 @@
         "cst_number_and_proximity_of_community_centres": 473.2,
         "cst_number_and_proximity_of_cultural_spaces": 104.74,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 109,
+        "crime_burglary_12mo": 60,
+        "crime_drug_offences_12mo": 182,
+        "crime_misc_society_12mo": 18,
+        "crime_weapons_12mo": 12,
+        "crime_public_order_12mo": 60,
+        "crime_robbery_12mo": 24,
+        "crime_sexual_offences_12mo": 26,
+        "crime_theft_12mo": 173,
+        "crime_vehicle_12mo": 260,
+        "crime_violence_12mo": 422
       },
       "gp_list": [
         {
@@ -7361,7 +7988,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 1194,
+        "crime_total": 847,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7430,7 +8057,18 @@
         "cst_number_and_proximity_of_community_centres": 711.53,
         "cst_number_and_proximity_of_cultural_spaces": 297.04,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 67,
+        "crime_burglary_12mo": 71,
+        "crime_drug_offences_12mo": 49,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 58,
+        "crime_robbery_12mo": 14,
+        "crime_sexual_offences_12mo": 35,
+        "crime_theft_12mo": 95,
+        "crime_vehicle_12mo": 166,
+        "crime_violence_12mo": 276
       },
       "gp_list": [
         {
@@ -7477,7 +8115,7 @@
       "indicators": {
         "gp_practice_count": 7,
         "pharmacy_count": 6,
-        "crime_total": 2669,
+        "crime_total": 1787,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7546,7 +8184,18 @@
         "cst_number_and_proximity_of_community_centres": 1318.15,
         "cst_number_and_proximity_of_cultural_spaces": 245.58,
         "cst_number_of_faith_centres": 8,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 129,
+        "crime_burglary_12mo": 120,
+        "crime_drug_offences_12mo": 122,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 18,
+        "crime_public_order_12mo": 150,
+        "crime_robbery_12mo": 46,
+        "crime_sexual_offences_12mo": 49,
+        "crime_theft_12mo": 458,
+        "crime_vehicle_12mo": 133,
+        "crime_violence_12mo": 545
       },
       "gp_list": [
         {
@@ -7649,7 +8298,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 4,
-        "crime_total": 2630,
+        "crime_total": 1898,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7718,7 +8367,18 @@
         "cst_number_and_proximity_of_community_centres": 1016.22,
         "cst_number_and_proximity_of_cultural_spaces": 129.87,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 111,
+        "crime_burglary_12mo": 47,
+        "crime_drug_offences_12mo": 75,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 110,
+        "crime_robbery_12mo": 97,
+        "crime_sexual_offences_12mo": 44,
+        "crime_theft_12mo": 648,
+        "crime_vehicle_12mo": 174,
+        "crime_violence_12mo": 569
       },
       "gp_list": [
         {
@@ -7787,7 +8447,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 5,
-        "crime_total": 2803,
+        "crime_total": 2082,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7856,7 +8516,18 @@
         "cst_number_and_proximity_of_community_centres": 596.92,
         "cst_number_and_proximity_of_cultural_spaces": 119.69,
         "cst_number_of_faith_centres": 8,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 132,
+        "crime_burglary_12mo": 60,
+        "crime_drug_offences_12mo": 119,
+        "crime_misc_society_12mo": 24,
+        "crime_weapons_12mo": 14,
+        "crime_public_order_12mo": 119,
+        "crime_robbery_12mo": 70,
+        "crime_sexual_offences_12mo": 49,
+        "crime_theft_12mo": 582,
+        "crime_vehicle_12mo": 240,
+        "crime_violence_12mo": 673
       },
       "gp_list": [
         {
@@ -7930,7 +8601,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 910,
+        "crime_total": 637,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -7999,7 +8670,18 @@
         "cst_number_and_proximity_of_community_centres": 768.71,
         "cst_number_and_proximity_of_cultural_spaces": 490.28,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 59,
+        "crime_burglary_12mo": 46,
+        "crime_drug_offences_12mo": 48,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 27,
+        "crime_robbery_12mo": 9,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 92,
+        "crime_vehicle_12mo": 74,
+        "crime_violence_12mo": 243
       },
       "gp_list": [
         {
@@ -8041,7 +8723,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 1235,
+        "crime_total": 1087,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -8110,7 +8792,18 @@
         "cst_number_and_proximity_of_community_centres": 906.62,
         "cst_number_and_proximity_of_cultural_spaces": 173.09,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 107,
+        "crime_burglary_12mo": 70,
+        "crime_drug_offences_12mo": 32,
+        "crime_misc_society_12mo": 6,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 59,
+        "crime_robbery_12mo": 21,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 291,
+        "crime_vehicle_12mo": 210,
+        "crime_violence_12mo": 264
       },
       "gp_list": [
         {
@@ -8169,7 +8862,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 3,
-        "crime_total": 2143,
+        "crime_total": 1429,
         "ft_life_expectancy_male": 81.5,
         "ft_healthy_life_expectancy_male": 76.1361595876895,
         "ft_smoking_prevalence_adults": 12.87573407,
@@ -8238,7 +8931,18 @@
         "cst_number_and_proximity_of_community_centres": 409.19,
         "cst_number_and_proximity_of_cultural_spaces": 239.85,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 85,
+        "crime_burglary_12mo": 72,
+        "crime_drug_offences_12mo": 76,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 11,
+        "crime_public_order_12mo": 105,
+        "crime_robbery_12mo": 60,
+        "crime_sexual_offences_12mo": 46,
+        "crime_theft_12mo": 360,
+        "crime_vehicle_12mo": 258,
+        "crime_violence_12mo": 344
       },
       "gp_list": [
         {
@@ -8308,7 +9012,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 534,
+        "crime_total": 428,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -8377,7 +9081,18 @@
         "cst_number_and_proximity_of_community_centres": 1653.15,
         "cst_number_and_proximity_of_cultural_spaces": 467.41,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 25,
+        "crime_burglary_12mo": 62,
+        "crime_drug_offences_12mo": 42,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 23,
+        "crime_robbery_12mo": 4,
+        "crime_sexual_offences_12mo": 15,
+        "crime_theft_12mo": 79,
+        "crime_vehicle_12mo": 56,
+        "crime_violence_12mo": 113
       },
       "gp_list": [
         {
@@ -8429,7 +9144,7 @@
       "lad_code": "E09000015",
       "indicators": {
         "pharmacy_count": 2,
-        "crime_total": 516,
+        "crime_total": 482,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -8498,7 +9213,18 @@
         "cst_number_and_proximity_of_community_centres": 1955.66,
         "cst_number_and_proximity_of_cultural_spaces": 17.86,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 36,
+        "crime_burglary_12mo": 64,
+        "crime_drug_offences_12mo": 15,
+        "crime_misc_society_12mo": 3,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 20,
+        "crime_robbery_12mo": 19,
+        "crime_sexual_offences_12mo": 15,
+        "crime_theft_12mo": 97,
+        "crime_vehicle_12mo": 91,
+        "crime_violence_12mo": 120
       },
       "pharmacy_list": [
         {
@@ -8537,7 +9263,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 709,
+        "crime_total": 538,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -8606,7 +9332,18 @@
         "cst_number_and_proximity_of_community_centres": 749.38,
         "cst_number_and_proximity_of_cultural_spaces": 496.8,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 30,
+        "crime_burglary_12mo": 71,
+        "crime_drug_offences_12mo": 24,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 25,
+        "crime_robbery_12mo": 9,
+        "crime_sexual_offences_12mo": 25,
+        "crime_theft_12mo": 80,
+        "crime_vehicle_12mo": 90,
+        "crime_violence_12mo": 172
       },
       "gp_list": [
         {
@@ -8659,7 +9396,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 5,
-        "crime_total": 709,
+        "crime_total": 968,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -8728,7 +9465,18 @@
         "cst_number_and_proximity_of_community_centres": 569.8,
         "cst_number_and_proximity_of_cultural_spaces": 506.72,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 66,
+        "crime_burglary_12mo": 142,
+        "crime_drug_offences_12mo": 54,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 56,
+        "crime_robbery_12mo": 49,
+        "crime_sexual_offences_12mo": 25,
+        "crime_theft_12mo": 134,
+        "crime_vehicle_12mo": 122,
+        "crime_violence_12mo": 295
       },
       "gp_list": [
         {
@@ -8796,7 +9544,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 5,
-        "crime_total": 3172,
+        "crime_total": 2453,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -8865,7 +9613,18 @@
         "cst_number_and_proximity_of_community_centres": 1000.01,
         "cst_number_and_proximity_of_cultural_spaces": 109.95,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 133,
+        "crime_burglary_12mo": 66,
+        "crime_drug_offences_12mo": 197,
+        "crime_misc_society_12mo": 21,
+        "crime_weapons_12mo": 16,
+        "crime_public_order_12mo": 154,
+        "crime_robbery_12mo": 96,
+        "crime_sexual_offences_12mo": 53,
+        "crime_theft_12mo": 984,
+        "crime_vehicle_12mo": 105,
+        "crime_violence_12mo": 628
       },
       "gp_list": [
         {
@@ -8927,7 +9686,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 3,
-        "crime_total": 985,
+        "crime_total": 783,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -8996,7 +9755,18 @@
         "cst_number_and_proximity_of_community_centres": 684.15,
         "cst_number_and_proximity_of_cultural_spaces": 101.12,
         "cst_number_of_faith_centres": 9,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 56,
+        "crime_burglary_12mo": 44,
+        "crime_drug_offences_12mo": 36,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 45,
+        "crime_robbery_12mo": 22,
+        "crime_sexual_offences_12mo": 37,
+        "crime_theft_12mo": 185,
+        "crime_vehicle_12mo": 57,
+        "crime_violence_12mo": 283
       },
       "gp_list": [
         {
@@ -9048,7 +9818,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 1282,
+        "crime_total": 1001,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9117,7 +9887,18 @@
         "cst_number_and_proximity_of_community_centres": 1024.97,
         "cst_number_and_proximity_of_cultural_spaces": 386.94,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 72,
+        "crime_burglary_12mo": 61,
+        "crime_drug_offences_12mo": 56,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 53,
+        "crime_robbery_12mo": 37,
+        "crime_sexual_offences_12mo": 24,
+        "crime_theft_12mo": 254,
+        "crime_vehicle_12mo": 109,
+        "crime_violence_12mo": 308
       },
       "gp_list": [
         {
@@ -9175,7 +9956,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 575,
+        "crime_total": 480,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9244,7 +10025,18 @@
         "cst_number_and_proximity_of_community_centres": 1338.67,
         "cst_number_and_proximity_of_cultural_spaces": 154.11,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 35,
+        "crime_burglary_12mo": 61,
+        "crime_drug_offences_12mo": 15,
+        "crime_misc_society_12mo": 4,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 24,
+        "crime_robbery_12mo": 3,
+        "crime_sexual_offences_12mo": 7,
+        "crime_theft_12mo": 162,
+        "crime_vehicle_12mo": 61,
+        "crime_violence_12mo": 107
       },
       "gp_list": [
         {
@@ -9295,7 +10087,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 1036,
+        "crime_total": 768,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9364,7 +10156,18 @@
         "cst_number_and_proximity_of_community_centres": 800.4,
         "cst_number_and_proximity_of_cultural_spaces": 169.97,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 54,
+        "crime_burglary_12mo": 53,
+        "crime_drug_offences_12mo": 43,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 45,
+        "crime_robbery_12mo": 27,
+        "crime_sexual_offences_12mo": 22,
+        "crime_theft_12mo": 168,
+        "crime_vehicle_12mo": 105,
+        "crime_violence_12mo": 235
       },
       "gp_list": [
         {
@@ -9422,7 +10225,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 1198,
+        "crime_total": 684,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9491,7 +10294,18 @@
         "cst_number_and_proximity_of_community_centres": 280.22,
         "cst_number_and_proximity_of_cultural_spaces": 466.23,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 38,
+        "crime_burglary_12mo": 65,
+        "crime_drug_offences_12mo": 36,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 27,
+        "crime_robbery_12mo": 29,
+        "crime_sexual_offences_12mo": 25,
+        "crime_theft_12mo": 108,
+        "crime_vehicle_12mo": 99,
+        "crime_violence_12mo": 241
       },
       "gp_list": [
         {
@@ -9548,7 +10362,7 @@
       "lad_code": "E09000015",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 420,
+        "crime_total": 337,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9617,7 +10431,18 @@
         "cst_number_and_proximity_of_community_centres": 1123.55,
         "cst_number_and_proximity_of_cultural_spaces": 480.93,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 23,
+        "crime_burglary_12mo": 20,
+        "crime_drug_offences_12mo": 13,
+        "crime_misc_society_12mo": 3,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 11,
+        "crime_robbery_12mo": 10,
+        "crime_sexual_offences_12mo": 12,
+        "crime_theft_12mo": 53,
+        "crime_vehicle_12mo": 80,
+        "crime_violence_12mo": 109
       },
       "pharmacy_list": [
         {
@@ -9650,7 +10475,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1333,
+        "crime_total": 791,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9719,7 +10544,18 @@
         "cst_number_and_proximity_of_community_centres": 306.86,
         "cst_number_and_proximity_of_cultural_spaces": 423.28,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 63,
+        "crime_burglary_12mo": 51,
+        "crime_drug_offences_12mo": 53,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 48,
+        "crime_robbery_12mo": 23,
+        "crime_sexual_offences_12mo": 22,
+        "crime_theft_12mo": 137,
+        "crime_vehicle_12mo": 104,
+        "crime_violence_12mo": 274
       },
       "gp_list": [
         {
@@ -9772,7 +10608,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 635,
+        "crime_total": 491,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9841,7 +10677,18 @@
         "cst_number_and_proximity_of_community_centres": 441.55,
         "cst_number_and_proximity_of_cultural_spaces": 446.3,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 34,
+        "crime_burglary_12mo": 44,
+        "crime_drug_offences_12mo": 20,
+        "crime_misc_society_12mo": 4,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 26,
+        "crime_robbery_12mo": 12,
+        "crime_sexual_offences_12mo": 10,
+        "crime_theft_12mo": 132,
+        "crime_vehicle_12mo": 60,
+        "crime_violence_12mo": 146
       },
       "gp_list": [
         {
@@ -9899,7 +10746,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 4,
-        "crime_total": 893,
+        "crime_total": 655,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -9968,7 +10815,18 @@
         "cst_number_and_proximity_of_community_centres": 993.35,
         "cst_number_and_proximity_of_cultural_spaces": 217.04,
         "cst_number_of_faith_centres": 8,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 30,
+        "crime_burglary_12mo": 53,
+        "crime_drug_offences_12mo": 27,
+        "crime_misc_society_12mo": 10,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 44,
+        "crime_robbery_12mo": 20,
+        "crime_sexual_offences_12mo": 9,
+        "crime_theft_12mo": 203,
+        "crime_vehicle_12mo": 84,
+        "crime_violence_12mo": 170
       },
       "gp_list": [
         {
@@ -10024,7 +10882,7 @@
       "lad_code": "E09000015",
       "indicators": {
         "pharmacy_count": 3,
-        "crime_total": 840,
+        "crime_total": 669,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10093,7 +10951,18 @@
         "cst_number_and_proximity_of_community_centres": 644.51,
         "cst_number_and_proximity_of_cultural_spaces": 230.28,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 33,
+        "crime_burglary_12mo": 53,
+        "crime_drug_offences_12mo": 28,
+        "crime_misc_society_12mo": 5,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 36,
+        "crime_robbery_12mo": 22,
+        "crime_sexual_offences_12mo": 14,
+        "crime_theft_12mo": 189,
+        "crime_vehicle_12mo": 100,
+        "crime_violence_12mo": 186
       },
       "pharmacy_list": [
         {
@@ -10137,7 +11006,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 1,
-        "crime_total": 498,
+        "crime_total": 424,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10206,7 +11075,18 @@
         "cst_number_and_proximity_of_community_centres": 984.97,
         "cst_number_and_proximity_of_cultural_spaces": 526.13,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 16,
+        "crime_burglary_12mo": 33,
+        "crime_drug_offences_12mo": 12,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 0,
+        "crime_public_order_12mo": 28,
+        "crime_robbery_12mo": 10,
+        "crime_sexual_offences_12mo": 14,
+        "crime_theft_12mo": 74,
+        "crime_vehicle_12mo": 63,
+        "crime_violence_12mo": 165
       },
       "gp_list": [
         {
@@ -10254,7 +11134,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 936,
+        "crime_total": 633,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10323,7 +11203,18 @@
         "cst_number_and_proximity_of_community_centres": 741.01,
         "cst_number_and_proximity_of_cultural_spaces": 635.16,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 57,
+        "crime_burglary_12mo": 23,
+        "crime_drug_offences_12mo": 43,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 42,
+        "crime_robbery_12mo": 14,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 101,
+        "crime_vehicle_12mo": 61,
+        "crime_violence_12mo": 260
       },
       "gp_list": [
         {
@@ -10370,7 +11261,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 5,
-        "crime_total": 1622,
+        "crime_total": 1186,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10439,7 +11330,18 @@
         "cst_number_and_proximity_of_community_centres": 1074.2,
         "cst_number_and_proximity_of_cultural_spaces": 403.21,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 83,
+        "crime_burglary_12mo": 61,
+        "crime_drug_offences_12mo": 37,
+        "crime_misc_society_12mo": 19,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 61,
+        "crime_robbery_12mo": 74,
+        "crime_sexual_offences_12mo": 35,
+        "crime_theft_12mo": 303,
+        "crime_vehicle_12mo": 145,
+        "crime_violence_12mo": 360
       },
       "gp_list": [
         {
@@ -10500,7 +11402,7 @@
       "lad_code": "E09000015",
       "indicators": {
         "pharmacy_count": 2,
-        "crime_total": 1113,
+        "crime_total": 767,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10569,7 +11471,18 @@
         "cst_number_and_proximity_of_community_centres": 1426.95,
         "cst_number_and_proximity_of_cultural_spaces": 56.63,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 55,
+        "crime_burglary_12mo": 84,
+        "crime_drug_offences_12mo": 43,
+        "crime_misc_society_12mo": 10,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 39,
+        "crime_robbery_12mo": 24,
+        "crime_sexual_offences_12mo": 22,
+        "crime_theft_12mo": 160,
+        "crime_vehicle_12mo": 90,
+        "crime_violence_12mo": 236
       },
       "pharmacy_list": [
         {
@@ -10607,7 +11520,7 @@
       "lad_code": "E09000015",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 1007,
+        "crime_total": 614,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10676,7 +11589,18 @@
         "cst_number_and_proximity_of_community_centres": 880.48,
         "cst_number_and_proximity_of_cultural_spaces": 140.69,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 38,
+        "crime_burglary_12mo": 31,
+        "crime_drug_offences_12mo": 48,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 40,
+        "crime_robbery_12mo": 13,
+        "crime_sexual_offences_12mo": 11,
+        "crime_theft_12mo": 110,
+        "crime_vehicle_12mo": 98,
+        "crime_violence_12mo": 207
       },
       "pharmacy_list": [
         {
@@ -10709,7 +11633,7 @@
       "lad_code": "E09000015",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 1183,
+        "crime_total": 1032,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10778,7 +11702,18 @@
         "cst_number_and_proximity_of_community_centres": 614.38,
         "cst_number_and_proximity_of_cultural_spaces": 188.38,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 54,
+        "crime_burglary_12mo": 56,
+        "crime_drug_offences_12mo": 96,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 87,
+        "crime_robbery_12mo": 35,
+        "crime_sexual_offences_12mo": 25,
+        "crime_theft_12mo": 322,
+        "crime_vehicle_12mo": 60,
+        "crime_violence_12mo": 280
       },
       "pharmacy_list": [
         {
@@ -10812,7 +11747,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 1,
-        "crime_total": 620,
+        "crime_total": 440,
         "ft_life_expectancy_male": 82.0,
         "ft_healthy_life_expectancy_male": 78.4887299198361,
         "ft_smoking_prevalence_adults": 13.80985801,
@@ -10881,7 +11816,18 @@
         "cst_number_and_proximity_of_community_centres": 532.53,
         "cst_number_and_proximity_of_cultural_spaces": 254.33,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 29,
+        "crime_burglary_12mo": 19,
+        "crime_drug_offences_12mo": 12,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 32,
+        "crime_robbery_12mo": 10,
+        "crime_sexual_offences_12mo": 12,
+        "crime_theft_12mo": 67,
+        "crime_vehicle_12mo": 66,
+        "crime_violence_12mo": 183
       },
       "gp_list": [
         {
@@ -10935,7 +11881,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 4,
-        "crime_total": 1593,
+        "crime_total": 1334,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11004,7 +11950,18 @@
         "cst_number_and_proximity_of_community_centres": 894.85,
         "cst_number_and_proximity_of_cultural_spaces": 192.59,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 64,
+        "crime_burglary_12mo": 105,
+        "crime_drug_offences_12mo": 90,
+        "crime_misc_society_12mo": 15,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 80,
+        "crime_robbery_12mo": 50,
+        "crime_sexual_offences_12mo": 36,
+        "crime_theft_12mo": 272,
+        "crime_vehicle_12mo": 204,
+        "crime_violence_12mo": 413
       },
       "gp_list": [
         {
@@ -11067,7 +12024,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 936,
+        "crime_total": 682,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11136,7 +12093,18 @@
         "cst_number_and_proximity_of_community_centres": 510.72,
         "cst_number_and_proximity_of_cultural_spaces": 425.35,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 62,
+        "crime_burglary_12mo": 45,
+        "crime_drug_offences_12mo": 37,
+        "crime_misc_society_12mo": 15,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 37,
+        "crime_robbery_12mo": 22,
+        "crime_sexual_offences_12mo": 19,
+        "crime_theft_12mo": 88,
+        "crime_vehicle_12mo": 117,
+        "crime_violence_12mo": 237
       },
       "gp_list": [
         {
@@ -11183,7 +12151,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 1,
-        "crime_total": 2417,
+        "crime_total": 1871,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11252,7 +12220,18 @@
         "cst_number_and_proximity_of_community_centres": 313.67,
         "cst_number_and_proximity_of_cultural_spaces": 392.22,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 158,
+        "crime_burglary_12mo": 74,
+        "crime_drug_offences_12mo": 109,
+        "crime_misc_society_12mo": 47,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 151,
+        "crime_robbery_12mo": 27,
+        "crime_sexual_offences_12mo": 88,
+        "crime_theft_12mo": 253,
+        "crime_vehicle_12mo": 163,
+        "crime_violence_12mo": 791
       },
       "gp_list": [
         {
@@ -11312,7 +12291,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 3,
-        "crime_total": 986,
+        "crime_total": 795,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11381,7 +12360,18 @@
         "cst_number_and_proximity_of_community_centres": 577.61,
         "cst_number_and_proximity_of_cultural_spaces": 154.47,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 55,
+        "crime_burglary_12mo": 50,
+        "crime_drug_offences_12mo": 40,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 39,
+        "crime_robbery_12mo": 19,
+        "crime_sexual_offences_12mo": 16,
+        "crime_theft_12mo": 220,
+        "crime_vehicle_12mo": 126,
+        "crime_violence_12mo": 219
       },
       "gp_list": [
         {
@@ -11451,7 +12441,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 454,
+        "crime_total": 332,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11520,7 +12510,18 @@
         "cst_number_and_proximity_of_community_centres": 2255.72,
         "cst_number_and_proximity_of_cultural_spaces": 260.85,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 33,
+        "crime_burglary_12mo": 20,
+        "crime_drug_offences_12mo": 8,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 0,
+        "crime_public_order_12mo": 28,
+        "crime_robbery_12mo": 7,
+        "crime_sexual_offences_12mo": 13,
+        "crime_theft_12mo": 45,
+        "crime_vehicle_12mo": 37,
+        "crime_violence_12mo": 132
       },
       "gp_list": [
         {
@@ -11567,7 +12568,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 5,
-        "crime_total": 3044,
+        "crime_total": 2200,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11636,7 +12637,18 @@
         "cst_number_and_proximity_of_community_centres": 701.62,
         "cst_number_and_proximity_of_cultural_spaces": 271.76,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 140,
+        "crime_burglary_12mo": 106,
+        "crime_drug_offences_12mo": 83,
+        "crime_misc_society_12mo": 21,
+        "crime_weapons_12mo": 17,
+        "crime_public_order_12mo": 153,
+        "crime_robbery_12mo": 89,
+        "crime_sexual_offences_12mo": 51,
+        "crime_theft_12mo": 708,
+        "crime_vehicle_12mo": 216,
+        "crime_violence_12mo": 616
       },
       "gp_list": [
         {
@@ -11704,7 +12716,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 8223,
+        "crime_total": 6432,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11773,7 +12785,18 @@
         "cst_number_and_proximity_of_community_centres": 659.98,
         "cst_number_and_proximity_of_cultural_spaces": 695.58,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 312,
+        "crime_burglary_12mo": 89,
+        "crime_drug_offences_12mo": 203,
+        "crime_misc_society_12mo": 1551,
+        "crime_weapons_12mo": 46,
+        "crime_public_order_12mo": 362,
+        "crime_robbery_12mo": 47,
+        "crime_sexual_offences_12mo": 183,
+        "crime_theft_12mo": 1747,
+        "crime_vehicle_12mo": 634,
+        "crime_violence_12mo": 1258
       },
       "gp_list": [
         {
@@ -11831,7 +12854,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 5,
-        "crime_total": 1218,
+        "crime_total": 965,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -11900,7 +12923,18 @@
         "cst_number_and_proximity_of_community_centres": 766.38,
         "cst_number_and_proximity_of_cultural_spaces": 176.28,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 79,
+        "crime_burglary_12mo": 41,
+        "crime_drug_offences_12mo": 82,
+        "crime_misc_society_12mo": 21,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 77,
+        "crime_robbery_12mo": 13,
+        "crime_sexual_offences_12mo": 46,
+        "crime_theft_12mo": 152,
+        "crime_vehicle_12mo": 139,
+        "crime_violence_12mo": 308
       },
       "gp_list": [
         {
@@ -11973,7 +13007,7 @@
       "lad_code": "E09000017",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 687,
+        "crime_total": 485,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12042,7 +13076,18 @@
         "cst_number_and_proximity_of_community_centres": 1037.33,
         "cst_number_and_proximity_of_cultural_spaces": 84.33,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 56,
+        "crime_burglary_12mo": 34,
+        "crime_drug_offences_12mo": 19,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 37,
+        "crime_robbery_12mo": 6,
+        "crime_sexual_offences_12mo": 12,
+        "crime_theft_12mo": 64,
+        "crime_vehicle_12mo": 72,
+        "crime_violence_12mo": 176
       },
       "pharmacy_list": [
         {
@@ -12076,7 +13121,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 624,
+        "crime_total": 444,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12145,7 +13190,18 @@
         "cst_number_and_proximity_of_community_centres": 1359.03,
         "cst_number_and_proximity_of_cultural_spaces": 186.73,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 37,
+        "crime_burglary_12mo": 23,
+        "crime_drug_offences_12mo": 16,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 37,
+        "crime_robbery_12mo": 9,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 60,
+        "crime_vehicle_12mo": 76,
+        "crime_violence_12mo": 150
       },
       "gp_list": [
         {
@@ -12192,7 +13248,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 861,
+        "crime_total": 724,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12261,7 +13317,18 @@
         "cst_number_and_proximity_of_community_centres": 1509.47,
         "cst_number_and_proximity_of_cultural_spaces": 586.57,
         "cst_number_of_faith_centres": 8,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 46,
+        "crime_burglary_12mo": 64,
+        "crime_drug_offences_12mo": 16,
+        "crime_misc_society_12mo": 6,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 45,
+        "crime_robbery_12mo": 20,
+        "crime_sexual_offences_12mo": 18,
+        "crime_theft_12mo": 237,
+        "crime_vehicle_12mo": 99,
+        "crime_violence_12mo": 168
       },
       "gp_list": [
         {
@@ -12318,7 +13385,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 939,
+        "crime_total": 719,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12387,7 +13454,18 @@
         "cst_number_and_proximity_of_community_centres": 744.37,
         "cst_number_and_proximity_of_cultural_spaces": 81.3,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 23,
+        "crime_burglary_12mo": 65,
+        "crime_drug_offences_12mo": 63,
+        "crime_misc_society_12mo": 16,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 37,
+        "crime_robbery_12mo": 17,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 140,
+        "crime_vehicle_12mo": 85,
+        "crime_violence_12mo": 245
       },
       "gp_list": [
         {
@@ -12440,7 +13518,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 2156,
+        "crime_total": 1613,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12509,7 +13587,18 @@
         "cst_number_and_proximity_of_community_centres": 441.68,
         "cst_number_and_proximity_of_cultural_spaces": 250.34,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 109,
+        "crime_burglary_12mo": 117,
+        "crime_drug_offences_12mo": 68,
+        "crime_misc_society_12mo": 22,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 104,
+        "crime_robbery_12mo": 49,
+        "crime_sexual_offences_12mo": 58,
+        "crime_theft_12mo": 291,
+        "crime_vehicle_12mo": 240,
+        "crime_violence_12mo": 547
       },
       "gp_list": [
         {
@@ -12568,7 +13657,7 @@
       "indicators": {
         "gp_practice_count": 5,
         "pharmacy_count": 4,
-        "crime_total": 1321,
+        "crime_total": 930,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12637,7 +13726,18 @@
         "cst_number_and_proximity_of_community_centres": 914.8,
         "cst_number_and_proximity_of_cultural_spaces": 200.23,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 67,
+        "crime_burglary_12mo": 74,
+        "crime_drug_offences_12mo": 53,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 70,
+        "crime_robbery_12mo": 30,
+        "crime_sexual_offences_12mo": 21,
+        "crime_theft_12mo": 224,
+        "crime_vehicle_12mo": 115,
+        "crime_violence_12mo": 251
       },
       "gp_list": [
         {
@@ -12717,7 +13817,7 @@
       "lad_code": "E09000017",
       "indicators": {
         "pharmacy_count": 4,
-        "crime_total": 544,
+        "crime_total": 432,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12786,7 +13886,18 @@
         "cst_number_and_proximity_of_community_centres": 1154.1,
         "cst_number_and_proximity_of_cultural_spaces": 162.62,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 25,
+        "crime_burglary_12mo": 23,
+        "crime_drug_offences_12mo": 20,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 30,
+        "crime_robbery_12mo": 8,
+        "crime_sexual_offences_12mo": 21,
+        "crime_theft_12mo": 55,
+        "crime_vehicle_12mo": 87,
+        "crime_violence_12mo": 145
       },
       "pharmacy_list": [
         {
@@ -12834,7 +13945,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 1,
-        "crime_total": 1561,
+        "crime_total": 1303,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -12903,7 +14014,18 @@
         "cst_number_and_proximity_of_community_centres": 1314.35,
         "cst_number_and_proximity_of_cultural_spaces": 249.46,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 87,
+        "crime_burglary_12mo": 55,
+        "crime_drug_offences_12mo": 46,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 71,
+        "crime_robbery_12mo": 33,
+        "crime_sexual_offences_12mo": 26,
+        "crime_theft_12mo": 485,
+        "crime_vehicle_12mo": 206,
+        "crime_violence_12mo": 285
       },
       "gp_list": [
         {
@@ -12957,7 +14079,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 4,
-        "crime_total": 4094,
+        "crime_total": 3035,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -13026,7 +14148,18 @@
         "cst_number_and_proximity_of_community_centres": 738.27,
         "cst_number_and_proximity_of_cultural_spaces": 35.79,
         "cst_number_of_faith_centres": 9,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 196,
+        "crime_burglary_12mo": 95,
+        "crime_drug_offences_12mo": 186,
+        "crime_misc_society_12mo": 45,
+        "crime_weapons_12mo": 18,
+        "crime_public_order_12mo": 252,
+        "crime_robbery_12mo": 92,
+        "crime_sexual_offences_12mo": 85,
+        "crime_theft_12mo": 946,
+        "crime_vehicle_12mo": 234,
+        "crime_violence_12mo": 886
       },
       "gp_list": [
         {
@@ -13089,7 +14222,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 4,
-        "crime_total": 1923,
+        "crime_total": 1500,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -13158,7 +14291,18 @@
         "cst_number_and_proximity_of_community_centres": 77.01,
         "cst_number_and_proximity_of_cultural_spaces": 235.62,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 141,
+        "crime_burglary_12mo": 106,
+        "crime_drug_offences_12mo": 65,
+        "crime_misc_society_12mo": 28,
+        "crime_weapons_12mo": 6,
+        "crime_public_order_12mo": 103,
+        "crime_robbery_12mo": 24,
+        "crime_sexual_offences_12mo": 68,
+        "crime_theft_12mo": 280,
+        "crime_vehicle_12mo": 160,
+        "crime_violence_12mo": 519
       },
       "gp_list": [
         {
@@ -13215,7 +14359,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 2753,
+        "crime_total": 2300,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -13284,7 +14428,18 @@
         "cst_number_and_proximity_of_community_centres": 236.57,
         "cst_number_and_proximity_of_cultural_spaces": 214.05,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 126,
+        "crime_burglary_12mo": 81,
+        "crime_drug_offences_12mo": 94,
+        "crime_misc_society_12mo": 36,
+        "crime_weapons_12mo": 13,
+        "crime_public_order_12mo": 114,
+        "crime_robbery_12mo": 61,
+        "crime_sexual_offences_12mo": 71,
+        "crime_theft_12mo": 814,
+        "crime_vehicle_12mo": 292,
+        "crime_violence_12mo": 598
       },
       "gp_list": [
         {
@@ -13331,7 +14486,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1695,
+        "crime_total": 1254,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -13400,7 +14555,18 @@
         "cst_number_and_proximity_of_community_centres": 630.21,
         "cst_number_and_proximity_of_cultural_spaces": 447.69,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 111,
+        "crime_burglary_12mo": 51,
+        "crime_drug_offences_12mo": 106,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 80,
+        "crime_robbery_12mo": 36,
+        "crime_sexual_offences_12mo": 38,
+        "crime_theft_12mo": 233,
+        "crime_vehicle_12mo": 170,
+        "crime_violence_12mo": 409
       },
       "gp_list": [
         {
@@ -13453,7 +14619,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 3,
-        "crime_total": 1994,
+        "crime_total": 1426,
         "ft_life_expectancy_male": 80.1,
         "ft_healthy_life_expectancy_male": 75.3160663481131,
         "ft_smoking_prevalence_adults": 13.50709553,
@@ -13522,7 +14688,18 @@
         "cst_number_and_proximity_of_community_centres": 509.13,
         "cst_number_and_proximity_of_cultural_spaces": 201.67,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 112,
+        "crime_burglary_12mo": 54,
+        "crime_drug_offences_12mo": 132,
+        "crime_misc_society_12mo": 24,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 90,
+        "crime_robbery_12mo": 56,
+        "crime_sexual_offences_12mo": 40,
+        "crime_theft_12mo": 321,
+        "crime_vehicle_12mo": 144,
+        "crime_violence_12mo": 444
       },
       "gp_list": [
         {
@@ -13586,7 +14763,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 3,
-        "crime_total": 1756,
+        "crime_total": 1163,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -13655,7 +14832,18 @@
         "cst_number_and_proximity_of_community_centres": 1575.97,
         "cst_number_and_proximity_of_cultural_spaces": 212.08,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 101,
+        "crime_burglary_12mo": 63,
+        "crime_drug_offences_12mo": 49,
+        "crime_misc_society_12mo": 25,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 103,
+        "crime_robbery_12mo": 21,
+        "crime_sexual_offences_12mo": 45,
+        "crime_theft_12mo": 170,
+        "crime_vehicle_12mo": 96,
+        "crime_violence_12mo": 482
       },
       "gp_list": [
         {
@@ -13723,7 +14911,7 @@
       "lad": "Hounslow",
       "lad_code": "E09000018",
       "indicators": {
-        "crime_total": 908,
+        "crime_total": 799,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -13792,7 +14980,18 @@
         "cst_number_and_proximity_of_community_centres": 374.87,
         "cst_number_and_proximity_of_cultural_spaces": 258.49,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 67,
+        "crime_burglary_12mo": 56,
+        "crime_drug_offences_12mo": 80,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 63,
+        "crime_robbery_12mo": 16,
+        "crime_sexual_offences_12mo": 18,
+        "crime_theft_12mo": 112,
+        "crime_vehicle_12mo": 76,
+        "crime_violence_12mo": 294
       },
       "crime_by_category": {
         "anti-social-behaviour": 246,
@@ -13818,7 +15017,7 @@
       "lad_code": "E09000018",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 1092,
+        "crime_total": 761,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -13887,7 +15086,18 @@
         "cst_number_and_proximity_of_community_centres": 812.51,
         "cst_number_and_proximity_of_cultural_spaces": 26.54,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 82,
+        "crime_burglary_12mo": 36,
+        "crime_drug_offences_12mo": 62,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 41,
+        "crime_robbery_12mo": 19,
+        "crime_sexual_offences_12mo": 12,
+        "crime_theft_12mo": 182,
+        "crime_vehicle_12mo": 85,
+        "crime_violence_12mo": 229
       },
       "pharmacy_list": [
         {
@@ -13921,7 +15131,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 6,
-        "crime_total": 2013,
+        "crime_total": 1799,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -13990,7 +15200,18 @@
         "cst_number_and_proximity_of_community_centres": 395.21,
         "cst_number_and_proximity_of_cultural_spaces": 59.39,
         "cst_number_of_faith_centres": 10,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 83,
+        "crime_burglary_12mo": 104,
+        "crime_drug_offences_12mo": 65,
+        "crime_misc_society_12mo": 15,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 106,
+        "crime_robbery_12mo": 52,
+        "crime_sexual_offences_12mo": 45,
+        "crime_theft_12mo": 656,
+        "crime_vehicle_12mo": 353,
+        "crime_violence_12mo": 313
       },
       "gp_list": [
         {
@@ -14075,7 +15296,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 3,
-        "crime_total": 1280,
+        "crime_total": 1101,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14144,7 +15365,18 @@
         "cst_number_and_proximity_of_community_centres": 267.54,
         "cst_number_and_proximity_of_cultural_spaces": 47.61,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 67,
+        "crime_burglary_12mo": 87,
+        "crime_drug_offences_12mo": 27,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 67,
+        "crime_robbery_12mo": 34,
+        "crime_sexual_offences_12mo": 21,
+        "crime_theft_12mo": 295,
+        "crime_vehicle_12mo": 260,
+        "crime_violence_12mo": 225
       },
       "gp_list": [
         {
@@ -14196,7 +15428,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 860,
+        "crime_total": 649,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14265,7 +15497,18 @@
         "cst_number_and_proximity_of_community_centres": 651.62,
         "cst_number_and_proximity_of_cultural_spaces": 262.32,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 33,
+        "crime_burglary_12mo": 51,
+        "crime_drug_offences_12mo": 22,
+        "crime_misc_society_12mo": 10,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 47,
+        "crime_robbery_12mo": 6,
+        "crime_sexual_offences_12mo": 20,
+        "crime_theft_12mo": 136,
+        "crime_vehicle_12mo": 131,
+        "crime_violence_12mo": 190
       },
       "gp_list": [
         {
@@ -14307,7 +15550,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1576,
+        "crime_total": 1222,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14376,7 +15619,18 @@
         "cst_number_and_proximity_of_community_centres": 847.07,
         "cst_number_and_proximity_of_cultural_spaces": 265.27,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 82,
+        "crime_burglary_12mo": 64,
+        "crime_drug_offences_12mo": 71,
+        "crime_misc_society_12mo": 28,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 94,
+        "crime_robbery_12mo": 13,
+        "crime_sexual_offences_12mo": 49,
+        "crime_theft_12mo": 155,
+        "crime_vehicle_12mo": 153,
+        "crime_violence_12mo": 503
       },
       "gp_list": [
         {
@@ -14428,7 +15682,7 @@
       "lad_code": "E09000018",
       "indicators": {
         "gp_practice_count": 2,
-        "crime_total": 1370,
+        "crime_total": 1226,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14497,7 +15751,18 @@
         "cst_number_and_proximity_of_community_centres": 1001.63,
         "cst_number_and_proximity_of_cultural_spaces": 67.35,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 101,
+        "crime_burglary_12mo": 78,
+        "crime_drug_offences_12mo": 75,
+        "crime_misc_society_12mo": 18,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 104,
+        "crime_robbery_12mo": 32,
+        "crime_sexual_offences_12mo": 45,
+        "crime_theft_12mo": 162,
+        "crime_vehicle_12mo": 82,
+        "crime_violence_12mo": 521
       },
       "gp_list": [
         {
@@ -14538,7 +15803,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 2292,
+        "crime_total": 1669,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14607,7 +15872,18 @@
         "cst_number_and_proximity_of_community_centres": 1228.24,
         "cst_number_and_proximity_of_cultural_spaces": 548.12,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 177,
+        "crime_burglary_12mo": 51,
+        "crime_drug_offences_12mo": 59,
+        "crime_misc_society_12mo": 37,
+        "crime_weapons_12mo": 12,
+        "crime_public_order_12mo": 118,
+        "crime_robbery_12mo": 44,
+        "crime_sexual_offences_12mo": 32,
+        "crime_theft_12mo": 446,
+        "crime_vehicle_12mo": 82,
+        "crime_violence_12mo": 611
       },
       "gp_list": [
         {
@@ -14666,7 +15942,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 1158,
+        "crime_total": 838,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14735,7 +16011,18 @@
         "cst_number_and_proximity_of_community_centres": 715.69,
         "cst_number_and_proximity_of_cultural_spaces": 195.8,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 82,
+        "crime_burglary_12mo": 56,
+        "crime_drug_offences_12mo": 30,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 21,
+        "crime_public_order_12mo": 85,
+        "crime_robbery_12mo": 16,
+        "crime_sexual_offences_12mo": 30,
+        "crime_theft_12mo": 112,
+        "crime_vehicle_12mo": 56,
+        "crime_violence_12mo": 330
       },
       "gp_list": [
         {
@@ -14777,7 +16064,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 1,
-        "crime_total": 1453,
+        "crime_total": 1122,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14846,7 +16133,18 @@
         "cst_number_and_proximity_of_community_centres": 300.17,
         "cst_number_and_proximity_of_cultural_spaces": 127.52,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 106,
+        "crime_burglary_12mo": 49,
+        "crime_drug_offences_12mo": 43,
+        "crime_misc_society_12mo": 22,
+        "crime_weapons_12mo": 15,
+        "crime_public_order_12mo": 86,
+        "crime_robbery_12mo": 16,
+        "crime_sexual_offences_12mo": 46,
+        "crime_theft_12mo": 164,
+        "crime_vehicle_12mo": 124,
+        "crime_violence_12mo": 451
       },
       "gp_list": [
         {
@@ -14893,7 +16191,7 @@
       "lad_code": "E09000018",
       "indicators": {
         "pharmacy_count": 2,
-        "crime_total": 1439,
+        "crime_total": 1124,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -14962,7 +16260,18 @@
         "cst_number_and_proximity_of_community_centres": 425.05,
         "cst_number_and_proximity_of_cultural_spaces": 734.76,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 72,
+        "crime_burglary_12mo": 62,
+        "crime_drug_offences_12mo": 46,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 90,
+        "crime_robbery_12mo": 35,
+        "crime_sexual_offences_12mo": 29,
+        "crime_theft_12mo": 243,
+        "crime_vehicle_12mo": 94,
+        "crime_violence_12mo": 435
       },
       "pharmacy_list": [
         {
@@ -15001,7 +16310,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 1132,
+        "crime_total": 926,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15070,7 +16379,18 @@
         "cst_number_and_proximity_of_community_centres": 653.9,
         "cst_number_and_proximity_of_cultural_spaces": 404.0,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 62,
+        "crime_burglary_12mo": 63,
+        "crime_drug_offences_12mo": 52,
+        "crime_misc_society_12mo": 6,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 70,
+        "crime_robbery_12mo": 30,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 210,
+        "crime_vehicle_12mo": 85,
+        "crime_violence_12mo": 313
       },
       "gp_list": [
         {
@@ -15117,7 +16437,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 1428,
+        "crime_total": 1572,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15186,7 +16506,18 @@
         "cst_number_and_proximity_of_community_centres": 698.94,
         "cst_number_and_proximity_of_cultural_spaces": 269.93,
         "cst_number_of_faith_centres": 0,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 116,
+        "crime_burglary_12mo": 61,
+        "crime_drug_offences_12mo": 82,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 3,
+        "crime_public_order_12mo": 108,
+        "crime_robbery_12mo": 41,
+        "crime_sexual_offences_12mo": 37,
+        "crime_theft_12mo": 405,
+        "crime_vehicle_12mo": 218,
+        "crime_violence_12mo": 490
       },
       "gp_list": [
         {
@@ -15245,7 +16576,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 4,
-        "crime_total": 3598,
+        "crime_total": 3060,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15314,7 +16645,18 @@
         "cst_number_and_proximity_of_community_centres": 941.42,
         "cst_number_and_proximity_of_cultural_spaces": 71.49,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 129,
+        "crime_burglary_12mo": 72,
+        "crime_drug_offences_12mo": 179,
+        "crime_misc_society_12mo": 24,
+        "crime_weapons_12mo": 18,
+        "crime_public_order_12mo": 232,
+        "crime_robbery_12mo": 100,
+        "crime_sexual_offences_12mo": 68,
+        "crime_theft_12mo": 1535,
+        "crime_vehicle_12mo": 75,
+        "crime_violence_12mo": 628
       },
       "gp_list": [
         {
@@ -15382,7 +16724,7 @@
       "lad_code": "E09000018",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 1044,
+        "crime_total": 733,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15451,7 +16793,18 @@
         "cst_number_and_proximity_of_community_centres": 863.06,
         "cst_number_and_proximity_of_cultural_spaces": 61.59,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 54,
+        "crime_burglary_12mo": 51,
+        "crime_drug_offences_12mo": 71,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 64,
+        "crime_robbery_12mo": 17,
+        "crime_sexual_offences_12mo": 14,
+        "crime_theft_12mo": 136,
+        "crime_vehicle_12mo": 50,
+        "crime_violence_12mo": 251
       },
       "pharmacy_list": [
         {
@@ -15484,7 +16837,7 @@
       "lad_code": "E09000018",
       "indicators": {
         "pharmacy_count": 3,
-        "crime_total": 1770,
+        "crime_total": 1339,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15553,7 +16906,18 @@
         "cst_number_and_proximity_of_community_centres": 1008.78,
         "cst_number_and_proximity_of_cultural_spaces": 537.15,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 89,
+        "crime_burglary_12mo": 77,
+        "crime_drug_offences_12mo": 91,
+        "crime_misc_society_12mo": 29,
+        "crime_weapons_12mo": 16,
+        "crime_public_order_12mo": 98,
+        "crime_robbery_12mo": 37,
+        "crime_sexual_offences_12mo": 36,
+        "crime_theft_12mo": 258,
+        "crime_vehicle_12mo": 126,
+        "crime_violence_12mo": 482
       },
       "pharmacy_list": [
         {
@@ -15597,7 +16961,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 701,
+        "crime_total": 540,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15666,7 +17030,18 @@
         "cst_number_and_proximity_of_community_centres": 1030.1,
         "cst_number_and_proximity_of_cultural_spaces": 415.08,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 34,
+        "crime_burglary_12mo": 37,
+        "crime_drug_offences_12mo": 35,
+        "crime_misc_society_12mo": 10,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 31,
+        "crime_robbery_12mo": 6,
+        "crime_sexual_offences_12mo": 15,
+        "crime_theft_12mo": 47,
+        "crime_vehicle_12mo": 87,
+        "crime_violence_12mo": 233
       },
       "gp_list": [
         {
@@ -15725,7 +17100,7 @@
       "indicators": {
         "gp_practice_count": 6,
         "pharmacy_count": 2,
-        "crime_total": 1842,
+        "crime_total": 1410,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15794,7 +17169,18 @@
         "cst_number_and_proximity_of_community_centres": 600.39,
         "cst_number_and_proximity_of_cultural_spaces": 414.95,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 97,
+        "crime_burglary_12mo": 91,
+        "crime_drug_offences_12mo": 70,
+        "crime_misc_society_12mo": 27,
+        "crime_weapons_12mo": 15,
+        "crime_public_order_12mo": 105,
+        "crime_robbery_12mo": 35,
+        "crime_sexual_offences_12mo": 66,
+        "crime_theft_12mo": 257,
+        "crime_vehicle_12mo": 112,
+        "crime_violence_12mo": 535
       },
       "gp_list": [
         {
@@ -15871,7 +17257,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 5,
-        "crime_total": 1395,
+        "crime_total": 947,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -15940,7 +17326,18 @@
         "cst_number_and_proximity_of_community_centres": 687.52,
         "cst_number_and_proximity_of_cultural_spaces": 189.95,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 147,
+        "crime_burglary_12mo": 49,
+        "crime_drug_offences_12mo": 46,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 56,
+        "crime_robbery_12mo": 21,
+        "crime_sexual_offences_12mo": 23,
+        "crime_theft_12mo": 169,
+        "crime_vehicle_12mo": 147,
+        "crime_violence_12mo": 270
       },
       "gp_list": [
         {
@@ -16002,7 +17399,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 4,
-        "crime_total": 1162,
+        "crime_total": 1001,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -16071,7 +17468,18 @@
         "cst_number_and_proximity_of_community_centres": 1639.44,
         "cst_number_and_proximity_of_cultural_spaces": 528.36,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 74,
+        "crime_burglary_12mo": 82,
+        "crime_drug_offences_12mo": 78,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 66,
+        "crime_robbery_12mo": 19,
+        "crime_sexual_offences_12mo": 31,
+        "crime_theft_12mo": 201,
+        "crime_vehicle_12mo": 129,
+        "crime_violence_12mo": 307
       },
       "gp_list": [
         {
@@ -16134,7 +17542,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 1,
-        "crime_total": 1731,
+        "crime_total": 1612,
         "ft_life_expectancy_male": 80.6,
         "ft_healthy_life_expectancy_male": 76.0343463710191,
         "ft_smoking_prevalence_adults": 12.71233927,
@@ -16203,7 +17611,18 @@
         "cst_number_and_proximity_of_community_centres": 214.61,
         "cst_number_and_proximity_of_cultural_spaces": 126.21,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 112,
+        "crime_burglary_12mo": 63,
+        "crime_drug_offences_12mo": 81,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 106,
+        "crime_robbery_12mo": 16,
+        "crime_sexual_offences_12mo": 62,
+        "crime_theft_12mo": 362,
+        "crime_vehicle_12mo": 152,
+        "crime_violence_12mo": 632
       },
       "gp_list": [
         {
@@ -16257,7 +17676,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 3,
-        "crime_total": 1360,
+        "crime_total": 1060,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -16326,7 +17745,18 @@
         "cst_number_and_proximity_of_community_centres": 341.38,
         "cst_number_and_proximity_of_cultural_spaces": 56.17,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 71,
+        "crime_burglary_12mo": 71,
+        "crime_drug_offences_12mo": 55,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 85,
+        "crime_robbery_12mo": 38,
+        "crime_sexual_offences_12mo": 25,
+        "crime_theft_12mo": 335,
+        "crime_vehicle_12mo": 84,
+        "crime_violence_12mo": 275
       },
       "gp_list": [
         {
@@ -16377,7 +17807,7 @@
       "lad_code": "E09000013",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 720,
+        "crime_total": 524,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -16446,7 +17876,18 @@
         "cst_number_and_proximity_of_community_centres": 151.97,
         "cst_number_and_proximity_of_cultural_spaces": 67.06,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 63,
+        "crime_burglary_12mo": 45,
+        "crime_drug_offences_12mo": 39,
+        "crime_misc_society_12mo": 6,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 38,
+        "crime_robbery_12mo": 10,
+        "crime_sexual_offences_12mo": 18,
+        "crime_theft_12mo": 106,
+        "crime_vehicle_12mo": 44,
+        "crime_violence_12mo": 151
       },
       "pharmacy_list": [
         {
@@ -16480,7 +17921,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 1,
-        "crime_total": 1221,
+        "crime_total": 1018,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -16549,7 +17990,18 @@
         "cst_number_and_proximity_of_community_centres": 210.4,
         "cst_number_and_proximity_of_cultural_spaces": 72.93,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 64,
+        "crime_burglary_12mo": 61,
+        "crime_drug_offences_12mo": 87,
+        "crime_misc_society_12mo": 20,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 118,
+        "crime_robbery_12mo": 14,
+        "crime_sexual_offences_12mo": 40,
+        "crime_theft_12mo": 185,
+        "crime_vehicle_12mo": 67,
+        "crime_violence_12mo": 357
       },
       "gp_list": [
         {
@@ -16603,7 +18055,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 2205,
+        "crime_total": 1351,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -16672,7 +18124,18 @@
         "cst_number_and_proximity_of_community_centres": 575.66,
         "cst_number_and_proximity_of_cultural_spaces": 513.07,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 92,
+        "crime_burglary_12mo": 57,
+        "crime_drug_offences_12mo": 104,
+        "crime_misc_society_12mo": 33,
+        "crime_weapons_12mo": 11,
+        "crime_public_order_12mo": 85,
+        "crime_robbery_12mo": 35,
+        "crime_sexual_offences_12mo": 76,
+        "crime_theft_12mo": 258,
+        "crime_vehicle_12mo": 131,
+        "crime_violence_12mo": 469
       },
       "gp_list": [
         {
@@ -16725,7 +18188,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 4,
-        "crime_total": 1338,
+        "crime_total": 1042,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -16794,7 +18257,18 @@
         "cst_number_and_proximity_of_community_centres": 204.82,
         "cst_number_and_proximity_of_cultural_spaces": 40.94,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 64,
+        "crime_burglary_12mo": 62,
+        "crime_drug_offences_12mo": 69,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 13,
+        "crime_public_order_12mo": 74,
+        "crime_robbery_12mo": 34,
+        "crime_sexual_offences_12mo": 39,
+        "crime_theft_12mo": 277,
+        "crime_vehicle_12mo": 86,
+        "crime_violence_12mo": 311
       },
       "gp_list": [
         {
@@ -16851,7 +18325,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 1626,
+        "crime_total": 1307,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -16920,7 +18394,18 @@
         "cst_number_and_proximity_of_community_centres": 148.36,
         "cst_number_and_proximity_of_cultural_spaces": 242.6,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 102,
+        "crime_burglary_12mo": 70,
+        "crime_drug_offences_12mo": 93,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 89,
+        "crime_robbery_12mo": 24,
+        "crime_sexual_offences_12mo": 52,
+        "crime_theft_12mo": 303,
+        "crime_vehicle_12mo": 69,
+        "crime_violence_12mo": 487
       },
       "gp_list": [
         {
@@ -16962,7 +18447,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 799,
+        "crime_total": 589,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17031,7 +18516,18 @@
         "cst_number_and_proximity_of_community_centres": 63.14,
         "cst_number_and_proximity_of_cultural_spaces": 74.38,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 23,
+        "crime_burglary_12mo": 60,
+        "crime_drug_offences_12mo": 22,
+        "crime_misc_society_12mo": 1,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 55,
+        "crime_robbery_12mo": 18,
+        "crime_sexual_offences_12mo": 6,
+        "crime_theft_12mo": 218,
+        "crime_vehicle_12mo": 55,
+        "crime_violence_12mo": 130
       },
       "gp_list": [
         {
@@ -17078,7 +18574,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 757,
+        "crime_total": 452,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17147,7 +18643,18 @@
         "cst_number_and_proximity_of_community_centres": 582.47,
         "cst_number_and_proximity_of_cultural_spaces": 53.45,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 33,
+        "crime_burglary_12mo": 39,
+        "crime_drug_offences_12mo": 27,
+        "crime_misc_society_12mo": 3,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 21,
+        "crime_robbery_12mo": 6,
+        "crime_sexual_offences_12mo": 22,
+        "crime_theft_12mo": 102,
+        "crime_vehicle_12mo": 67,
+        "crime_violence_12mo": 130
       },
       "gp_list": [
         {
@@ -17189,7 +18696,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 4,
-        "crime_total": 3198,
+        "crime_total": 2310,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17258,7 +18765,18 @@
         "cst_number_and_proximity_of_community_centres": 16.82,
         "cst_number_and_proximity_of_cultural_spaces": 25.67,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 100,
+        "crime_burglary_12mo": 87,
+        "crime_drug_offences_12mo": 99,
+        "crime_misc_society_12mo": 25,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 193,
+        "crime_robbery_12mo": 89,
+        "crime_sexual_offences_12mo": 49,
+        "crime_theft_12mo": 1042,
+        "crime_vehicle_12mo": 89,
+        "crime_violence_12mo": 527
       },
       "gp_list": [
         {
@@ -17315,7 +18833,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 909,
+        "crime_total": 642,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17384,7 +18902,18 @@
         "cst_number_and_proximity_of_community_centres": 161.19,
         "cst_number_and_proximity_of_cultural_spaces": 179.59,
         "cst_number_of_faith_centres": 0,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 37,
+        "crime_burglary_12mo": 44,
+        "crime_drug_offences_12mo": 59,
+        "crime_misc_society_12mo": 4,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 50,
+        "crime_robbery_12mo": 22,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 158,
+        "crime_vehicle_12mo": 33,
+        "crime_violence_12mo": 200
       },
       "gp_list": [
         {
@@ -17426,7 +18955,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 843,
+        "crime_total": 670,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17495,7 +19024,18 @@
         "cst_number_and_proximity_of_community_centres": 256.97,
         "cst_number_and_proximity_of_cultural_spaces": 81.41,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 40,
+        "crime_burglary_12mo": 61,
+        "crime_drug_offences_12mo": 26,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 46,
+        "crime_robbery_12mo": 10,
+        "crime_sexual_offences_12mo": 20,
+        "crime_theft_12mo": 151,
+        "crime_vehicle_12mo": 113,
+        "crime_violence_12mo": 182
       },
       "gp_list": [
         {
@@ -17541,7 +19081,7 @@
       "lad_code": "E09000013",
       "indicators": {
         "gp_practice_count": 1,
-        "crime_total": 707,
+        "crime_total": 685,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17610,7 +19150,18 @@
         "cst_number_and_proximity_of_community_centres": 11.8,
         "cst_number_and_proximity_of_cultural_spaces": 67.65,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 41,
+        "crime_burglary_12mo": 69,
+        "crime_drug_offences_12mo": 32,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 54,
+        "crime_robbery_12mo": 15,
+        "crime_sexual_offences_12mo": 30,
+        "crime_theft_12mo": 107,
+        "crime_vehicle_12mo": 119,
+        "crime_violence_12mo": 209
       },
       "gp_list": [
         {
@@ -17645,7 +19196,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 801,
+        "crime_total": 628,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17714,7 +19265,18 @@
         "cst_number_and_proximity_of_community_centres": 469.27,
         "cst_number_and_proximity_of_cultural_spaces": 88.4,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 41,
+        "crime_burglary_12mo": 59,
+        "crime_drug_offences_12mo": 37,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 39,
+        "crime_robbery_12mo": 18,
+        "crime_sexual_offences_12mo": 16,
+        "crime_theft_12mo": 183,
+        "crime_vehicle_12mo": 77,
+        "crime_violence_12mo": 147
       },
       "gp_list": [
         {
@@ -17755,7 +19317,7 @@
       "lad_code": "E09000013",
       "indicators": {
         "gp_practice_count": 1,
-        "crime_total": 852,
+        "crime_total": 727,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17824,7 +19386,18 @@
         "cst_number_and_proximity_of_community_centres": 752.93,
         "cst_number_and_proximity_of_cultural_spaces": 80.41,
         "cst_number_of_faith_centres": 6,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 50,
+        "crime_burglary_12mo": 53,
+        "crime_drug_offences_12mo": 22,
+        "crime_misc_society_12mo": 5,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 43,
+        "crime_robbery_12mo": 16,
+        "crime_sexual_offences_12mo": 24,
+        "crime_theft_12mo": 210,
+        "crime_vehicle_12mo": 133,
+        "crime_violence_12mo": 169
       },
       "gp_list": [
         {
@@ -17859,7 +19432,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 709,
+        "crime_total": 752,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -17928,7 +19501,18 @@
         "cst_number_and_proximity_of_community_centres": 725.35,
         "cst_number_and_proximity_of_cultural_spaces": 110.82,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 54,
+        "crime_burglary_12mo": 71,
+        "crime_drug_offences_12mo": 46,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 47,
+        "crime_robbery_12mo": 19,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 156,
+        "crime_vehicle_12mo": 88,
+        "crime_violence_12mo": 229
       },
       "gp_list": [
         {
@@ -17969,7 +19553,7 @@
       "lad_code": "E09000013",
       "indicators": {
         "pharmacy_count": 4,
-        "crime_total": 3537,
+        "crime_total": 3100,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -18038,7 +19622,18 @@
         "cst_number_and_proximity_of_community_centres": 482.51,
         "cst_number_and_proximity_of_cultural_spaces": 101.64,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 93,
+        "crime_burglary_12mo": 70,
+        "crime_drug_offences_12mo": 174,
+        "crime_misc_society_12mo": 32,
+        "crime_weapons_12mo": 24,
+        "crime_public_order_12mo": 180,
+        "crime_robbery_12mo": 146,
+        "crime_sexual_offences_12mo": 71,
+        "crime_theft_12mo": 1594,
+        "crime_vehicle_12mo": 106,
+        "crime_violence_12mo": 610
       },
       "pharmacy_list": [
         {
@@ -18087,7 +19682,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 1550,
+        "crime_total": 1170,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -18156,7 +19751,18 @@
         "cst_number_and_proximity_of_community_centres": 200.11,
         "cst_number_and_proximity_of_cultural_spaces": 81.97,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 61,
+        "crime_burglary_12mo": 65,
+        "crime_drug_offences_12mo": 66,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 2,
+        "crime_public_order_12mo": 131,
+        "crime_robbery_12mo": 32,
+        "crime_sexual_offences_12mo": 31,
+        "crime_theft_12mo": 413,
+        "crime_vehicle_12mo": 40,
+        "crime_violence_12mo": 318
       },
       "gp_list": [
         {
@@ -18214,7 +19820,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 1,
-        "crime_total": 370,
+        "crime_total": 327,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -18283,7 +19889,18 @@
         "cst_number_and_proximity_of_community_centres": 435.32,
         "cst_number_and_proximity_of_cultural_spaces": 289.95,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 26,
+        "crime_burglary_12mo": 27,
+        "crime_drug_offences_12mo": 6,
+        "crime_misc_society_12mo": 4,
+        "crime_weapons_12mo": 0,
+        "crime_public_order_12mo": 24,
+        "crime_robbery_12mo": 5,
+        "crime_sexual_offences_12mo": 8,
+        "crime_theft_12mo": 55,
+        "crime_vehicle_12mo": 59,
+        "crime_violence_12mo": 113
       },
       "gp_list": [
         {
@@ -18324,7 +19941,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1121,
+        "crime_total": 804,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -18393,7 +20010,18 @@
         "cst_number_and_proximity_of_community_centres": 42.16,
         "cst_number_and_proximity_of_cultural_spaces": 62.03,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 69,
+        "crime_burglary_12mo": 55,
+        "crime_drug_offences_12mo": 64,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 8,
+        "crime_public_order_12mo": 50,
+        "crime_robbery_12mo": 15,
+        "crime_sexual_offences_12mo": 28,
+        "crime_theft_12mo": 184,
+        "crime_vehicle_12mo": 48,
+        "crime_violence_12mo": 271
       },
       "gp_list": [
         {
@@ -18446,7 +20074,7 @@
       "indicators": {
         "gp_practice_count": 5,
         "pharmacy_count": 5,
-        "crime_total": 1287,
+        "crime_total": 880,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -18515,7 +20143,18 @@
         "cst_number_and_proximity_of_community_centres": 198.69,
         "cst_number_and_proximity_of_cultural_spaces": 49.71,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 45,
+        "crime_burglary_12mo": 38,
+        "crime_drug_offences_12mo": 115,
+        "crime_misc_society_12mo": 15,
+        "crime_weapons_12mo": 12,
+        "crime_public_order_12mo": 88,
+        "crime_robbery_12mo": 20,
+        "crime_sexual_offences_12mo": 33,
+        "crime_theft_12mo": 149,
+        "crime_vehicle_12mo": 66,
+        "crime_violence_12mo": 299
       },
       "gp_list": [
         {
@@ -18600,7 +20239,7 @@
       "lad_code": "E09000013",
       "indicators": {
         "gp_practice_count": 1,
-        "crime_total": 779,
+        "crime_total": 439,
         "ft_life_expectancy_male": 80.9,
         "ft_healthy_life_expectancy_male": 74.3853332213905,
         "ft_smoking_prevalence_adults": 7.692775674,
@@ -18669,7 +20308,18 @@
         "cst_number_and_proximity_of_community_centres": 423.05,
         "cst_number_and_proximity_of_cultural_spaces": 367.16,
         "cst_number_of_faith_centres": 1,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 33,
+        "crime_burglary_12mo": 31,
+        "crime_drug_offences_12mo": 31,
+        "crime_misc_society_12mo": 9,
+        "crime_weapons_12mo": 4,
+        "crime_public_order_12mo": 26,
+        "crime_robbery_12mo": 5,
+        "crime_sexual_offences_12mo": 15,
+        "crime_theft_12mo": 59,
+        "crime_vehicle_12mo": 64,
+        "crime_violence_12mo": 162
       },
       "gp_list": [
         {
@@ -18704,7 +20354,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 3,
-        "crime_total": 1127,
+        "crime_total": 767,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -18773,7 +20423,18 @@
         "cst_number_and_proximity_of_community_centres": 684.52,
         "cst_number_and_proximity_of_cultural_spaces": 4.97,
         "cst_number_of_faith_centres": 5,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 48,
+        "crime_burglary_12mo": 92,
+        "crime_drug_offences_12mo": 23,
+        "crime_misc_society_12mo": 8,
+        "crime_weapons_12mo": 1,
+        "crime_public_order_12mo": 47,
+        "crime_robbery_12mo": 20,
+        "crime_sexual_offences_12mo": 13,
+        "crime_theft_12mo": 212,
+        "crime_vehicle_12mo": 103,
+        "crime_violence_12mo": 200
       },
       "gp_list": [
         {
@@ -18831,7 +20492,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 2,
-        "crime_total": 2233,
+        "crime_total": 1435,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -18900,7 +20561,18 @@
         "cst_number_and_proximity_of_community_centres": 390.09,
         "cst_number_and_proximity_of_cultural_spaces": 24.9,
         "cst_number_of_faith_centres": 7,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 70,
+        "crime_burglary_12mo": 158,
+        "crime_drug_offences_12mo": 131,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 16,
+        "crime_public_order_12mo": 88,
+        "crime_robbery_12mo": 36,
+        "crime_sexual_offences_12mo": 37,
+        "crime_theft_12mo": 445,
+        "crime_vehicle_12mo": 162,
+        "crime_violence_12mo": 278
       },
       "gp_list": [
         {
@@ -18947,7 +20619,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 3,
-        "crime_total": 2140,
+        "crime_total": 1593,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19016,7 +20688,18 @@
         "cst_number_and_proximity_of_community_centres": 70.15,
         "cst_number_and_proximity_of_cultural_spaces": 50.64,
         "cst_number_of_faith_centres": 0,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 106,
+        "crime_burglary_12mo": 77,
+        "crime_drug_offences_12mo": 101,
+        "crime_misc_society_12mo": 17,
+        "crime_weapons_12mo": 11,
+        "crime_public_order_12mo": 107,
+        "crime_robbery_12mo": 65,
+        "crime_sexual_offences_12mo": 54,
+        "crime_theft_12mo": 474,
+        "crime_vehicle_12mo": 113,
+        "crime_violence_12mo": 468
       },
       "gp_list": [
         {
@@ -19068,7 +20751,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 1928,
+        "crime_total": 1476,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19137,7 +20820,18 @@
         "cst_number_and_proximity_of_community_centres": 235.16,
         "cst_number_and_proximity_of_cultural_spaces": 241.47,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 75,
+        "crime_burglary_12mo": 66,
+        "crime_drug_offences_12mo": 86,
+        "crime_misc_society_12mo": 16,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 102,
+        "crime_robbery_12mo": 70,
+        "crime_sexual_offences_12mo": 41,
+        "crime_theft_12mo": 560,
+        "crime_vehicle_12mo": 95,
+        "crime_violence_12mo": 356
       },
       "gp_list": [
         {
@@ -19190,7 +20884,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 8,
-        "crime_total": 4689,
+        "crime_total": 3852,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19259,7 +20953,18 @@
         "cst_number_and_proximity_of_community_centres": 1087.83,
         "cst_number_and_proximity_of_cultural_spaces": 37.3,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 186,
+        "crime_burglary_12mo": 179,
+        "crime_drug_offences_12mo": 286,
+        "crime_misc_society_12mo": 49,
+        "crime_weapons_12mo": 35,
+        "crime_public_order_12mo": 233,
+        "crime_robbery_12mo": 166,
+        "crime_sexual_offences_12mo": 111,
+        "crime_theft_12mo": 1678,
+        "crime_vehicle_12mo": 167,
+        "crime_violence_12mo": 762
       },
       "gp_list": [
         {
@@ -19336,7 +21041,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 4364,
+        "crime_total": 2650,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19405,7 +21110,18 @@
         "cst_number_and_proximity_of_community_centres": 658.41,
         "cst_number_and_proximity_of_cultural_spaces": 34.64,
         "cst_number_of_faith_centres": 9,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 176,
+        "crime_burglary_12mo": 110,
+        "crime_drug_offences_12mo": 74,
+        "crime_misc_society_12mo": 15,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 145,
+        "crime_robbery_12mo": 105,
+        "crime_sexual_offences_12mo": 63,
+        "crime_theft_12mo": 1243,
+        "crime_vehicle_12mo": 285,
+        "crime_violence_12mo": 424
       },
       "gp_list": [
         {
@@ -19464,7 +21180,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 2,
-        "crime_total": 2907,
+        "crime_total": 2286,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19533,7 +21249,18 @@
         "cst_number_and_proximity_of_community_centres": 718.3,
         "cst_number_and_proximity_of_cultural_spaces": 117.74,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 87,
+        "crime_burglary_12mo": 179,
+        "crime_drug_offences_12mo": 139,
+        "crime_misc_society_12mo": 18,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 118,
+        "crime_robbery_12mo": 84,
+        "crime_sexual_offences_12mo": 63,
+        "crime_theft_12mo": 1063,
+        "crime_vehicle_12mo": 130,
+        "crime_violence_12mo": 395
       },
       "gp_list": [
         {
@@ -19586,7 +21313,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 4,
-        "crime_total": 1203,
+        "crime_total": 831,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19655,7 +21382,18 @@
         "cst_number_and_proximity_of_community_centres": 481.62,
         "cst_number_and_proximity_of_cultural_spaces": 7.29,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 49,
+        "crime_burglary_12mo": 74,
+        "crime_drug_offences_12mo": 44,
+        "crime_misc_society_12mo": 18,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 50,
+        "crime_robbery_12mo": 28,
+        "crime_sexual_offences_12mo": 17,
+        "crime_theft_12mo": 227,
+        "crime_vehicle_12mo": 105,
+        "crime_violence_12mo": 209
       },
       "gp_list": [
         {
@@ -19724,7 +21462,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 1148,
+        "crime_total": 1071,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19793,7 +21531,18 @@
         "cst_number_and_proximity_of_community_centres": 457.6,
         "cst_number_and_proximity_of_cultural_spaces": 126.22,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 62,
+        "crime_burglary_12mo": 82,
+        "crime_drug_offences_12mo": 81,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 54,
+        "crime_robbery_12mo": 27,
+        "crime_sexual_offences_12mo": 18,
+        "crime_theft_12mo": 303,
+        "crime_vehicle_12mo": 143,
+        "crime_violence_12mo": 282
       },
       "gp_list": [
         {
@@ -19852,7 +21601,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 13,
-        "crime_total": 4515,
+        "crime_total": 3878,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -19921,7 +21670,18 @@
         "cst_number_and_proximity_of_community_centres": 258.66,
         "cst_number_and_proximity_of_cultural_spaces": 17.01,
         "cst_number_of_faith_centres": 12,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 154,
+        "crime_burglary_12mo": 230,
+        "crime_drug_offences_12mo": 65,
+        "crime_misc_society_12mo": 22,
+        "crime_weapons_12mo": 10,
+        "crime_public_order_12mo": 162,
+        "crime_robbery_12mo": 152,
+        "crime_sexual_offences_12mo": 61,
+        "crime_theft_12mo": 2158,
+        "crime_vehicle_12mo": 367,
+        "crime_violence_12mo": 497
       },
       "gp_list": [
         {
@@ -20035,7 +21795,7 @@
       "indicators": {
         "gp_practice_count": 2,
         "pharmacy_count": 8,
-        "crime_total": 2947,
+        "crime_total": 1964,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -20104,7 +21864,18 @@
         "cst_number_and_proximity_of_community_centres": 453.02,
         "cst_number_and_proximity_of_cultural_spaces": 32.77,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 90,
+        "crime_burglary_12mo": 90,
+        "crime_drug_offences_12mo": 44,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 17,
+        "crime_public_order_12mo": 134,
+        "crime_robbery_12mo": 91,
+        "crime_sexual_offences_12mo": 49,
+        "crime_theft_12mo": 1001,
+        "crime_vehicle_12mo": 60,
+        "crime_violence_12mo": 374
       },
       "gp_list": [
         {
@@ -20186,7 +21957,7 @@
       "lad_code": "E09000033",
       "indicators": {
         "pharmacy_count": 1,
-        "crime_total": 1289,
+        "crime_total": 774,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -20255,7 +22026,18 @@
         "cst_number_and_proximity_of_community_centres": 338.01,
         "cst_number_and_proximity_of_cultural_spaces": 134.13,
         "cst_number_of_faith_centres": 3,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 44,
+        "crime_burglary_12mo": 47,
+        "crime_drug_offences_12mo": 34,
+        "crime_misc_society_12mo": 14,
+        "crime_weapons_12mo": 5,
+        "crime_public_order_12mo": 53,
+        "crime_robbery_12mo": 20,
+        "crime_sexual_offences_12mo": 34,
+        "crime_theft_12mo": 217,
+        "crime_vehicle_12mo": 54,
+        "crime_violence_12mo": 252
       },
       "pharmacy_list": [
         {
@@ -20289,7 +22071,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 1,
-        "crime_total": 1128,
+        "crime_total": 971,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -20358,7 +22140,18 @@
         "cst_number_and_proximity_of_community_centres": 123.14,
         "cst_number_and_proximity_of_cultural_spaces": 180.94,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 73,
+        "crime_burglary_12mo": 55,
+        "crime_drug_offences_12mo": 132,
+        "crime_misc_society_12mo": 11,
+        "crime_weapons_12mo": 17,
+        "crime_public_order_12mo": 64,
+        "crime_robbery_12mo": 30,
+        "crime_sexual_offences_12mo": 31,
+        "crime_theft_12mo": 131,
+        "crime_vehicle_12mo": 91,
+        "crime_violence_12mo": 336
       },
       "gp_list": [
         {
@@ -20412,7 +22205,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 5,
-        "crime_total": 2585,
+        "crime_total": 2210,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -20481,7 +22274,18 @@
         "cst_number_and_proximity_of_community_centres": 619.0,
         "cst_number_and_proximity_of_cultural_spaces": 103.85,
         "cst_number_of_faith_centres": 8,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 76,
+        "crime_burglary_12mo": 124,
+        "crime_drug_offences_12mo": 57,
+        "crime_misc_society_12mo": 13,
+        "crime_weapons_12mo": 7,
+        "crime_public_order_12mo": 119,
+        "crime_robbery_12mo": 81,
+        "crime_sexual_offences_12mo": 46,
+        "crime_theft_12mo": 1260,
+        "crime_vehicle_12mo": 167,
+        "crime_violence_12mo": 260
       },
       "gp_list": [
         {
@@ -20543,7 +22347,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 8,
-        "crime_total": 22187,
+        "crime_total": 19786,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -20612,7 +22416,18 @@
         "cst_number_and_proximity_of_community_centres": 676.89,
         "cst_number_and_proximity_of_cultural_spaces": 32.88,
         "cst_number_of_faith_centres": 21,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 502,
+        "crime_burglary_12mo": 377,
+        "crime_drug_offences_12mo": 652,
+        "crime_misc_society_12mo": 79,
+        "crime_weapons_12mo": 79,
+        "crime_public_order_12mo": 964,
+        "crime_robbery_12mo": 796,
+        "crime_sexual_offences_12mo": 448,
+        "crime_theft_12mo": 12726,
+        "crime_vehicle_12mo": 341,
+        "crime_violence_12mo": 2822
       },
       "gp_list": [
         {
@@ -20701,7 +22516,7 @@
       "indicators": {
         "gp_practice_count": 1,
         "pharmacy_count": 3,
-        "crime_total": 2482,
+        "crime_total": 1391,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -20770,7 +22585,18 @@
         "cst_number_and_proximity_of_community_centres": 252.98,
         "cst_number_and_proximity_of_cultural_spaces": 57.4,
         "cst_number_of_faith_centres": 2,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 98,
+        "crime_burglary_12mo": 84,
+        "crime_drug_offences_12mo": 75,
+        "crime_misc_society_12mo": 7,
+        "crime_weapons_12mo": 14,
+        "crime_public_order_12mo": 141,
+        "crime_robbery_12mo": 48,
+        "crime_sexual_offences_12mo": 29,
+        "crime_theft_12mo": 507,
+        "crime_vehicle_12mo": 37,
+        "crime_violence_12mo": 351
       },
       "gp_list": [
         {
@@ -20822,7 +22648,7 @@
       "indicators": {
         "gp_practice_count": 4,
         "pharmacy_count": 13,
-        "crime_total": 34774,
+        "crime_total": 29923,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -20891,7 +22717,18 @@
         "cst_number_and_proximity_of_community_centres": 842.41,
         "cst_number_and_proximity_of_cultural_spaces": 32.21,
         "cst_number_of_faith_centres": 17,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 421,
+        "crime_burglary_12mo": 617,
+        "crime_drug_offences_12mo": 604,
+        "crime_misc_society_12mo": 128,
+        "crime_weapons_12mo": 65,
+        "crime_public_order_12mo": 764,
+        "crime_robbery_12mo": 1293,
+        "crime_sexual_offences_12mo": 406,
+        "crime_theft_12mo": 22429,
+        "crime_vehicle_12mo": 764,
+        "crime_violence_12mo": 2432
       },
       "gp_list": [
         {
@@ -21011,7 +22848,7 @@
       "indicators": {
         "gp_practice_count": 3,
         "pharmacy_count": 2,
-        "crime_total": 1532,
+        "crime_total": 1219,
         "ft_life_expectancy_male": 86.7,
         "ft_healthy_life_expectancy_male": 82.2155342470985,
         "ft_smoking_prevalence_adults": 7.800684097,
@@ -21080,7 +22917,18 @@
         "cst_number_and_proximity_of_community_centres": 145.66,
         "cst_number_and_proximity_of_cultural_spaces": 125.14,
         "cst_number_of_faith_centres": 4,
-        "cst_source": "London Civic Strength Index (Round 3), London Datastore"
+        "cst_source": "London Civic Strength Index (Round 3), London Datastore",
+        "crime_arson_12mo": 67,
+        "crime_burglary_12mo": 120,
+        "crime_drug_offences_12mo": 137,
+        "crime_misc_society_12mo": 12,
+        "crime_weapons_12mo": 9,
+        "crime_public_order_12mo": 77,
+        "crime_robbery_12mo": 47,
+        "crime_sexual_offences_12mo": 44,
+        "crime_theft_12mo": 213,
+        "crime_vehicle_12mo": 91,
+        "crime_violence_12mo": 402
       },
       "gp_list": [
         {
@@ -21175,6 +23023,9 @@
       "cst_number_and_proximity_of_community_centres",
       "cst_number_and_proximity_of_cultural_spaces",
       "cst_number_of_faith_centres"
-    ]
+    ],
+    "crime_source": "Met Police MPS · London Datastore",
+    "crime_window": "Apr 2025 - Mar 2026",
+    "crime_metrics_added": "2026-04-25T07:57:50Z"
   }
 }

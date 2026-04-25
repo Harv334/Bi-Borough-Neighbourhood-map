@@ -362,6 +362,36 @@
           <label class="lrow"><div class="ldot" style="background:#E89B1B"></div><span class="lname">Pharmacies <span class="lcount" id="pharm-count">0</span></span><input type="checkbox" id="tph"></label>
         </div>
         <div class="sb-sec" style="flex-shrink:0;border-bottom:1px solid #e5e5e0">
+          <div class="sb-lbl">Civic &amp; education<span class="lhelp" title="Schools, community centres, libraries and formal ESOL providers — sourced from the GLA ESOL Planning Map (English language proficiency planning dataset).">?</span></div>
+          <label class="lrow"><div class="ldot" style="background:#1E5BB8"></div><span class="lname">Schools <span class="lcount" id="schools-count">0</span></span><input type="checkbox" id="tsch"></label>
+          <div id="schools-filter-wrap" style="margin:2px 0 4px 16px">
+            <select id="schools-phase-filter" style="width:100%;padding:3px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
+              <option value="all" selected>All schools</option>
+              <option value="Primary">Primary</option>
+              <option value="Secondary">Secondary</option>
+              <option value="Nursery">Nursery</option>
+              <option value="All-through">All-through</option>
+              <option value="16 plus">16+ / Sixth form</option>
+              <option value="Not applicable">Special / Other</option>
+            </select>
+          </div>
+          <label class="lrow"><div class="ldot" style="background:#D87C2D"></div><span class="lname">Community centres <span class="lcount" id="cc-count">0</span></span><input type="checkbox" id="tcc"></label>
+          <label class="lrow"><div class="ldot" style="background:#00A0A0"></div><span class="lname">Libraries <span class="lcount" id="lib-count">0</span></span><input type="checkbox" id="tlib"></label>
+          <label class="lrow"><div class="ldot" style="background:#B83C3C"></div><span class="lname">Formal ESOL providers <span class="lcount" id="esol-count">0</span></span><input type="checkbox" id="tesol"></label>
+          <div id="esol-filter-wrap" style="margin:2px 0 4px 16px">
+            <select id="esol-type-filter" style="width:100%;padding:3px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
+              <option value="all" selected>All provider types</option>
+              <option value="Local Authority">Local Authority</option>
+              <option value="Further Education College">FE College</option>
+              <option value="Independent Training Provider">Independent Training Provider</option>
+              <option value="Institute of Adult Learning">Institute of Adult Learning</option>
+              <option value="Charity">Charity</option>
+              <option value="University">University</option>
+            </select>
+          </div>
+          <div style="font-size:10px;color:#888;margin-top:4px;line-height:1.3">Source: GLA ESOL Planning Map</div>
+        </div>
+        <div class="sb-sec" style="flex-shrink:0;border-bottom:1px solid #e5e5e0">
           <div class="sb-lbl">Borough boundaries</div>
           <label class="lrow"><div style="width:9px;height:9px;border:2px solid #1a1a1a;border-radius:2px;flex-shrink:0"></div><span class="lname">NW London boroughs</span><input type="checkbox" id="tb"></label>
           <div style="margin:4px 0 8px 0">
@@ -1818,6 +1848,155 @@ fetch('pharmacies.json').then(r => r.ok ? r.json() : []).then(data => {
 }).catch(() => console.log('pharmacies.json not available'));
 
 
+// ── ESOL Planning Map: schools + community centres + libraries + ESOL providers ───
+// Source: GLA ESOL Planning Map (Greater London Authority)
+// Generic helper to build a clustered point layer with consistent styling
+function _mkCivicCluster(colour, rgba) {
+  return L.markerClusterGroup({
+    maxClusterRadius: 40,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    iconCreateFunction: cluster => {
+      const c = cluster.getChildCount();
+      const sz = c > 50 ? 36 : c > 20 ? 30 : 26;
+      return L.divIcon({ html:`<div style="background:${rgba};width:${sz}px;height:${sz}px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)">${c}</div>`, iconSize:[sz,sz], iconAnchor:[sz/2,sz/2], className:'' });
+    }
+  });
+}
+function _mkCivicIcon(colour) {
+  return L.divIcon({ html: `<div style="background:${colour};width:10px;height:10px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.3)"></div>`, iconSize:[10,10], iconAnchor:[5,5], className:'' });
+}
+function _esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Schools (DfE GIAS, NWL boroughs only) ────────────────────────────────
+const schoolsCluster  = _mkCivicCluster('#1E5BB8', 'rgba(30,91,184,.78)');
+let schoolsData = [];
+let schoolsPhaseFilter = 'all';
+function loadSchoolsLayer(rows) {
+  schoolsCluster.clearLayers();
+  schoolsData = [];
+  rows.forEach(p => {
+    if (!p.lat || !p.lng) return;
+    const marker = L.marker([p.lat, p.lng], {icon: _mkCivicIcon('#1E5BB8')});
+    const ageRow = (p.low_age != null && p.high_age != null) ? `<div class="pop-row"><span class="pop-key">Ages</span><span>${p.low_age}–${p.high_age}</span></div>` : '';
+    const pupRow = (p.pupils != null) ? `<div class="pop-row"><span class="pop-key">Pupils</span><span>${p.pupils}${p.capacity?` / ${p.capacity}`:''}</span></div>` : '';
+    const fsmRow = (p.fsm_pct != null) ? `<div class="pop-row"><span class="pop-key">FSM</span><span>${p.fsm_pct}%</span></div>` : '';
+    const phRow = p.phase ? `<div class="pop-row"><span class="pop-key">Phase</span><span>${_esc(p.phase)}</span></div>` : '';
+    const tyRow = p.type ? `<div class="pop-row"><span class="pop-key">Type</span><span>${_esc(p.type)}</span></div>` : '';
+    const wsRow = p.website ? `<div class="pop-row"><span class="pop-key">Web</span><span><a href="${_esc(p.website)}" target="_blank" rel="noopener">link</a></span></div>` : '';
+    marker.bindPopup(`<div class="pop-hdr" style="background:#1E5BB8">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.street,p.town,p.postcode].filter(Boolean).join(', '))}</div>${phRow}${tyRow}${ageRow}${pupRow}${fsmRow}<div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wsRow}</div>`);
+    marker.bindTooltip(`${_esc(p.name)} · ${_esc(p.phase||'School')}`, { direction:'top', className:'marker-tip' });
+    schoolsData.push({ phase:p.phase||'', marker });
+  });
+  _applySchoolsFilter();
+  console.log(`Loaded ${schoolsData.length} schools`);
+}
+function _applySchoolsFilter() {
+  if (!Array.isArray(schoolsData)) return;
+  schoolsCluster.clearLayers();
+  let n = 0;
+  schoolsData.forEach(d => {
+    const keep = schoolsPhaseFilter === 'all' ? true : d.phase === schoolsPhaseFilter;
+    if (keep) { schoolsCluster.addLayer(d.marker); n++; }
+  });
+  const el = document.getElementById('schools-count');
+  if (el) el.textContent = n;
+}
+fetch('schools.json').then(r => r.ok ? r.json() : []).then(data => {
+  if (data && data.length) loadSchoolsLayer(data);
+  else console.log('schools.json not found or empty');
+}).catch(() => console.log('schools.json not available'));
+
+// ── Community centres (GLA ESOL Planning Map) ─────────────────────────────
+const ccCluster  = _mkCivicCluster('#D87C2D', 'rgba(216,124,45,.78)');
+let ccData = [];
+function loadCCLayer(rows) {
+  ccCluster.clearLayers();
+  ccData = [];
+  rows.forEach(p => {
+    if (!p.lat || !p.lng) return;
+    const marker = L.marker([p.lat, p.lng], {icon: _mkCivicIcon('#D87C2D')});
+    const wsRow = p.website ? `<div class="pop-row"><span class="pop-key">Web</span><span><a href="${_esc(p.website)}" target="_blank" rel="noopener">link</a></span></div>` : '';
+    const wdRow = p.ward_name ? `<div class="pop-row"><span class="pop-key">Ward</span><span>${_esc(p.ward_name)}</span></div>` : '';
+    marker.bindPopup(`<div class="pop-hdr" style="background:#D87C2D">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div><div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wdRow}${wsRow}</div>`);
+    marker.bindTooltip(`${_esc(p.name)} · Community centre`, { direction:'top', className:'marker-tip' });
+    ccCluster.addLayer(marker);
+    ccData.push({ marker });
+  });
+  const el = document.getElementById('cc-count');
+  if (el) el.textContent = ccData.length;
+  console.log(`Loaded ${ccData.length} community centres`);
+}
+fetch('community_centres.json').then(r => r.ok ? r.json() : []).then(data => {
+  if (data && data.length) loadCCLayer(data);
+  else console.log('community_centres.json not found or empty');
+}).catch(() => console.log('community_centres.json not available'));
+
+// ── Libraries (GLA ESOL Planning Map) ─────────────────────────────────────
+const libCluster  = _mkCivicCluster('#00A0A0', 'rgba(0,160,160,.78)');
+let libData = [];
+function loadLibLayer(rows) {
+  libCluster.clearLayers();
+  libData = [];
+  rows.forEach(p => {
+    if (!p.lat || !p.lng) return;
+    const marker = L.marker([p.lat, p.lng], {icon: _mkCivicIcon('#00A0A0')});
+    const wsRow = p.website ? `<div class="pop-row"><span class="pop-key">Web</span><span><a href="${_esc(p.website)}" target="_blank" rel="noopener">link</a></span></div>` : '';
+    const wdRow = p.ward_name ? `<div class="pop-row"><span class="pop-key">Ward</span><span>${_esc(p.ward_name)}</span></div>` : '';
+    const stRow = p.status ? `<div class="pop-row"><span class="pop-key">Status</span><span>${_esc(p.status)}</span></div>` : '';
+    marker.bindPopup(`<div class="pop-hdr" style="background:#00A0A0">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div><div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wdRow}${stRow}${wsRow}</div>`);
+    marker.bindTooltip(`${_esc(p.name)} · Library`, { direction:'top', className:'marker-tip' });
+    libCluster.addLayer(marker);
+    libData.push({ marker });
+  });
+  const el = document.getElementById('lib-count');
+  if (el) el.textContent = libData.length;
+  console.log(`Loaded ${libData.length} libraries`);
+}
+fetch('libraries.json').then(r => r.ok ? r.json() : []).then(data => {
+  if (data && data.length) loadLibLayer(data);
+  else console.log('libraries.json not found or empty');
+}).catch(() => console.log('libraries.json not available'));
+
+// ── Formal ESOL providers (GLA ESOL Planning Map) ─────────────────────────
+const esolCluster  = _mkCivicCluster('#B83C3C', 'rgba(184,60,60,.78)');
+let esolData = [];
+let esolTypeFilter = 'all';
+function loadESOLLayer(rows) {
+  esolCluster.clearLayers();
+  esolData = [];
+  rows.forEach(p => {
+    if (!p.lat || !p.lng) return;
+    const marker = L.marker([p.lat, p.lng], {icon: _mkCivicIcon('#B83C3C')});
+    const wsRow = p.website ? `<div class="pop-row"><span class="pop-key">Web</span><span><a href="${_esc(p.website)}" target="_blank" rel="noopener">link</a></span></div>` : '';
+    const tyRow = p.type ? `<div class="pop-row"><span class="pop-key">Type</span><span>${_esc(p.type)}</span></div>` : '';
+    marker.bindPopup(`<div class="pop-hdr" style="background:#B83C3C">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div>${tyRow}<div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wsRow}</div>`);
+    marker.bindTooltip(`${_esc(p.name)} · ${_esc(p.type||'ESOL provider')}`, { direction:'top', className:'marker-tip' });
+    esolData.push({ type:p.type||'', marker });
+  });
+  _applyESOLFilter();
+  console.log(`Loaded ${esolData.length} ESOL providers`);
+}
+function _applyESOLFilter() {
+  if (!Array.isArray(esolData)) return;
+  esolCluster.clearLayers();
+  let n = 0;
+  esolData.forEach(d => {
+    const keep = esolTypeFilter === 'all' ? true : d.type === esolTypeFilter;
+    if (keep) { esolCluster.addLayer(d.marker); n++; }
+  });
+  const el = document.getElementById('esol-count');
+  if (el) el.textContent = n;
+}
+fetch('esol_providers.json').then(r => r.ok ? r.json() : []).then(data => {
+  if (data && data.length) loadESOLLayer(data);
+  else console.log('esol_providers.json not found or empty');
+}).catch(() => console.log('esol_providers.json not available'));
+
+
 // ── VCSE filtering ────────────────────────────────────────────────────────
 // Ward codes per neighbourhood (for spatial filtering)
 const NBHD_WARDS = {
@@ -3035,6 +3214,30 @@ document.getElementById('td').addEventListener('change',  e => e.target.checked 
   });
 })();
 document.getElementById('tph').addEventListener('change', e => e.target.checked ? pharmCluster.addTo(map) : map.removeLayer(pharmCluster));
+
+// ── Civic & education layer toggles (GLA ESOL Planning Map) ──
+document.getElementById('tsch')  && document.getElementById('tsch').addEventListener('change',  e => e.target.checked ? schoolsCluster.addTo(map) : map.removeLayer(schoolsCluster));
+document.getElementById('tcc')   && document.getElementById('tcc').addEventListener('change',   e => e.target.checked ? ccCluster.addTo(map)      : map.removeLayer(ccCluster));
+document.getElementById('tlib')  && document.getElementById('tlib').addEventListener('change',  e => e.target.checked ? libCluster.addTo(map)     : map.removeLayer(libCluster));
+document.getElementById('tesol') && document.getElementById('tesol').addEventListener('change', e => e.target.checked ? esolCluster.addTo(map)    : map.removeLayer(esolCluster));
+// Schools phase filter
+(function(){
+  const sel = document.getElementById('schools-phase-filter');
+  if (!sel) return;
+  sel.addEventListener('change', e => {
+    schoolsPhaseFilter = (e.target.value || 'all');
+    if (typeof _applySchoolsFilter === 'function') _applySchoolsFilter();
+  });
+})();
+// ESOL provider type filter
+(function(){
+  const sel = document.getElementById('esol-type-filter');
+  if (!sel) return;
+  sel.addEventListener('change', e => {
+    esolTypeFilter = (e.target.value || 'all');
+    if (typeof _applyESOLFilter === 'function') _applyESOLFilter();
+  });
+})();
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LSOA IMD LAYER (embedded — no external files needed)

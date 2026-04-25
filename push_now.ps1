@@ -14,7 +14,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue .git\HEAD.lock
 # mis-parsed as flags).
 $msgPath = Join-Path $env:TEMP "nwl_commit_msg.txt"
 $msg = @'
-data(crime,civic,ui): MPS 12mo crime breakdown + civic strength + UI
+data(crime,civic,esol,ui): MPS crime + civic strength + GLA ESOL planning layers + UI
 
 Adopts the official ONS LSOA (2021) -> Electoral Ward (May 2024)
 best-fit lookup as the authoritative LSOA->ward mapping, replacing
@@ -510,6 +510,79 @@ MPS crime — UI wiring
   options (violence, theft, burglary, robbery, vehicle,
   drug offences) — bivariate kept compact to avoid
   overwhelming the second-axis dropdown.
+
+GLA ESOL Planning Map — 4 new point layers
+------------------------------------------
+- Adds four new point datasets to the map, sourced from
+  the Greater London Authority's English language (ESOL)
+  Planning Map (London Datastore, "ESOL Planning Map"):
+    * schools.json             — 750 records
+    * community_centres.json   — 190 records
+    * libraries.json           —  81 records
+    * esol_providers.json      —  58 records
+- All four filtered to the 8-borough NWL ICS footprint
+  (Brent, Ealing, H&F, Harrow, Hillingdon, Hounslow,
+  K&C, Westminster) — Camden excluded per project scope.
+- Geocoding strategy:
+    * Schools: easting/northing in source CSV reprojected
+      OSGB36 (EPSG:27700) -> WGS84 (EPSG:4326) via pyproj.
+      Filtered to establishmentstatus__name_ == 'Open'.
+    * Community centres / libraries: lat/lng provided
+      directly in source CSV. Libraries additionally
+      filtered to open_status == '1'.
+    * Formal ESOL providers: only postcodes provided.
+      Geocoded via local ONSPD (Feb 2026) cache with a
+      3-tier fallback:
+        1. Exact pcds match
+        2. Sector centroid (1st 5 chars, e.g. NW10 6)
+        3. Outward-code centroid (e.g. NW10)
+      Hit rate: 57/58 (one terminated W1P 2PD postcode
+      could not be resolved, dropped).
+- School phase distribution (NWL): Primary 381,
+  Secondary 108, Nursery 21, All-through 8, 16+/Sixth
+  form 9, Special/Other 223. ESOL provider type
+  distribution: Local Authority 29, FE College 20,
+  Independent Training Provider 5, Institute of Adult
+  Learning 2, Charity 1, University 1.
+
+ESOL planning — UI wiring
+-------------------------
+- New "Civic & education" sidebar section (between
+  Point layers and Borough boundaries) with 4 toggles:
+    * Schools (#tsch, blue #1E5BB8) + phase filter
+      dropdown (All / Primary / Secondary / Nursery /
+      All-through / 16+ / Special-Other)
+    * Community centres (#tcc, orange #D87C2D)
+    * Libraries (#tlib, teal #00A0A0)
+    * Formal ESOL providers (#tesol, red #B83C3C) +
+      type filter dropdown (All / Local Authority /
+      FE College / Independent Training Provider /
+      Institute of Adult Learning / Charity /
+      University)
+- Each layer rendered via `L.markerClusterGroup` with
+  consistent styling (matching existing dental/pharmacy
+  pattern): 10×10 div-icon pins, cluster bubbles
+  coloured to match the layer dot, count badges on
+  the sidebar row.
+- Marker popups include name, address, postcode, ward
+  (where available), borough, and a website link if
+  present. Schools popups additionally show phase,
+  type, age range, pupils/capacity, and FSM%.
+- Source attribution rendered in the sidebar:
+  "Source: GLA ESOL Planning Map".
+- Layers default to OFF (user toggles via sidebar);
+  filter dropdowns re-render the cluster + update the
+  count badge live.
+
+New scripts (ESOL planning)
+---------------------------
+- scripts/build_esol_v2.py: canonical builder for the
+  4 JSONs. Reads source CSVs from /uploads/, applies
+  NWL filter, geocodes via ONSPD where needed,
+  writes flat JSON arrays to repo root.
+- scripts/build_esol_layers.py: kept as a thin stub
+  that runpy-delegates to build_esol_v2.py for
+  backwards compatibility.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

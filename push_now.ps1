@@ -1262,6 +1262,62 @@ Export dialog — shared modal helper
   selection, null on cancel. Same helper used
   for both PNG and CSV pickers, can be reused
   for future export modes.
+
+PNG — "Prepare screen for screenshot" mode (the fix that finally works)
+-----------------------------------------------------------------------
+- User observation: during the brief moment
+  between fitBounds and html2canvas where the
+  white overlay is on screen but capture
+  hasn't run yet, the screen looks PERFECT.
+  After html2canvas runs, the output is
+  shifted to the north-west.
+- Conclusion: the bug is exclusively in
+  html2canvas's reading of Leaflet's
+  translated overlay panes. The actual
+  rendered DOM is fine; capture is what's
+  broken.
+- Fix (user's idea): add a "Prepare screen
+  for screenshot" mode that does everything
+  EXCEPT html2canvas. The screen is put into
+  the perfect state — fitBounds applied,
+  white-outside overlay added, controls
+  hidden, dl-badge hidden — and a top banner
+  appears with instructions:
+    "Screen ready for screenshot — use
+     Win+Shift+S (Windows) or Cmd+Shift+4
+     (Mac), then click Done."
+  The user takes their own screenshot via
+  the OS, then clicks Done to remove the
+  overlay and restore their view. Output is
+  pixel-perfect because no rasterisation
+  happens client-side.
+- Three "prepare" sub-modes added to the PNG
+  dialog (starred for visibility):
+    Prepare screen — Entire NW London
+    Prepare screen — Focused borough (when
+       a borough is focused)
+    Prepare screen — Current view (no
+       fitBounds, just whitens outside)
+- Auto-download modes kept as fallback for
+  users who prefer one-click. Marked clearly
+  with "may have rendering quirks" so users
+  know to try Prepare-screen first.
+- _prepareScreenForScreenshot:
+    * Saves center/zoom + previous element
+      visibility for Done cleanup.
+    * Optionally fitBounds based on mode.
+    * Adds L.polygon white overlay (outer
+      world ring + inner borough holes,
+      fillOpacity 1.0). Leaflet projects it,
+      so it always lines up.
+    * Hides Leaflet controls + dl-badge.
+    * Shows a fixed-position banner with
+      kbd instructions + a Done button.
+    * Done button removes overlay, restores
+      controls + view, removes banner.
+- _screenshotState module-level var ensures
+  the user can't accidentally enter screenshot
+  mode twice.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

@@ -5569,6 +5569,102 @@ function _exportDialog(title, options, extras) {
   });
 }
 
+// ── Prepare-for-screenshot mode ─────────────────────────────────────────
+// User-driven manual screenshot. We:
+//   1. Fit the map to the chosen scope (NWL or focused borough), or skip
+//      fitBounds if 'wysiwyg'.
+//   2. Paint a white Leaflet polygon overlay over everything outside the
+//      scope (uses Leaflet's projection — always lines up with basemap).
+//   3. Show a top banner: "Use Windows+Shift+S (or Cmd+Shift+4 on macOS)
+//      to capture, then click Done".
+//   4. When the user clicks Done, remove the overlay + restore their view.
+// This sidesteps html2canvas entirely. The user gets a pixel-perfect
+// screenshot of the actual rendered map — no rasterisation, no
+// projection mismatch.
+let _screenshotState = null;
+async function _prepareScreenForScreenshot(opts) {
+  opts = opts || { mode: 'nwl', whiteOutside: true };
+  if (_screenshotState) return; // already in screenshot mode
+  if (typeof map === 'undefined') return;
+
+  const savedCenter = map.getCenter();
+  const savedZoom = map.getZoom();
+  const dlBadge = document.getElementById('dl-badge');
+  const dlPrevVis = dlBadge ? dlBadge.style.visibility : '';
+  const ctrlCorners = Array.from(document.querySelectorAll(
+    '.leaflet-top, .leaflet-bottom, .leaflet-control-attribution'
+  ));
+  const ctrlPrevVis = ctrlCorners.map(el => el.style.visibility);
+  if (dlBadge) dlBadge.style.visibility = 'hidden';
+  ctrlCorners.forEach(el => { el.style.visibility = 'hidden'; });
+
+  let movedMap = false;
+  let whiteOverlay = null;
+
+  // Fit to scope if requested.
+  if (opts.mode === 'nwl' || opts.mode === 'borough') {
+    const savedFocus = (typeof focusedBorough !== 'undefined') ? focusedBorough : 'all';
+    let scopeBounds;
+    try {
+      if (opts.mode === 'nwl') focusedBorough = 'all';
+      scopeBounds = _pngScopeBounds();
+    } finally {
+      if (opts.mode === 'nwl') focusedBorough = savedFocus;
+    }
+    if (scopeBounds) {
+      try {
+        map.fitBounds(scopeBounds, { padding: [40, 40], animate: false });
+        movedMap = true;
+        await new Promise(r => setTimeout(r, 250));
+      } catch (e) { /* no-op */ }
+    }
+  }
+
+  // Add white-outside overlay.
+  if (opts.whiteOutside) {
+    try {
+      const feats = _pngScopeFeatures();
+      if (feats && feats.length) {
+        const outerRing = [[51.0, -2.0], [51.0, 2.0], [53.0, 2.0], [53.0, -2.0]];
+        const allRings = [outerRing];
+        feats.forEach(f => {
+          const g = f && f.geometry; if (!g) return;
+          const pushRing = ring => allRings.push(ring.map(c => [c[1], c[0]]));
+          if (g.type === 'Polygon') g.coordinates.forEach(pushRing);
+          else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(pushRing));
+        });
+        whiteOverlay = L.polygon(allRings, {
+          color: '#ffffff', fillColor: '#ffffff', fillOpacity: 1.0,
+          weight: 0, interactive: false, fillRule: 'evenodd',
+        }).addTo(map);
+        whiteOverlay.bringToFront();
+      }
+    } catch(e) { console.warn('white-outside overlay failed:', e); }
+  }
+
+  // Show banner with instructions + Done button.
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#1a2640;color:#fff;padding:10px 18px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.3);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;font-size:13px;z-index:99998;display:flex;align-items:center;gap:14px';
+  banner.innerHTML = `
+    <span><strong>Screen ready for screenshot</strong> — use <kbd style="background:#fff;color:#1a2640;padding:2px 6px;border-radius:3px;font-family:monospace;font-size:11px">Win + Shift + S</kbd> (Windows) or <kbd style="background:#fff;color:#1a2640;padding:2px 6px;border-radius:3px;font-family:monospace;font-size:11px">Cmd + Shift + 4</kbd> (Mac), then click Done.</span>
+    <button id="screenshot-done" style="padding:6px 14px;border:1px solid #fff;background:#fff;color:#1a2640;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">Done</button>`;
+  document.body.appendChild(banner);
+
+  _screenshotState = {
+    cleanup: () => {
+      try { if (whiteOverlay) map.removeLayer(whiteOverlay); } catch(e) {}
+      if (dlBadge) dlBadge.style.visibility = dlPrevVis;
+      ctrlCorners.forEach((el, i) => { el.style.visibility = ctrlPrevVis[i] || ''; });
+      if (movedMap) {
+        try { map.setView(savedCenter, savedZoom, { animate: false }); } catch (e) {}
+      }
+      if (banner.parentNode) banner.parentNode.removeChild(banner);
+      _screenshotState = null;
+    }
+  };
+  banner.querySelector('#screenshot-done').addEventListener('click', () => _screenshotState && _screenshotState.cleanup());
+}
+
 (function _wireExportButtons() {
   const pngBtn = document.getElementById('tb-png');
   const csvBtn = document.getElementById('tb-csv');
@@ -5576,16 +5672,31 @@ function _exportDialog(title, options, extras) {
   if (pngBtn) pngBtn.addEventListener('click', async () => {
     const focused = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all') ? focusedBorough : null;
     const opts = [
-      { key: 'wysiwyg', label: 'Current view (recommended)',
-        desc: 'Capture exactly what is on screen now. Pan/zoom first, then choose this. No re-framing, no projection issues.' },
-      { key: 'nwl', label: 'Entire NW London',
-        desc: 'Re-frame the map to fit all 8 NWL boroughs, then capture.' },
+      { key: 'prepare-nwl',     label: '⭐ Prepare screen for screenshot — Entire NW London',
+        desc: 'Whitens everything outside NWL, then you take your own screenshot (Win+Shift+S). Pixel-perfect, no alignment issues.' },
     ];
-    if (focused) opts.push({ key: 'borough', label: `Focused borough (${focused})`,
-      desc: 'Re-frame to the currently focused borough only.' });
-    const extras = '<label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#444;cursor:pointer"><input type="checkbox" id="png-white-outside"> Paint everything outside NW London white</label>';
+    if (focused) opts.push({
+      key: 'prepare-borough', label: `⭐ Prepare screen for screenshot — Focused borough (${focused})`,
+      desc: 'Whitens everything outside the focused borough, then you screenshot manually.'
+    });
+    opts.push(
+      { key: 'prepare-current', label: '⭐ Prepare screen for screenshot — Current view',
+        desc: 'Whitens outside NWL but keeps your current pan/zoom. Then screenshot manually.' },
+      { key: 'wysiwyg',     label: 'Auto-download — Current view',
+        desc: 'Capture exactly what is on screen now via html2canvas. Fast but may have rendering quirks.' },
+      { key: 'nwl',         label: 'Auto-download — Entire NW London',
+        desc: 'Re-frame to all 8 NWL boroughs and auto-download. May have alignment issues.' },
+    );
+    const extras = '<label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#444;cursor:pointer"><input type="checkbox" id="png-white-outside"> (Auto-download only) Paint everything outside NW London white</label>';
     const choice = await _exportDialog('Download map as PNG', opts, extras);
     if (!choice) return;
+    if (choice.key.startsWith('prepare-')) {
+      const mode = choice.key === 'prepare-nwl' ? 'nwl'
+                 : choice.key === 'prepare-borough' ? 'borough'
+                 : 'wysiwyg';
+      _prepareScreenForScreenshot({ mode, whiteOutside: true });
+      return;
+    }
     _downloadMapPng({ mode: choice.key, whiteOutside: !!choice.flags['png-white-outside'] });
   });
 

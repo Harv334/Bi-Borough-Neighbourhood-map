@@ -5334,10 +5334,12 @@ async function _downloadMapPng() {
       ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
     // Step 3: paint the dim mask onto the captured canvas using Canvas-2D
-    // Path2D + evenodd fill. Polygons projected NOW (post-capture, while
-    // the map state is identical to what was just rasterised) — no SVG,
-    // no DOM, no rendering-pipeline timing race.
+    // Path2D + evenodd fill, AND collect the polygon bbox in canvas pixels
+    // for the tight crop in step 4. Polygons are projected NOW (post-capture,
+    // while the map state is identical to what was just rasterised) — no
+    // SVG, no DOM, no rendering-pipeline timing race.
     const feats = _pngScopeFeatures();
+    let bxMin = Infinity, byMin = Infinity, bxMax = -Infinity, byMax = -Infinity;
     if (feats && feats.length) {
       try {
         const ctx = fullCanvas.getContext('2d');
@@ -5357,6 +5359,10 @@ async function _downloadMapPng() {
               const p = map.latLngToContainerPoint(L.latLng(c[1], c[0]));
               const cx = p.x * xScale;
               const cy = p.y * yScale;
+              if (cx < bxMin) bxMin = cx;
+              if (cy < byMin) byMin = cy;
+              if (cx > bxMax) bxMax = cx;
+              if (cy > byMax) byMax = cy;
               if (i === 0) path.moveTo(cx, cy); else path.lineTo(cx, cy);
             });
             path.closePath();
@@ -5371,7 +5377,30 @@ async function _downloadMapPng() {
       }
     }
 
-    const outCanvas = fullCanvas;
+    // Step 4: crop to the polygon bbox + 100 CSS-px pad. fitBounds frames
+    // the polygon vertically (or horizontally — whichever is the shorter
+    // viewport dimension), but on wide displays leaves huge surplus on the
+    // long axis. Cropping eliminates that surplus. The pad is in CSS px so
+    // we multiply by xScale/yScale to get canvas pixels — generous enough
+    // to never clip the polygon outline.
+    let outCanvas = fullCanvas;
+    if (isFinite(bxMin) && (bxMax - bxMin) > 60 && (byMax - byMin) > 60) {
+      const padX = 100 * xScale;
+      const padY = 100 * yScale;
+      const cx = Math.max(0, Math.round(bxMin - padX));
+      const cy = Math.max(0, Math.round(byMin - padY));
+      const cw = Math.min(fullCanvas.width  - cx, Math.round((bxMax - bxMin) + padX * 2));
+      const ch = Math.min(fullCanvas.height - cy, Math.round((byMax - byMin) + padY * 2));
+      if (cw > 100 && ch > 100) {
+        outCanvas = document.createElement('canvas');
+        outCanvas.width = cw;
+        outCanvas.height = ch;
+        const cctx = outCanvas.getContext('2d');
+        cctx.fillStyle = '#ffffff';
+        cctx.fillRect(0, 0, cw, ch);
+        cctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
+      }
+    }
     outCanvas._nwlDpr = Math.max(xScale, yScale);
 
     // Caption pill (scope · overlay · month YYYY).

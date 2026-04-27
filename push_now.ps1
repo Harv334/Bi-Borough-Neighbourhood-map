@@ -999,6 +999,39 @@ PNG export — drop SVG mask, paint mask post-capture
 - Cleaned up: removed `maskSvg` variable and
   the finally{}-block child-removal logic,
   since there's no DOM element to manage now.
+
+PNG export — re-add tight crop with generous pad
+------------------------------------------------
+- After the SVG → Canvas-2D mask switch, the
+  capture was correctly aligned but the image
+  extended far beyond NWL on wide-aspect
+  viewports. fitBounds frames the polygon
+  vertically (or in whichever is the shorter
+  viewport dimension) but leaves surplus
+  basemap on the longer axis — on a 16:8
+  monitor that meant ~30% of the export was
+  irrelevant London / Chilterns / Essex.
+- Fix: crop the output canvas to the polygon
+  bbox + 100 CSS-px padding per side. The
+  bbox is computed from the SAME
+  latLngToContainerPoint passes used to paint
+  the dim mask, so crop and mask cannot drift
+  apart. Padding is converted to canvas pixels
+  via xScale/yScale (the html2canvas-measured
+  pixel ratio) so retina captures don't lose
+  the pad.
+- Crop only applies if the bbox is at least
+  60 CSS-px wide AND tall (sanity guard
+  against degenerate bboxes), and clamps cw/ch
+  to canvas extent. Fills the destination with
+  white before drawImage so any padding past
+  the source canvas is solid white rather than
+  transparent black.
+- The previous tight-crop-clipping bug
+  (Westminster/K&C cut off) was caused by 14px
+  CSS padding being too tight. 100px gives
+  visibly comfortable breathing room around
+  every borough outline at any zoom.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

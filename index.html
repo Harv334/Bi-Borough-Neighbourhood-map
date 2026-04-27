@@ -351,6 +351,7 @@
             </div>
           </div>
           <label class="lrow"><div class="ldot" style="background:#854F0B"></div><span class="lname">VCSE organisations <span class="lcount">...</span></span><input type="checkbox" id="tv"></label>
+          <label class="lrow"><div class="ldot" style="background:#5C5C8A"></div><span class="lname">Community Interest Companies <span class="lcount" id="cic-count">...</span></span><input type="checkbox" id="tcic"></label>
           <label class="lrow"><div class="ldot" style="background:#7B2D8E"></div><span class="lname">Dental practices <span class="lcount" id="dental-count">0</span></span><input type="checkbox" id="td"></label>
           <div id="dental-filter-wrap" style="margin:2px 0 4px 16px">
             <select id="dental-contract-filter" style="width:100%;padding:3px 6px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#333;background:#fff">
@@ -2191,6 +2192,75 @@ fetch('vcse_data.json')
   .catch(err => console.error('VCSE load failed:', err));
 
 // vcseCluster not added by default - toggle on via sidebar
+
+// ── Community Interest Companies (CIC) layer ───────────────────────────────
+// Sourced from Companies House monthly bulk product (BasicCompanyDataAsOneFile).
+// Filtered to CompanyCategory='Community Interest Company', live-status only,
+// geocoded via ONSPD, scoped to the 8 NWL boroughs. SIC text is mapped to the
+// same cause buckets as the VCSE layer so colours stay consistent.
+const cicCluster = L.markerClusterGroup({
+  maxClusterRadius: 40,
+  showCoverageOnHover: false,
+  zoomToBoundsOnClick: true,
+  iconCreateFunction: cluster => {
+    const c = cluster.getChildCount();
+    const sz = c > 50 ? 36 : c > 20 ? 30 : 26;
+    return L.divIcon({
+      html:`<div style="background:rgba(92,92,138,.78);width:${sz}px;height:${sz}px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:${sz>32?13:12}px;box-shadow:0 2px 6px rgba(0,0,0,.2)">${c}</div>`,
+      className: 'cic-cluster', iconSize: [sz, sz]
+    });
+  }
+});
+let CIC_ALL = [];
+let cicData = [];
+function mkCICIcon(r) {
+  // Square marker so CICs are visually distinct from VCSE circles even when
+  // they share the same cause-bucket colour.
+  const color = (typeof VCSE_BUCKET_COLORS === 'object' && r && r.wt && r.wt[0])
+                ? (VCSE_BUCKET_COLORS[r.wt[0]] || '#5C5C8A') : '#5C5C8A';
+  return L.divIcon({
+    html: `<div style="background:${color};width:9px;height:9px;border:1.5px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.3)"></div>`,
+    iconSize: [9, 9], iconAnchor: [4, 4], className: ''
+  });
+}
+function cicPopupHtml(r) {
+  const sicLine = (r.wd || []).slice(0, 2).join(' · ');
+  const incDate = r.reg ? new Date(r.reg).toLocaleDateString('en-GB',
+                          {year:'numeric', month:'short'}) : '';
+  return `<div style="font-family:-apple-system,sans-serif;font-size:12px;line-height:1.4;max-width:260px">
+    <div style="font-weight:600;font-size:13px;margin-bottom:4px">${r.n||''}</div>
+    <div style="color:#666;font-size:11px;margin-bottom:6px">CIC · ${r.no||''}${incDate ? ' · incorporated '+incDate : ''}</div>
+    ${sicLine ? `<div style="margin-bottom:4px">${sicLine}</div>` : ''}
+    <div style="color:#888;font-size:11px">${r.a||''}</div>
+  </div>`;
+}
+function wireCICs(records) {
+  CIC_ALL = records || [];
+  cicCluster.clearLayers();
+  cicData = [];
+  CIC_ALL.forEach(r => {
+    if (r.lat == null || r.lng == null) return;
+    const m = L.marker([r.lat, r.lng], { icon: mkCICIcon(r) });
+    m.bindPopup(cicPopupHtml(r), { maxWidth: 280 });
+    m.bindTooltip(r.n, { direction: 'top', className: 'marker-tip' });
+    cicCluster.addLayer(m);
+    cicData.push({ name: r.n, addr: r.a, lat: r.lat, lng: r.lng, marker: m, record: r });
+  });
+  const cnt = document.getElementById('cic-count');
+  if (cnt) cnt.textContent = CIC_ALL.length.toLocaleString();
+}
+fetch('cics.json')
+  .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status)))
+  .then(wireCICs)
+  .catch(err => {
+    // Soft fail — cics.json is optional. Hide the count if missing.
+    console.info('cics.json not loaded (run scripts/fetch_cics.py to generate):', err.message);
+    const cnt = document.getElementById('cic-count');
+    if (cnt) cnt.textContent = '0';
+  });
+const _tcic = document.getElementById('tcic');
+if (_tcic) _tcic.addEventListener('change', e =>
+  e.target.checked ? cicCluster.addTo(map) : map.removeLayer(cicCluster));
 
 // ── Dental practices layer ───────────────────────────────────────────────
 function mkDentalIcon() {

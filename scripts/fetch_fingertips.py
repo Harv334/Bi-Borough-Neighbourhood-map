@@ -477,6 +477,12 @@ def aggregate_to_ward(msoa_data, lsoa_to_msoa, lsoa_to_ward, lsoa_pop):
             v = msoa_vals.get(msoa)
             if v is None:
                 continue
+            # Skip NaN (suppressed Fingertips values) — they propagate through
+            # the pop-weighted mean and produce NaN ward values, which then
+            # break browser JSON parsing because Python writes NaN as a bare
+            # token that JSON.parse rejects.
+            if isinstance(v, float) and v != v:
+                continue
             pop = lsoa_pop.get(lsoa)
             if pop is None or pop <= 0:
                 continue
@@ -736,21 +742,45 @@ def main():
     wd = json.loads(wpath.read_text(encoding='utf-8'))
     n_cells = 0
     n_wards = set()
+    n_skipped_nan = 0
     for iid, ward_vals in ward_data.items():
         key = f'ft_{iid}'
         for wcode, v in ward_vals.items():
             if v is None or wcode not in wd['wards']:
                 continue
+            # Skip NaN (Python serialises as bare 'NaN' which is invalid JSON
+            # and breaks the dashboard's fetch + parse). Defensive — the
+            # aggregation step also filters NaN now.
+            if isinstance(v, float) and v != v:
+                n_skipped_nan += 1
+                continue
             wd['wards'][wcode].setdefault('indicators', {})
             wd['wards'][wcode]['indicators'][key] = round(v, 4)
             n_cells += 1
             n_wards.add(wcode)
+    # Strip any pre-existing NaN values from prior fingertips fields — patcher
+    # may have written them in earlier runs, before this fix existed.
+    n_cleaned = 0
+    for w in wd['wards'].values():
+        inds = w.get('indicators') or {}
+        for k in list(inds.keys()):
+            v = inds[k]
+            if isinstance(v, float) and v != v:
+                del inds[k]
+                n_cleaned += 1
     wd.setdefault('metadata', {})
     wd['metadata']['fingertips_added']           = datetime.utcnow().isoformat() + 'Z'
     wd['metadata']['fingertips_indicator_count'] = n_with
     wd['metadata']['fingertips_profile']         = profile.get('Name')
-    wpath.write_text(json.dumps(wd, ensure_ascii=False, indent=1), encoding='utf-8')
-    print(f"  patched {n_cells} cells across {len(n_wards)} wards")
+    # allow_nan=False makes json.dumps RAISE if any NaN/Infinity sneaks in,
+    # rather than silently producing invalid JSON. Belt-and-braces.
+    wpath.write_text(
+        json.dumps(wd, ensure_ascii=False, indent=1, allow_nan=False),
+        encoding='utf-8',
+    )
+    print(f"  patched {n_cells} cells across {len(n_wards)} wards "
+          f"(skipped {n_skipped_nan} NaN values during patch, "
+          f"cleaned {n_cleaned} pre-existing NaN values)")
     print(f"\nDONE. Now run: py scripts/wire_fingertips_ui.py")
 
 

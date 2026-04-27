@@ -1804,6 +1804,13 @@ function fmtOv(v, k) {
 function ovTooltipRows(valueForKey, ward) {
   // valueForKey: function(k) -> raw value
   // ward: optional ward record (used for suppression flag lookup)
+  // Read overlay keys LIVE from the dropdowns rather than from curOv/curOv2 globals.
+  // The globals can fall out of sync if a change handler errored mid-run; the dropdown
+  // always shows what the user actually has selected, so it's the source of truth.
+  const _ovEl  = document.getElementById('ov');
+  const _ov2El = document.getElementById('ov2');
+  const _ovK   = (_ovEl  && _ovEl.value)  || (typeof curOv  !== 'undefined' ? curOv  : 'none');
+  const _ov2K  = (_ov2El && _ov2El.value) || (typeof curOv2 !== 'undefined' ? curOv2 : 'none');
   let rows = '';
   const _suppList = (ward && ward.fingertips_suppressed) || [];
   const _renderRow = (k) => {
@@ -1816,10 +1823,13 @@ function ovTooltipRows(valueForKey, ward) {
     if (isMissing && isFt) {
       return `<br><span style="font-size:10.5px"><b>${ovLabel(k)}:</b> <span style="color:#999">no data</span></span>`;
     }
+    if (isMissing) {
+      return `<br><span style="font-size:10.5px"><b>${ovLabel(k)}:</b> <span style="color:#999">—</span></span>`;
+    }
     return `<br><span style="font-size:10.5px"><b>${ovLabel(k)}:</b> ${fmtOv(v, k)}</span>`;
   };
-  if (typeof curOv !== 'undefined' && curOv && curOv !== 'none') rows += _renderRow(curOv);
-  if (typeof curOv2 !== 'undefined' && curOv2 && curOv2 !== 'none') rows += _renderRow(curOv2);
+  if (_ovK  && _ovK  !== 'none') rows += _renderRow(_ovK);
+  if (_ov2K && _ov2K !== 'none') rows += _renderRow(_ov2K);
   return rows;
 }
 function mkicon(color, label) {

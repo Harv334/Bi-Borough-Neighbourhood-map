@@ -466,29 +466,48 @@ def fetch_msoa_data_for_lad(ftp, indicator_ids, msoa_area_type_id, lad_atid, lad
 # ──────────────────────────────────────────────────────────────────────────
 # Aggregate
 # ──────────────────────────────────────────────────────────────────────────
-def aggregate_to_ward(msoa_data, msoa_suppressed, lsoa_to_msoa, lsoa_to_ward, lsoa_pop):
+def aggregate_to_ward(msoa_data, msoa_suppressed, lsoa_to_msoa, lsoa_to_ward, lsoa_pop,
+                      known_msoas=None):
     """Returns:
         out:        {indicator_id: {ward_code: ward_value}}
         suppressed: {indicator_id: set(ward_code)} — wards whose MSOAs all
-                    returned empty/suppressed values for this indicator."""
+                    returned no value for this indicator (either via explicit
+                    suppression OR via row-omission, which Fingertips also uses).
+
+    `known_msoas` is the set of MSOA codes for which Fingertips returned ANY
+    data (across any indicator). MSOAs in this set that have no row for a
+    specific indicator are treated as "suppressed by row omission" — Fingertips
+    omits suppressed rows entirely below their privacy/quality threshold rather
+    than including them with NaN. Without this, wards like Brentford East and
+    Wembley Park show "no data" for every indicator their MSOAs are missing,
+    when in reality those values are suppressed at source."""
+    if known_msoas is None:
+        known_msoas = set()
+        for vals in msoa_data.values():
+            known_msoas.update(vals.keys())
     out = {}
     suppressed = {}
     for iid, msoa_vals in msoa_data.items():
         ward_acc = {}
-        ward_supp_check = {}  # ward_code → [n_msoas_total, n_msoas_suppressed]
+        ward_supp_check = {}  # ward_code → [n_msoas_total, n_msoas_with_no_value]
         seen_msoas_per_ward = {}
         for lsoa, wcode in lsoa_to_ward.items():
             msoa = lsoa_to_msoa.get(lsoa)
             if not msoa:
                 continue
-            # Track which MSOAs covered this ward + how many were suppressed
+            # Track which MSOAs covered this ward, and for each, whether the
+            # MSOA has no usable value for this indicator (either explicitly
+            # suppressed OR no row returned but MSOA exists elsewhere in the
+            # dataset, indicating row-omission suppression).
             if wcode not in seen_msoas_per_ward:
                 seen_msoas_per_ward[wcode] = set()
             if msoa not in seen_msoas_per_ward[wcode]:
                 seen_msoas_per_ward[wcode].add(msoa)
                 slot_supp = ward_supp_check.setdefault(wcode, [0, 0])
                 slot_supp[0] += 1
-                if (iid, msoa) in msoa_suppressed:
+                explicitly_supp = (iid, msoa) in msoa_suppressed
+                row_omitted    = (msoa in known_msoas) and (msoa not in msoa_vals)
+                if explicitly_supp or row_omitted:
                     slot_supp[1] += 1
             v = msoa_vals.get(msoa)
             if v is None:
@@ -503,7 +522,8 @@ def aggregate_to_ward(msoa_data, msoa_suppressed, lsoa_to_msoa, lsoa_to_ward, ls
             slot[1] += pop
         out[iid] = {w: (n/d) for w, (n, d) in ward_acc.items() if d > 0}
         # A ward is "suppressed for this indicator" if ALL its MSOAs returned
-        # empty values AND the ward got no aggregated value.
+        # no value (explicit suppression or row-omission) AND the ward got no
+        # aggregated value.
         ward_supp = set()
         for wcode, (total, n_supp) in ward_supp_check.items():
             if wcode not in out[iid] and total > 0 and n_supp == total:

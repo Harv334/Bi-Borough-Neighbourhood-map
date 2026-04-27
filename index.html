@@ -5259,7 +5259,6 @@ async function _downloadMapPng() {
   ));
   const ctrlPrevVis = ctrlCorners.map(el => el.style.visibility);
 
-  let maskSvg = null;
   let movedMap = false;
 
   // Wait until every tile layer finishes loading (cap at 3s).
@@ -5313,59 +5312,12 @@ async function _downloadMapPng() {
     await new Promise(r => setTimeout(r, 220));
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-    // Step 2: build the mask as a REAL SVG DOM element appended to the
-    // map div. Not Leaflet-SVG (which has clipping quirks at extreme
-    // coords), not programmatic Canvas-2D (which inverted at some zoom
-    // levels). Plain SVG with fill-rule="evenodd": outer rect covers the
-    // whole viewport, inner subpaths cut holes for each NWL borough, the
-    // fill whites out everything outside those holes. html2canvas reads
-    // this SVG directly during the capture, so the result is reliable
-    // regardless of Leaflet's projection state.
-    const feats = _pngScopeFeatures();
-    const w = mapEl.clientWidth;
-    const h = mapEl.clientHeight;
-    let bxMin = Infinity, byMin = Infinity, bxMax = -Infinity, byMax = -Infinity;
-    let pathD = `M0,0 L${w},0 L${w},${h} L0,${h} Z`;
-    (feats || []).forEach(f => {
-      const g = f && f.geometry; if (!g) return;
-      const rings = [];
-      if (g.type === 'Polygon') g.coordinates.forEach(r => rings.push(r));
-      else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(r => rings.push(r)));
-      rings.forEach(ring => {
-        if (!ring || !ring.length) return;
-        const pts = ring.map(c => map.latLngToContainerPoint(L.latLng(c[1], c[0])));
-        pts.forEach(p => {
-          if (p.x < bxMin) bxMin = p.x;
-          if (p.y < byMin) byMin = p.y;
-          if (p.x > bxMax) bxMax = p.x;
-          if (p.y > byMax) byMax = p.y;
-        });
-        pathD += ' M' + pts.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' L') + ' Z';
-      });
-    });
-
-    const svgNS = 'http://www.w3.org/2000/svg';
-    maskSvg = document.createElementNS(svgNS, 'svg');
-    maskSvg.setAttribute('width', String(w));
-    maskSvg.setAttribute('height', String(h));
-    maskSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    maskSvg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:500';
-    const maskPath = document.createElementNS(svgNS, 'path');
-    maskPath.setAttribute('d', pathD);
-    // Semi-transparent white mask: basemap stays visible outside NWL but is
-    // dimmed so attention focuses on the in-scope area. fill-opacity used as
-    // a separate attribute (not rgba in fill string) because html2canvas
-    // renders that more reliably than rgba() in fill strings.
-    maskPath.setAttribute('fill', '#ffffff');
-    maskPath.setAttribute('fill-opacity', '0.55');
-    maskPath.setAttribute('fill-rule', 'evenodd');
-    maskSvg.appendChild(maskPath);
-    mapEl.appendChild(maskSvg);
-
-    // Let the SVG paint before we capture.
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-    // Step 3: capture.
+    // Step 2: capture the map FIRST, with no mask in the DOM. This avoids
+    // the html2canvas SVG-rendering quirks that were causing the mask to
+    // appear in the wrong place on the captured canvas (per user report —
+    // choropleth ended up in the top-left of the export). The mask is
+    // applied AFTER capture, in canvas-pixel space, projecting borough
+    // polygons against the same canvas we just drew into.
     const dpr = window.devicePixelRatio || 1;
     const fullCanvas = await html2canvas(mapEl, {
       useCORS: true,
@@ -5375,17 +5327,50 @@ async function _downloadMapPng() {
       scale: dpr,
     });
 
-    // Measure the true pixel ratio html2canvas actually produced.
+    // Measure true pixel ratio html2canvas produced.
     const xScale = mapEl.clientWidth
       ? (fullCanvas.width / mapEl.clientWidth)  : dpr;
     const yScale = mapEl.clientHeight
       ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
-    // No tight-crop. fitBounds() above already framed the map so the scope
-    // polygon fills the viewport with breathing room. Cropping again past
-    // the polygon bbox was reliably cutting off the eastern boroughs
-    // (Westminster, K&C, H&F) per user-reported output. The captured
-    // canvas IS the output.
+    // Step 3: paint the dim mask onto the captured canvas using Canvas-2D
+    // Path2D + evenodd fill. Polygons projected NOW (post-capture, while
+    // the map state is identical to what was just rasterised) — no SVG,
+    // no DOM, no rendering-pipeline timing race.
+    const feats = _pngScopeFeatures();
+    if (feats && feats.length) {
+      try {
+        const ctx = fullCanvas.getContext('2d');
+        const path = new Path2D();
+        // Outer ring: full canvas extent.
+        path.rect(0, 0, fullCanvas.width, fullCanvas.height);
+        // Inner rings: each NWL borough polygon, projected from latLng to
+        // canvas pixels via the live Leaflet projection.
+        feats.forEach(f => {
+          const g = f && f.geometry; if (!g) return;
+          const rings = [];
+          if (g.type === 'Polygon') g.coordinates.forEach(r => rings.push(r));
+          else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(r => rings.push(r)));
+          rings.forEach(ring => {
+            if (!ring || ring.length < 3) return;
+            ring.forEach((c, i) => {
+              const p = map.latLngToContainerPoint(L.latLng(c[1], c[0]));
+              const cx = p.x * xScale;
+              const cy = p.y * yScale;
+              if (i === 0) path.moveTo(cx, cy); else path.lineTo(cx, cy);
+            });
+            path.closePath();
+          });
+        });
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.fill(path, 'evenodd');
+        ctx.restore();
+      } catch (e) {
+        console.warn('PNG mask paint failed (output will be unmasked):', e);
+      }
+    }
+
     const outCanvas = fullCanvas;
     outCanvas._nwlDpr = Math.max(xScale, yScale);
 
@@ -5408,9 +5393,8 @@ async function _downloadMapPng() {
     console.error('PNG export error', e);
     alert('PNG export failed — some basemap tiles may be blocked by CORS. Try again after the tiles finish loading.');
   } finally {
-    if (maskSvg && maskSvg.parentNode) {
-      try { maskSvg.parentNode.removeChild(maskSvg); } catch (e) { /* ignore */ }
-    }
+    // Mask is now painted onto the output canvas post-capture, so there's
+    // no SVG element in the DOM to clean up here.
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     ctrlCorners.forEach((el, i) => { el.style.visibility = ctrlPrevVis[i] || ''; });
     // Restore the user's view — we fitted to the scope for capture.

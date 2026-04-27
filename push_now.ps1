@@ -952,6 +952,53 @@ CSV export — also emit every visible point layer
   ward/LSOA choropleth CSV continues to download
   immediately as before — this addition is
   alongside, not in place of.
+
+PNG export — drop SVG mask, paint mask post-capture
+---------------------------------------------------
+- User report: the choropleth (the highlighted
+  in-scope wards) was rendering in the TOP LEFT
+  of the export, while the basemap and point
+  markers correctly spanned the full NWL
+  footprint at the right zoom. The mask SVG was
+  being captured in the wrong position relative
+  to the captured tiles.
+- Root cause: html2canvas's SVG-rendering
+  pipeline does not always replay
+  position:absolute / viewBox / z-index in
+  precisely the way a live browser does,
+  particularly when the SVG is appended to a
+  Leaflet map div that has its own panes
+  internally translated. The capture sometimes
+  pasted the SVG mask at the wrong offset on
+  the output canvas, leaving most of the canvas
+  with the mask's solid white background and
+  only a small region (often the top-left) with
+  the basemap visible.
+- Fix: stop putting an SVG mask in the DOM at
+  all. Capture the map FIRST (no mask), then
+  paint the dim overlay POST-capture using
+  Canvas-2D Path2D + evenodd fill. The borough
+  polygons are projected at this point —
+  literally the moment of canvas rasterisation —
+  via map.latLngToContainerPoint() scaled by
+  the html2canvas-measured xScale/yScale to
+  convert CSS-pixel container coords to canvas
+  pixels. There is no projection-state race,
+  no SVG element, and no html2canvas SVG quirk
+  to navigate.
+- Implementation: Path2D outer rect at
+  (0,0,canvas.width,canvas.height) then one
+  closed subpath per borough (Polygon and
+  MultiPolygon both supported). Single
+  ctx.fill(path,'evenodd') with
+  rgba(255,255,255,0.55) — same dim level as
+  the previous SVG mask. Wrapped in try/catch
+  so a projection error degrades gracefully to
+  an unmasked output rather than aborting the
+  whole export.
+- Cleaned up: removed `maskSvg` variable and
+  the finally{}-block child-removal logic,
+  since there's no DOM element to manage now.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

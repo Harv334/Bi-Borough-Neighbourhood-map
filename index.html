@@ -456,7 +456,7 @@
           <div class="sb-lbl">Filter by cause</div>
           <div id="cause-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px"></div>
           <div style="font-size:10.5px;color:#888;line-height:1.4">
-            Click chips to toggle. Affects both layers. At zoom-out the map shows per-ward counts; zoom in for individual pins.
+            Click chips to toggle. Affects both layers.
           </div>
         </div>
         <div class="sb-sec" style="padding-bottom:8px">
@@ -2274,20 +2274,16 @@ fetch('cics.json')
     if (cnt) cnt.textContent = '0';
   });
 // Paired-toggle helper for CICs (mirrors _setVcseLayerVisible).
-// At zoom < 12 we *don't* add the cluster to the map even when toggled on —
-// the per-ward count circles handle that view. The zoom-watcher will swap
-// modes when the user zooms in past 12.
 function _setCicLayerVisible(on) {
   const a = document.getElementById('tcic');
   const b = document.getElementById('cic-tab-toggle');
   if (a && a.checked !== !!on) a.checked = !!on;
   if (b && b.checked !== !!on) b.checked = !!on;
-  if (on && map.getZoom() >= 12) {
+  if (on) {
     if (!cicCluster._map) cicCluster.addTo(map);
   } else {
     if (cicCluster._map) map.removeLayer(cicCluster);
   }
-  if (typeof _updateThirdSectorWardCounts === 'function') _updateThirdSectorWardCounts();
 }
 const _tcic = document.getElementById('tcic');
 if (_tcic) _tcic.addEventListener('change', e => _setCicLayerVisible(e.target.checked));
@@ -2359,131 +2355,16 @@ function buildCauseChips() {
       }
       applyVCSEFilter();
       applyCICFilter();
-      _updateThirdSectorWardCounts();
     });
     host.appendChild(chip);
   });
 }
-
-// ── Ward-count circles for low-zoom view ─────────────────────────────────
-// At zoom < 12 we hide individual pins and instead show a small circle at
-// each ward's centroid sized by total third-sector orgs (VCSE + CIC) in the
-// ward, filtered by the active cause chips. Answers "where is the sector
-// dense?" without 2,800 overlapping pins.
-let _thirdSectorCountsLayer = null;
-function _wardCentroid(feature) {
-  // Cheap centroid: average of all coords. Good enough for a marker centre.
-  const coords = [];
-  const walk = (g) => {
-    if (typeof g[0] === 'number') { coords.push(g); return; }
-    g.forEach(walk);
-  };
-  walk(feature.geometry.coordinates);
-  if (!coords.length) return null;
-  const lng = coords.reduce((s,c) => s + c[0], 0) / coords.length;
-  const lat = coords.reduce((s,c) => s + c[1], 0) / coords.length;
-  return [lat, lng];
-}
-function _thirdSectorCountByWard() {
-  // Returns Map<WD24CD, count>
-  const counts = new Map();
-  const bump = (wd) => { if (wd) counts.set(wd, (counts.get(wd)||0) + 1); };
-  if (typeof VCSE_PINNED !== 'undefined') {
-    VCSE_PINNED.forEach(r => { if (_causeMatches(r)) bump(r.ward); });
-  }
-  if (typeof CIC_ALL !== 'undefined') {
-    CIC_ALL.forEach(r => { if (_causeMatches(r)) bump(r.ward); });
-  }
-  return counts;
-}
-function _updateThirdSectorWardCounts() {
-  if (typeof GJ === 'undefined' || !GJ.features) return;
-  if (_thirdSectorCountsLayer) {
-    map.removeLayer(_thirdSectorCountsLayer);
-    _thirdSectorCountsLayer = null;
-  }
-  // Only build when we'd actually render — saves work when zoom is high.
-  if (map.getZoom() >= 12) return;
-  // Only build when user has at least one of the two layers active.
-  const vcseOn = !!document.getElementById('tv')?.checked
-              || !!document.getElementById('vcse-tab-toggle')?.checked;
-  const cicOn  = !!document.getElementById('tcic')?.checked
-              || !!document.getElementById('cic-tab-toggle')?.checked;
-  if (!vcseOn && !cicOn) return;
-  const counts = _thirdSectorCountByWard();
-  if (counts.size === 0) return;
-  const maxN = Math.max(...counts.values());
-  const layers = [];
-  GJ.features.forEach(f => {
-    const wd = f.properties && f.properties.WD24CD;
-    const n = counts.get(wd) || 0;
-    if (n === 0) return;
-    const ll = _wardCentroid(f);
-    if (!ll) return;
-    // Radius: sqrt scaling so big counts don't dominate. 4–22 px range.
-    const r = Math.max(4, Math.min(22, 4 + 18 * Math.sqrt(n / maxN)));
-    const c = L.circleMarker(ll, {
-      radius: r,
-      color: '#fff',
-      weight: 1.5,
-      fillColor: '#5C5C8A',
-      fillOpacity: 0.78,
-      interactive: true,
-    });
-    c.bindTooltip(`<b>${f.properties.WD24NM}</b><br>${n} third-sector org${n!==1?'s':''}`,
-                  { sticky: true, opacity: 0.95 });
-    layers.push(c);
-  });
-  _thirdSectorCountsLayer = L.layerGroup(layers).addTo(map);
-}
-
-// Zoom watcher: swap pins ↔ count circles at zoom 12. Hide the marker
-// clusters when zoomed out so the per-ward count is the only thing showing.
-let _zoomedOutMode = false;
-function _refreshZoomMode() {
-  const z = map.getZoom();
-  const shouldZoomOut = z < 12;
-  if (shouldZoomOut === _zoomedOutMode) {
-    // Mode hasn't changed — but if user toggled a chip the counts may need
-    // refreshing.
-    if (_zoomedOutMode) _updateThirdSectorWardCounts();
-    return;
-  }
-  _zoomedOutMode = shouldZoomOut;
-  const vcseOn = !!document.getElementById('tv')?.checked
-              || !!document.getElementById('vcse-tab-toggle')?.checked;
-  const cicOn  = !!document.getElementById('tcic')?.checked
-              || !!document.getElementById('cic-tab-toggle')?.checked;
-  if (shouldZoomOut) {
-    // Hide marker clusters; show ward counts.
-    if (vcseCluster._map) map.removeLayer(vcseCluster);
-    if (cicCluster._map)  map.removeLayer(cicCluster);
-    _updateThirdSectorWardCounts();
-  } else {
-    // Show marker clusters (if user had them on); hide ward counts.
-    if (vcseOn && !vcseCluster._map) vcseCluster.addTo(map);
-    if (cicOn  && !cicCluster._map)  cicCluster.addTo(map);
-    if (_thirdSectorCountsLayer) {
-      map.removeLayer(_thirdSectorCountsLayer);
-      _thirdSectorCountsLayer = null;
-    }
-  }
-}
-map.on('zoomend', _refreshZoomMode);
 
 // Wire the VCSE-tab CIC toggle to the same paired helper as `tcic`.
 const _cicTabToggle = document.getElementById('cic-tab-toggle');
 if (_cicTabToggle) {
   _cicTabToggle.addEventListener('change', e => _setCicLayerVisible(e.target.checked));
 }
-// Refresh ward-count circles whenever either layer toggle flips, since
-// the displayed pop count depends on which layers the user has on.
-['vcse-tab-toggle', 'tv'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('change', () => {
-    if (typeof _updateThirdSectorWardCounts === 'function') _updateThirdSectorWardCounts();
-  });
-});
 
 // Build chips once both data layers have loaded. The VCSE + CIC fetchers
 // are fire-and-forget async, so we mark each as ready and only build chips
@@ -2493,7 +2374,6 @@ function _maybeBuildChips() {
   if (!_vcseReady || !_cicReady) return;
   buildCauseChips();
   applyCICFilter();
-  _refreshZoomMode();
 }
 // Hook into the fetch promise chains we set up earlier — both .then()
 // callbacks have already captured the original wireVCSE/wireCICs references,
@@ -4507,11 +4387,7 @@ document.getElementById('tgr').addEventListener('change', e => {
 //   #vcse-tab-toggle (VCSE tab, so you can turn it on from the filter pane)
 // Whichever one changes, we apply the state to the map AND mirror it to the other.
 function _setVcseLayerVisible(on) {
-  // Zoom-aware: at zoom < 12 we keep pins off the map and rely on the
-  // per-ward count circles instead. The zoom-watcher swaps modes at the
-  // boundary so flipping the toggle while zoomed out still does the right
-  // thing once the user zooms in.
-  if (on && map.getZoom() >= 12) {
+  if (on) {
     if (!vcseCluster._map) vcseCluster.addTo(map);
   } else {
     if (vcseCluster._map) map.removeLayer(vcseCluster);
@@ -4520,7 +4396,6 @@ function _setVcseLayerVisible(on) {
   const b = document.getElementById('vcse-tab-toggle');
   if (a && a.checked !== !!on) a.checked = !!on;
   if (b && b.checked !== !!on) b.checked = !!on;
-  if (typeof _updateThirdSectorWardCounts === 'function') _updateThirdSectorWardCounts();
 }
 document.getElementById('tv').addEventListener('change', e => _setVcseLayerVisible(e.target.checked));
 {

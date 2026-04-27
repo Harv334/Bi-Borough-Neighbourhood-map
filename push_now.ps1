@@ -14,7 +14,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue .git\HEAD.lock
 # mis-parsed as flags).
 $msgPath = Join-Path $env:TEMP "nwl_commit_msg.txt"
 $msg = @'
-data+ui(crime,civic,esol,profile): MPS crime + civic + ESOL + ward A4 profile + PNG fix
+ui+tooling: revert OSM, dim mask, fix svc counts, multi-page A4, ward .pptx generator
 
 Adopts the official ONS LSOA (2021) -> Electoral Ward (May 2024)
 best-fit lookup as the authoritative LSOA->ward mapping, replacing
@@ -583,6 +583,133 @@ New scripts (ESOL planning)
 - scripts/build_esol_layers.py: kept as a thin stub
   that runpy-delegates to build_esol_v2.py for
   backwards compatibility.
+
+PNG export — revert to OSM, dim mask instead of erase
+------------------------------------------------------
+- Reverted the basemap from CARTO Voyager back to
+  the standard OSM tiles. Web search (April 2026)
+  confirmed tile.openstreetmap.org sends
+  Access-Control-Allow-Origin:* on tile responses,
+  so html2canvas + crossOrigin:'anonymous' on the
+  L.tileLayer is sufficient for the PNG export to
+  capture tile pixels — no need to swap providers.
+- The SVG export mask (the "world-minus-NWL" path)
+  no longer paints the outside area solid white.
+  fill='#ffffff' is now paired with
+  fill-opacity='0.55' as a separate attribute (more
+  reliable than rgba() in fill string under
+  html2canvas's SVG renderer). Effect: basemap
+  outside NW London stays visible but is dimmed,
+  drawing the eye to the in-scope area without
+  obliterating geographic context.
+- Researched alternatives (leaflet-image,
+  html-to-image, leaflet-simple-map-screenshoter,
+  modern-screenshot, snapdom). All except
+  leaflet-image have the same DOM-canvas-tainting
+  rules as html2canvas. leaflet-image works around
+  CORS by re-fetching tiles via XHR but is
+  effectively unmaintained, doesn't cooperate with
+  markercluster, and would force us into Leaflet's
+  canvas renderer mode. Conclusion: stay on
+  html2canvas, keep CartoDB and OSM both viable as
+  basemaps.
+
+Ward profile — service counts now actually populate
+---------------------------------------------------
+- The new A4 profile's services strip (GP /
+  Pharmacy / Dental / Hospital / Schools / Comm
+  ctr / Library / ESOL / VCSE) was rendering all
+  dashes because the previous spatial-test logic
+  silently returned 0 when wLyr was unset or the
+  marker layers hadn't loaded yet. Rewritten with
+  a 3-tier strategy:
+    1. Use the ward indicator if present (GP via
+       gp_practice_count, pharmacy via
+       pharmacy_count) — authoritative.
+    2. Use ward_code attribute on the JSON record
+       if present (schools, community centres,
+       libraries — exact match, no spatial test
+       needed).
+    3. Fall back to spatial point-in-polygon test
+       (hospital, dental, ESOL, VCSE, greenspace).
+- loadSchoolsLayer / loadCCLayer / loadLibLayer /
+  loadESOLLayer extended to push lat, lng, and
+  ward_code onto each record so both ward_code
+  matching and the spatial fallback work without
+  needing marker.getLatLng() calls.
+- Cards with zero count render the dash in dim
+  grey instead of bright blue so empty cells don't
+  look like data.
+
+Ward profile — multi-page A4 layout
+-----------------------------------
+- A4 single-page layout was too cramped per user
+  feedback. Restructured into 4–5 explicit pages
+  with @media print page-break-before:always
+  between them:
+    Page 1: hero + KPI strip + services + demographics
+            (ethnicity stack, age stack, vs-NWL bars)
+    Page 2: health & deprivation (IMD radar +
+            health/economic compare bars + green
+            & blue space access)
+    Page 3: crime breakdown (only present if data
+            available)
+    Page 4: civic strength
+    Page 5: GP + pharmacy named lists
+- Loosened typography: hero h1 24px → 32px, KPI
+  values 20px → 28px, KPI labels 9px → 10px bold,
+  service-strip values 15px → 22px, panel h3 11px
+  → 12.5px, body line-height 1.4 → 1.5, content
+  padding 14px → 22px. Added explicit
+  .section-h dividers per major section. Mini-map
+  240×140 → 280×170. Result: every section
+  breathes; tables and charts no longer fight for
+  the same vertical real estate.
+
+Ward slide-deck generator (.pptx, automated)
+---------------------------------------------
+- New scripts/build_ward_pptx.py — Python script
+  that consumes ward_data.json, lsoa_data.json,
+  schools.json, community_centres.json,
+  libraries.json, plus lsoa_boundaries.geojson
+  (for the LSOA → ward lookup) and produces a
+  5-slide PowerPoint deck per ward.
+- Slide layout mirrors the A4 report:
+    1. Cover: navy header band, ward name, IMD
+       rank-in-NWL, 6 KPI tiles, 8-tile services
+       strip.
+    2. Demographics: ethnicity stacked bar, age
+       stacked bar, demographic-vs-NWL compare bars.
+    3. Health & deprivation: 7-axis IMD radar
+       (mean of ward LSOAs) with NWL ward-mean
+       reference ring + 8 health/economic compare
+       bars.
+    4. Crime: 11 MPS categories sorted by ward
+       count with NWL median ticks, total
+       annotated.
+    5. Civic strength + green/blue space access.
+- All charts rendered via matplotlib at 180 dpi,
+  embedded into slides via python-pptx
+  add_picture. Colour palette matches the A4
+  report (red = direction-of-concern, green =
+  direction-of-strength).
+- CLI:
+    python scripts/build_ward_pptx.py --ward "Roundwood"
+    python scripts/build_ward_pptx.py --all
+    python scripts/build_ward_pptx.py --list
+- Output: output/ward_decks/nwl-ward-{slug}.pptx
+  (or wherever --out points). Per-ward decks for
+  ad-hoc use; --all bulk-generates 168 decks
+  (~5 min on a laptop). Each deck is ~340 KB.
+- Dependencies: pip install python-pptx
+  matplotlib --break-system-packages
+- Decision rationale (over a JS/pptxgenjs
+  client-side approach): the data pipeline is
+  already Python, matplotlib produces consistent
+  print-quality output, decks can be regenerated
+  in CI without a browser. A "Download as .pptx"
+  button in the dashboard remains a future
+  enhancement.
 
 PNG export — fix blank interior (tile CORS)
 -------------------------------------------

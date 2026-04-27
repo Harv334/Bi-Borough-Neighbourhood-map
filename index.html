@@ -1508,15 +1508,14 @@ const BOROUGH_GJ = {"type":"FeatureCollection","features":[{"type":"Feature","pr
 // ═══════════════════════════════════════════════════════════════════════════
 // Start zoomed out at NW London ward level — fitBounds on wLyr refines once wards load.
 const map = L.map('map', { center:[51.540,-0.300], zoom:10, zoomControl:true });
-// CartoDB Voyager basemap — CORS-enabled, lighter cartography (better behind
-// choropleth fills + as a slide background) and OSM-policy compliant.
-// crossOrigin:'anonymous' is REQUIRED so html2canvas can read tile pixels
-// during PNG export — without it the export produces a blank interior.
-L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
-  subdomains: 'abcd',
-  maxZoom: 20,
+// OpenStreetMap basemap. crossOrigin:'anonymous' is REQUIRED so html2canvas
+// can read tile pixels during PNG export — without it the export produces a
+// blank interior. tile.openstreetmap.org sends Access-Control-Allow-Origin:*
+// (verified 2026), so this works without proxying.
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
   crossOrigin: 'anonymous',
-  attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors · © <a href="https://carto.com/attributions">CARTO</a>'
+  attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
 // Static layers
@@ -1895,7 +1894,7 @@ function loadSchoolsLayer(rows) {
     const wsRow = p.website ? `<div class="pop-row"><span class="pop-key">Web</span><span><a href="${_esc(p.website)}" target="_blank" rel="noopener">link</a></span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#1E5BB8">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.street,p.town,p.postcode].filter(Boolean).join(', '))}</div>${phRow}${tyRow}${ageRow}${pupRow}${fsmRow}<div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · ${_esc(p.phase||'School')}`, { direction:'top', className:'marker-tip' });
-    schoolsData.push({ phase:p.phase||'', marker });
+    schoolsData.push({ phase:p.phase||'', ward_code:p.ward_code||'', lat:p.lat, lng:p.lng, marker });
   });
   _applySchoolsFilter();
   console.log(`Loaded ${schoolsData.length} schools`);
@@ -1930,7 +1929,7 @@ function loadCCLayer(rows) {
     marker.bindPopup(`<div class="pop-hdr" style="background:#D87C2D">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div><div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wdRow}${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · Community centre`, { direction:'top', className:'marker-tip' });
     ccCluster.addLayer(marker);
-    ccData.push({ marker });
+    ccData.push({ ward_code:p.ward_code||'', lat:p.lat, lng:p.lng, marker });
   });
   const el = document.getElementById('cc-count');
   if (el) el.textContent = ccData.length;
@@ -1956,7 +1955,7 @@ function loadLibLayer(rows) {
     marker.bindPopup(`<div class="pop-hdr" style="background:#00A0A0">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div><div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wdRow}${stRow}${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · Library`, { direction:'top', className:'marker-tip' });
     libCluster.addLayer(marker);
-    libData.push({ marker });
+    libData.push({ ward_code:p.ward_code||'', lat:p.lat, lng:p.lng, marker });
   });
   const el = document.getElementById('lib-count');
   if (el) el.textContent = libData.length;
@@ -1981,7 +1980,7 @@ function loadESOLLayer(rows) {
     const tyRow = p.type ? `<div class="pop-row"><span class="pop-key">Type</span><span>${_esc(p.type)}</span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#B83C3C">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div>${tyRow}<div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · ${_esc(p.type||'ESOL provider')}`, { direction:'top', className:'marker-tip' });
-    esolData.push({ type:p.type||'', marker });
+    esolData.push({ type:p.type||'', lat:p.lat, lng:p.lng, marker });
   });
   _applyESOLFilter();
   console.log(`Loaded ${esolData.length} ESOL providers`);
@@ -2826,22 +2825,58 @@ window.generateWardReport = function(wn) {
     return svg;
   }
 
-  // Count services inside this ward
-  let gpN = 0, hospN = 0, pharmN = 0, grnN = 0, dentN = 0, vcseN = 0;
-  let schN = 0, ccN = 0, libN = 0, esolN = 0;
-  if (typeof pointInWardLayer === 'function') {
-    try { HOSP.forEach(d => { if (pointInWardLayer(d.lat, d.lng, wn)) hospN++; }); } catch(e){}
-    try { GRN.forEach(d  => { if (pointInWardLayer(d.lat, d.lng, wn)) grnN++; }); } catch(e){}
-    try { if (Array.isArray(pharmData)) pharmData.forEach(d => { if (pointInWardLayer(d.lat, d.lng, wn)) pharmN++; }); } catch(e){}
-    try { if (Array.isArray(dentalData)) dentalData.forEach(d => { if (pointInWardLayer(d.lat, d.lng, wn)) dentN++; }); } catch(e){}
-    try { if (Array.isArray(vcseData))   vcseData.forEach(d   => { if (pointInWardLayer(d.lat, d.lng, wn)) vcseN++; }); } catch(e){}
-    // ESOL planning datasets — markers carry no _lad pre-cache; fall back to spatial test.
-    try { if (Array.isArray(schoolsData)) schoolsData.forEach(d => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) schN++; }); } catch(e){}
-    try { if (Array.isArray(ccData))      ccData.forEach(d      => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) ccN++;  }); } catch(e){}
-    try { if (Array.isArray(libData))     libData.forEach(d     => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) libN++; }); } catch(e){}
-    try { if (Array.isArray(esolData))    esolData.forEach(d    => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) esolN++; }); } catch(e){}
-  }
-  gpN = (inds.gp_practice_count && parseInt(inds.gp_practice_count)) || 0;
+  // ── Service counts inside the ward ──────────────────────────────────────
+  // Strategy (in priority order):
+  //   1. Use ward-level indicator if available (gp_practice_count, pharmacy_count)
+  //      because that's the authoritative figure from ward_data.json.
+  //   2. Use ward_code attribute on the JSON record if present (schools / CC /
+  //      libraries — exact match, no spatial test needed).
+  //   3. Fall back to spatial test against the ward polygon (hospitals, dental,
+  //      VCSE, ESOL, greenspace).
+  // The previous version of this block silently returned 0 when wLyr was null
+  // or layers hadn't loaded yet — leaving every count as a dash. The new
+  // version always returns a number when the underlying data is loaded.
+  const wcode = (wdata && wdata.code) || '';
+  const _matchByWardCode = (arr) => {
+    if (!Array.isArray(arr) || !wcode) return null;
+    return arr.filter(d => d && d.ward_code === wcode).length;
+  };
+  const _matchSpatial = (arr) => {
+    if (!Array.isArray(arr) || typeof pointInWardLayer !== 'function') return 0;
+    let n = 0;
+    arr.forEach(d => {
+      try {
+        const lat = d.lat != null ? d.lat : (d.marker && d.marker.getLatLng().lat);
+        const lng = d.lng != null ? d.lng : (d.marker && d.marker.getLatLng().lng);
+        if (lat != null && lng != null && pointInWardLayer(lat, lng, wn)) n++;
+      } catch(e) {}
+    });
+    return n;
+  };
+
+  // GP & pharmacy: prefer the ward indicator (authoritative)
+  let gpN     = (inds.gp_practice_count && parseInt(inds.gp_practice_count)) || 0;
+  let pharmN  = (inds.pharmacy_count    && parseInt(inds.pharmacy_count))    || 0;
+  // If pharmacy_count indicator missing, fall back to spatial
+  if (!pharmN) pharmN = _matchSpatial(pharmData);
+  // Hospitals — spatial only (not in ward_data.json indicators)
+  let hospN  = _matchSpatial(typeof HOSP !== 'undefined' ? HOSP : []);
+  // Dental — spatial
+  let dentN  = _matchSpatial(typeof dentalData !== 'undefined' ? dentalData : []);
+  // VCSE — spatial
+  let vcseN  = _matchSpatial(typeof vcseData !== 'undefined' ? vcseData : []);
+  // Greenspace — spatial (uses GRN array if loaded)
+  let grnN   = _matchSpatial(typeof GRN !== 'undefined' ? GRN : []);
+  // Schools / CC / Libraries — match by ward_code (exact, attached during build).
+  // Falls back to spatial test if ward_code is missing or arrays not loaded.
+  let schN   = _matchByWardCode(typeof schoolsData !== 'undefined' ? schoolsData : []);
+  if (schN == null) schN = _matchSpatial(typeof schoolsData !== 'undefined' ? schoolsData : []);
+  let ccN    = _matchByWardCode(typeof ccData !== 'undefined' ? ccData : []);
+  if (ccN == null) ccN = _matchSpatial(typeof ccData !== 'undefined' ? ccData : []);
+  let libN   = _matchByWardCode(typeof libData !== 'undefined' ? libData : []);
+  if (libN == null) libN = _matchSpatial(typeof libData !== 'undefined' ? libData : []);
+  // ESOL — no ward_code in source CSV, spatial only
+  let esolN  = _matchSpatial(typeof esolData !== 'undefined' ? esolData : []);
 
   // Headline stats (ward-level only) + NWL reference values for context
   const popN     = _fmt(inds.census_population);
@@ -3161,182 +3196,215 @@ window.generateWardReport = function(wn) {
 <meta charset="utf-8">
 <title>${_esc(wdata ? wdata.name : wn)} — Ward profile</title>
 <style>
-  /* A4 portrait at 96dpi ≈ 794×1123 px. Layout fits on one page.
-     GP/pharmacy lists overflow to a second page. */
+  /* A4 portrait at 96dpi ≈ 794×1123 px. Multi-page layout with breathing
+     room: page 1 = hero + KPIs + services + demographics; page 2 = health
+     & deprivation; page 3 = crime + civic + green/blue; page 4 = lists. */
   @page { size: A4 portrait; margin: 12mm; }
   * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#eceae3; color:#1a1a1a; margin:0; padding:14px; line-height:1.4; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#eceae3; color:#1a1a1a; margin:0; padding:18px; line-height:1.5; }
   .report { width: 794px; max-width: 100%; margin: 0 auto; background:#fff; box-shadow:0 2px 14px rgba(0,0,0,.08); border-radius:6px; overflow:hidden; }
+  .page { padding: 0; }
+  .page + .page { border-top: 6px solid #eceae3; }
+  .page-title { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.12em; padding: 14px 26px 0; margin:0; font-weight:600; }
   /* HERO */
-  .hero { display:flex; gap:18px; padding:18px 22px 14px; border-bottom:1px solid #eee; align-items:flex-start; }
+  .hero { display:flex; gap:24px; padding:22px 26px 18px; border-bottom:1px solid #eee; align-items:flex-start; }
   .hero-text { flex:1; min-width:0; }
-  .hero-text .kicker { font-size:10px; color:#888; text-transform:uppercase; letter-spacing:.1em; margin-bottom:2px; }
-  .hero-text h1 { margin:0; font-size:24px; font-weight:700; letter-spacing:-0.01em; line-height:1.15; }
-  .hero-text .sub { color:#555; font-size:12px; margin-top:3px; }
-  .hero-text .badges { margin-top:6px; }
-  .badge { display:inline-block; margin-right:5px; padding:2px 9px; border-radius:14px; font-size:10px; font-weight:600; vertical-align:middle; }
+  .hero-text .kicker { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.12em; margin-bottom:4px; font-weight:600; }
+  .hero-text h1 { margin:0; font-size:32px; font-weight:700; letter-spacing:-0.015em; line-height:1.1; }
+  .hero-text .sub { color:#555; font-size:14px; margin-top:6px; }
+  .hero-text .badges { margin-top:10px; }
+  .badge { display:inline-block; margin-right:6px; padding:3px 11px; border-radius:14px; font-size:11px; font-weight:600; vertical-align:middle; }
   .badge.nb { ${nb ? `background:${nb.bg};color:${nb.color};` : 'background:#eee;color:#555;'} }
   .badge.core20 { background:#fde6ee; color:#8b0035; border:1px solid #f0b5cb; }
   .badge.imd { background:#1a1a1a; color:#fff; }
-  .hero-map { flex:0 0 240px; }
-  .minimap { width:240px; height:140px; border:1px solid #e6e6df; border-radius:4px; background:#f6f6f1; display:block; }
-  .minimap-cap { font-size:9px; color:#888; text-align:center; margin-top:2px; }
-  /* KPI strip — 6 cards */
+  .hero-map { flex:0 0 280px; }
+  .minimap { width:280px; height:170px; border:1px solid #e6e6df; border-radius:4px; background:#f6f6f1; display:block; }
+  .minimap-cap { font-size:10px; color:#888; text-align:center; margin-top:4px; }
+  /* KPI strip — 6 cards, taller and roomier */
   .kpis { display:grid; grid-template-columns: repeat(6, 1fr); border-top:1px solid #eee; border-bottom:1px solid #eee; }
-  .kpi { padding:10px 8px; text-align:center; border-right:1px solid #f0f0ec; }
+  .kpi { padding:16px 10px 14px; text-align:center; border-right:1px solid #f0f0ec; }
   .kpi:last-child { border-right:none; }
-  .kpi-lbl { font-size:9px; color:#666; text-transform:uppercase; letter-spacing:.04em; margin-bottom:1px; }
-  .kpi-val { font-size:20px; font-weight:700; color:#1a1a1a; line-height:1.05; font-variant-numeric: tabular-nums; }
+  .kpi-lbl { font-size:10px; color:#666; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; font-weight:600; }
+  .kpi-val { font-size:28px; font-weight:700; color:#1a1a1a; line-height:1.05; font-variant-numeric: tabular-nums; }
   .kpi-val.dim { color:#bbb; font-weight:400; }
-  .kpi-sub { font-size:9px; color:#999; margin-top:1px; }
-  .kpi-ctx { margin-top:5px; }
-  .kpi-ctx-bar { position:relative; height:4px; border-radius:2px; }
-  .kpi-ctx-tick { position:absolute; top:-2px; bottom:-2px; width:2px; background:#1a1a1a; border-radius:1px; }
-  .kpi-ctx-cap { font-size:8.5px; color:#666; margin-top:2px; }
-  /* SERVICES strip */
-  .services { display:grid; grid-template-columns: repeat(9, 1fr); background:#fafaf6; border-bottom:1px solid #eee; }
-  .svc { padding:8px 4px; text-align:center; border-right:1px solid #f0f0ec; }
+  .kpi-sub { font-size:10px; color:#999; margin-top:3px; }
+  .kpi-ctx { margin-top:8px; }
+  .kpi-ctx-bar { position:relative; height:5px; border-radius:3px; }
+  .kpi-ctx-tick { position:absolute; top:-2px; bottom:-2px; width:2.5px; background:#1a1a1a; border-radius:1px; }
+  .kpi-ctx-cap { font-size:9.5px; color:#666; margin-top:3px; }
+  /* SERVICES strip — 9 cards, much roomier */
+  .services-wrap { padding:0 0 4px; }
+  .services-title { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.08em; padding:12px 26px 6px; font-weight:600; }
+  .services { display:grid; grid-template-columns: repeat(9, 1fr); background:#fafaf6; border-top:1px solid #eee; border-bottom:1px solid #eee; }
+  .svc { padding:14px 4px 12px; text-align:center; border-right:1px solid #f0f0ec; }
   .svc:last-child { border-right:none; }
-  .svc-val { font-size:15px; font-weight:700; color:#185FA5; line-height:1.1; }
-  .svc-lbl { font-size:8.5px; color:#666; margin-top:1px; text-transform:uppercase; letter-spacing:.03em; }
+  .svc-val { font-size:22px; font-weight:700; color:#185FA5; line-height:1.1; font-variant-numeric: tabular-nums; }
+  .svc-val.dim { color:#bbb; font-weight:400; }
+  .svc-lbl { font-size:10px; color:#666; margin-top:4px; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
   /* CONTENT */
-  .content { padding: 14px 18px 16px; }
-  .row { display:flex; gap:14px; margin-bottom:14px; }
+  .content { padding: 22px 26px 24px; }
+  .section-h { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.1em; margin: 0 0 12px; font-weight:600; padding-bottom:4px; border-bottom:1px solid #e8e8e2; }
+  .row { display:flex; gap:18px; margin-bottom:20px; }
   .row.row-3 > .panel { flex:1; min-width:0; }
   .row.row-2 > .panel { flex:1; min-width:0; }
-  .panel { background:#fafaf7; border:1px solid #eee; border-radius:5px; padding:10px 12px 8px; page-break-inside: avoid; }
-  .panel h3 { font-size:11px; margin:0 0 6px; color:#333; text-transform:uppercase; letter-spacing:.06em; }
-  .panel .note { font-size:9.5px; color:#888; margin-top:4px; }
+  .panel { background:#fafaf7; border:1px solid #eee; border-radius:6px; padding:14px 16px 12px; page-break-inside: avoid; }
+  .panel h3 { font-size:12.5px; margin:0 0 10px; color:#333; text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+  .panel .note { font-size:10.5px; color:#888; margin-top:6px; }
   /* SVG charts */
   svg.ch-stack, svg.ch-hbar, svg.ch-compare { width:100%; height:auto; display:block; }
   svg.ch-radar { display:block; margin: 0 auto; }
-  /* page-2 lists */
-  .lst { padding: 12px 18px; page-break-inside: avoid; }
-  .lst h3 { font-size:12px; margin:8px 0 6px; color:#333; border-bottom:1.5px solid #1a1a1a; padding-bottom:3px; letter-spacing:.02em; }
-  table.kv { width:100%; border-collapse: collapse; font-size:11px; }
-  table.kv td { padding:4px 0; border-bottom:1px solid #f3f3ef; vertical-align:top; }
+  /* lists (GP/pharmacy) */
+  .lst { padding: 14px 26px 18px; page-break-inside: avoid; }
+  .lst h3 { font-size:13px; margin:10px 0 8px; color:#333; border-bottom:1.5px solid #1a1a1a; padding-bottom:4px; letter-spacing:.02em; }
+  table.kv { width:100%; border-collapse: collapse; font-size:11.5px; }
+  table.kv td { padding:6px 0; border-bottom:1px solid #f3f3ef; vertical-align:top; }
   table.kv td.v { font-weight:500; color:#1a1a1a; text-align:right; font-variant-numeric: tabular-nums; }
-  .legend { font-size:9px; color:#888; margin-top:4px; }
-  .legend-tick { display:inline-block; width:1px; height:8px; background:#1a1a1a; margin: 0 2px 0 0; vertical-align:middle; }
-  .footer { padding: 10px 18px 14px; background:#fafaf6; border-top:1px solid #eee; font-size:9.5px; color:#666; }
+  .legend { font-size:10px; color:#888; margin-top:6px; }
+  .legend-tick { display:inline-block; width:1px; height:9px; background:#1a1a1a; margin: 0 2px 0 0; vertical-align:middle; }
+  .footer { padding: 14px 26px 18px; background:#fafaf6; border-top:1px solid #eee; font-size:10.5px; color:#666; line-height:1.55; }
   .footer strong { color:#333; }
-  .actions { max-width:794px; margin: 10px auto 0; display:flex; gap:8px; justify-content:flex-end; }
-  .actions button { padding:6px 12px; border:1px solid #ddd; background:#fff; border-radius:5px; font-size:12px; cursor:pointer; color:#333; }
+  .actions { max-width:794px; margin: 12px auto 0; display:flex; gap:8px; justify-content:flex-end; }
+  .actions button { padding:8px 14px; border:1px solid #ddd; background:#fff; border-radius:5px; font-size:13px; cursor:pointer; color:#333; }
   .actions button:hover { border-color:#999; }
   @media print {
     body { background:#fff; padding:0; }
     .report { box-shadow:none; border-radius:0; width:100%; }
     .actions { display:none; }
-    .row, .panel, .lst, .hero, .kpis, .services { page-break-inside: avoid; }
-    .lst:first-of-type { page-break-before: always; }
+    .panel, .hero, .kpis, .services, .lst { page-break-inside: avoid; }
+    .page { page-break-before: always; }
+    .page:first-of-type { page-break-before: auto; }
   }
 </style>
 </head><body>
 <div class="report">
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-text">
-      <div class="kicker">NW London ward profile · ${_esc(today)}</div>
-      <h1>${_esc(wdata ? wdata.name : wn)}</h1>
-      <div class="sub">${_esc(borough)}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population ' + population : ''}${imdRank ? ' · IMD rank ' + imdRank + ' of ' + totalWards + ' NWL wards' : ''}</div>
-      <div class="badges">
-        ${nb ? `<span class="badge nb">${_esc(nb.label)}</span>` : ''}
-        ${core20Badge}
-        ${imdW != null ? `<span class="badge imd">IMD score ${imdW.toFixed(1)}</span>` : ''}
+  <!-- ═══════════════════════ PAGE 1: Overview ═══════════════════════ -->
+  <div class="page">
+    <div class="hero">
+      <div class="hero-text">
+        <div class="kicker">NW London ward profile · ${_esc(today)}</div>
+        <h1>${_esc(wdata ? wdata.name : wn)}</h1>
+        <div class="sub">${_esc(borough)}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population ' + population : ''}${imdRank ? ' · IMD rank ' + imdRank + ' of ' + totalWards + ' NWL wards' : ''}</div>
+        <div class="badges">
+          ${nb ? `<span class="badge nb">${_esc(nb.label)}</span>` : ''}
+          ${core20Badge}
+          ${imdW != null ? `<span class="badge imd">IMD score ${imdW.toFixed(1)}</span>` : ''}
+        </div>
       </div>
+      ${miniMapSVG ? `<div class="hero-map">${miniMapSVG}</div>` : ''}
     </div>
-    ${miniMapSVG ? `<div class="hero-map">${miniMapSVG}</div>` : ''}
-  </div>
 
-  <!-- KPI STRIP -->
-  <div class="kpis">
-    ${_kpi('Population',     popN  != null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
-    ${_kpi('IMD score',      imdW != null ? imdW.toFixed(1) : null,   'pop-weighted', _ctxBar(imdPct, 'lower-better'))}
-    ${_kpi('Good health',    goodHlt != null ? goodHlt.toFixed(0) + '%' : null, 'of residents', _ctxBar(goodHpct, 'higher-better'))}
-    ${_kpi('Bad health',     badHlt  != null ? badHlt.toFixed(1) + '%' : null, 'of residents', _ctxBar(badHpct, 'lower-better'))}
-    ${_kpi('Disability',     disAny  != null ? disAny.toFixed(1) + '%' : null, 'any condition', _ctxBar(disAnyPct, 'lower-better'))}
-    ${_kpi('Core20 LSOAs',   (c20L != null && totL != null) ? c20L.toFixed(0) + '/' + totL.toFixed(0) : null, 'most deprived')}
-  </div>
+    <div class="kpis">
+      ${_kpi('Population',     popN  != null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
+      ${_kpi('IMD score',      imdW != null ? imdW.toFixed(1) : null,   'pop-weighted', _ctxBar(imdPct, 'lower-better'))}
+      ${_kpi('Good health',    goodHlt != null ? goodHlt.toFixed(0) + '%' : null, 'of residents', _ctxBar(goodHpct, 'higher-better'))}
+      ${_kpi('Bad health',     badHlt  != null ? badHlt.toFixed(1) + '%' : null, 'of residents', _ctxBar(badHpct, 'lower-better'))}
+      ${_kpi('Disability',     disAny  != null ? disAny.toFixed(1) + '%' : null, 'any condition', _ctxBar(disAnyPct, 'lower-better'))}
+      ${_kpi('Core20 LSOAs',   (c20L != null && totL != null) ? c20L.toFixed(0) + '/' + totL.toFixed(0) : null, 'most deprived')}
+    </div>
 
-  <!-- SERVICES STRIP -->
-  <div class="services">
-    <div class="svc"><div class="svc-val">${gpN  || '—'}</div><div class="svc-lbl">GP</div></div>
-    <div class="svc"><div class="svc-val">${pharmN || '—'}</div><div class="svc-lbl">Pharm</div></div>
-    <div class="svc"><div class="svc-val">${dentN  || '—'}</div><div class="svc-lbl">Dental</div></div>
-    <div class="svc"><div class="svc-val">${hospN  || '—'}</div><div class="svc-lbl">Hospital</div></div>
-    <div class="svc"><div class="svc-val">${schN   || '—'}</div><div class="svc-lbl">Schools</div></div>
-    <div class="svc"><div class="svc-val">${ccN    || '—'}</div><div class="svc-lbl">Comm ctr</div></div>
-    <div class="svc"><div class="svc-val">${libN   || '—'}</div><div class="svc-lbl">Library</div></div>
-    <div class="svc"><div class="svc-val">${esolN  || '—'}</div><div class="svc-lbl">ESOL</div></div>
-    <div class="svc"><div class="svc-val">${vcseN  || '—'}</div><div class="svc-lbl">VCSE</div></div>
-  </div>
-
-  <div class="content">
-
-    <!-- DEMOGRAPHICS -->
-    <div class="row row-3">
-      <div class="panel">
-        <h3>Ethnicity (Census 2021)</h3>
-        ${ethStack}
-      </div>
-      <div class="panel">
-        <h3>Age (Census 2021)</h3>
-        ${ageStack}
-        ${inds.census_over85_pct != null ? `<div class="note">85+: ${parseFloat(inds.census_over85_pct).toFixed(1)}% of residents</div>` : ''}
-      </div>
-      <div class="panel">
-        <h3>Demographics vs NWL median</h3>
-        ${compareCensus}
-        <div class="legend"><span class="legend-tick"></span> NWL median &nbsp;·&nbsp; <span style="color:#c9534a">red</span> = worse, <span style="color:#2c8a4a">green</span> = better</div>
+    <div class="services-wrap">
+      <div class="services-title">Services in this ward</div>
+      <div class="services">
+        <div class="svc"><div class="svc-val ${gpN ? '' : 'dim'}">${gpN  || '—'}</div><div class="svc-lbl">GP</div></div>
+        <div class="svc"><div class="svc-val ${pharmN ? '' : 'dim'}">${pharmN || '—'}</div><div class="svc-lbl">Pharmacy</div></div>
+        <div class="svc"><div class="svc-val ${dentN ? '' : 'dim'}">${dentN  || '—'}</div><div class="svc-lbl">Dental</div></div>
+        <div class="svc"><div class="svc-val ${hospN ? '' : 'dim'}">${hospN  || '—'}</div><div class="svc-lbl">Hospital</div></div>
+        <div class="svc"><div class="svc-val ${schN ? '' : 'dim'}">${schN   || '—'}</div><div class="svc-lbl">Schools</div></div>
+        <div class="svc"><div class="svc-val ${ccN ? '' : 'dim'}">${ccN    || '—'}</div><div class="svc-lbl">Comm ctr</div></div>
+        <div class="svc"><div class="svc-val ${libN ? '' : 'dim'}">${libN   || '—'}</div><div class="svc-lbl">Library</div></div>
+        <div class="svc"><div class="svc-val ${esolN ? '' : 'dim'}">${esolN  || '—'}</div><div class="svc-lbl">ESOL</div></div>
+        <div class="svc"><div class="svc-val ${vcseN ? '' : 'dim'}">${vcseN  || '—'}</div><div class="svc-lbl">VCSE</div></div>
       </div>
     </div>
 
-    <!-- HEALTH & DEPRIVATION -->
-    <div class="row row-2">
-      <div class="panel" style="flex:0 0 280px">
-        <h3>IMD domains (mean of ward LSOAs)</h3>
-        ${radarSVG}
-        <div class="legend">Red fill = this ward · <span class="legend-tick"></span> dashed = NWL ward mean</div>
+    <div class="content">
+      <div class="section-h">Demographics — who lives here</div>
+      <div class="row row-2">
+        <div class="panel">
+          <h3>Ethnicity (Census 2021)</h3>
+          ${ethStack}
+        </div>
+        <div class="panel">
+          <h3>Age (Census 2021)</h3>
+          ${ageStack}
+          ${inds.census_over85_pct != null ? `<div class="note">85+: ${parseFloat(inds.census_over85_pct).toFixed(1)}% of residents</div>` : ''}
+        </div>
       </div>
-      <div class="panel">
-        <h3>Health & economic indicators vs NWL median</h3>
-        ${healthBars}
-      </div>
-    </div>
-
-    <!-- CRIME -->
-    ${crimeRows.length ? `<div class="row">
-      <div class="panel" style="flex:1">
-        <h3>Crime by category — last 12 months ${crimeTotal != null ? `· total ${Math.round(crimeTotal).toLocaleString()}` : ''}</h3>
-        ${crimeSVG}
-        <div class="legend"><span class="legend-tick"></span> NWL median for each category &nbsp;·&nbsp; sorted by ward count</div>
-      </div>
-    </div>` : ''}
-
-    <!-- CIVIC STRENGTH + GREEN/BLUE -->
-    <div class="row row-2">
-      <div class="panel" style="flex:1.4">
-        <h3>Civic strength (NWL percentile, higher = stronger)</h3>
-        ${civicSVG}
-        <div class="legend">Source: London Civic Strength Index Round 3, London Datastore (2024)</div>
-      </div>
-      <div class="panel">
-        <h3>Green & blue space access (mean of ward LSOAs)</h3>
-        ${greenSVG}
-        <div class="legend">Source: Defra ANGSt / Friends of the Earth (LSOA, 2023)</div>
+      <div class="row">
+        <div class="panel" style="flex:1">
+          <h3>Demographic indicators vs NWL median</h3>
+          ${compareCensus}
+          <div class="legend"><span class="legend-tick"></span> NWL median &nbsp;·&nbsp; <span style="color:#c9534a">red</span> = direction-of-concern, <span style="color:#2c8a4a">green</span> = direction-of-strength</div>
+        </div>
       </div>
     </div>
-
   </div>
 
-  <!-- LISTS — page 2 in print -->
-  ${gpListSection}
-  ${pharmacyListSection}
+  <!-- ═══════════════════════ PAGE 2: Health & deprivation ═══════════════════════ -->
+  <div class="page">
+    <div class="page-title">Health &amp; deprivation</div>
+    <div class="content">
+      <div class="row">
+        <div class="panel" style="flex:0 0 320px">
+          <h3>IMD domains — mean of ward LSOAs</h3>
+          ${radarSVG}
+          <div class="legend">Red polygon = this ward · <span class="legend-tick"></span> dashed = NWL ward-mean reference ring · each axis normalised to NWL LSOA max</div>
+        </div>
+        <div class="panel" style="flex:1">
+          <h3>Health &amp; economic indicators vs NWL median</h3>
+          ${healthBars}
+          <div class="legend"><span class="legend-tick"></span> NWL median &nbsp;·&nbsp; bar colour shows direction (red = concern, green = strength)</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="panel" style="flex:1">
+          <h3>Green &amp; blue space access — mean of ward LSOAs</h3>
+          ${greenSVG}
+          <div class="legend">% of LSOA UPRNs within walking distance of qualifying greenspace · source: Defra ANGSt / Friends of the Earth (2023)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  ${crimeRows.length ? `<!-- ═══════════════════════ PAGE 3: Crime ═══════════════════════ -->
+  <div class="page">
+    <div class="page-title">Crime — by category, last 12 months${crimeTotal != null ? ` · total ${Math.round(crimeTotal).toLocaleString()}` : ''}</div>
+    <div class="content">
+      <div class="row">
+        <div class="panel" style="flex:1">
+          <h3>MPS recorded crime — Apr 2025 to Mar 2026</h3>
+          ${crimeSVG}
+          <div class="legend"><span class="legend-tick"></span> NWL median for each category &nbsp;·&nbsp; sorted by this ward's count, highest first &nbsp;·&nbsp; source: Met Police via London Datastore</div>
+        </div>
+      </div>
+    </div>
+  </div>` : ''}
+
+  <!-- ═══════════════════════ PAGE 4: Civic strength ═══════════════════════ -->
+  <div class="page">
+    <div class="page-title">Civic strength &amp; community assets</div>
+    <div class="content">
+      <div class="row">
+        <div class="panel" style="flex:1">
+          <h3>Civic strength — NWL percentile (higher = stronger)</h3>
+          ${civicSVG}
+          <div class="legend">Each bar = % of 168 NWL wards this ward beats on that indicator · source: London Civic Strength Index Round 3, London Datastore (2024)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  ${(gpListSection || pharmacyListSection) ? `<!-- ═══════════════════════ PAGE 5: Service lists ═══════════════════════ -->
+  <div class="page">
+    <div class="page-title">Service lists — GPs &amp; pharmacies in this ward</div>
+    ${gpListSection}
+    ${pharmacyListSection}
+  </div>` : ''}
 
   <div class="footer">
-    <strong>Sources:</strong> ONS Census 2021 (demographics, health, household language, travel-to-work) · MHCLG Indices of Deprivation 2019 (mid-2022 pop-weighted) · Met Police MPS via London Datastore (crime, Apr 2025–Mar 2026) · London Civic Strength Index Round 3 (London Datastore, 2024) · DESNZ LILEE (fuel poverty) · NOMIS / DWP (claimant count) · NHS Digital ODS (GP, pharmacy, dental).
-    <div style="font-size:9px;color:#999;margin-top:4px">Service counts in services strip computed by spatial test against ward polygon. Bars marked "vs NWL median" use the median across all 168 NWL wards. NWL percentile = % of NWL wards below this ward's value.</div>
+    <strong>Data sources:</strong> ONS Census 2021 (demographics, health, household language, travel-to-work) · MHCLG Indices of Deprivation 2019, mid-2022 population-weighted · Met Police MPS via London Datastore (crime, Apr 2025 – Mar 2026) · London Civic Strength Index Round 3, London Datastore (2024) · DESNZ LILEE (fuel poverty) · NOMIS / DWP (claimant count, working-age) · NHS Digital ODS (GP, pharmacy, dental practice registers) · DfE GIAS (schools) · GLA ESOL Planning Map (community centres, libraries, formal ESOL providers).
+    <div style="margin-top:6px">Service counts use ward_code attribution where present (schools, community centres, libraries) and spatial test against the ward polygon otherwise (hospitals, dental, ESOL, VCSE). GP and pharmacy counts come from the ward indicator. "vs NWL median" bars use the median across all 168 NWL wards. "NWL percentile" = % of NWL wards below this ward on that indicator.</div>
   </div>
 </div>
 <div class="actions">
@@ -5248,7 +5316,12 @@ async function _downloadMapPng() {
     maskSvg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:500';
     const maskPath = document.createElementNS(svgNS, 'path');
     maskPath.setAttribute('d', pathD);
+    // Semi-transparent white mask: basemap stays visible outside NWL but is
+    // dimmed so attention focuses on the in-scope area. fill-opacity used as
+    // a separate attribute (not rgba in fill string) because html2canvas
+    // renders that more reliably than rgba() in fill strings.
     maskPath.setAttribute('fill', '#ffffff');
+    maskPath.setAttribute('fill-opacity', '0.55');
     maskPath.setAttribute('fill-rule', 'evenodd');
     maskSvg.appendChild(maskPath);
     mapEl.appendChild(maskSvg);

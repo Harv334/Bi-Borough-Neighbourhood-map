@@ -3981,23 +3981,178 @@ function showLSOA(feat) {
 // ─────────────────────────────────────────────────────────────────────────
 // LSOA report — printable page of IMD + all available census fields for an LSOA
 // ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// LSOA report — A4 dense profile (mirrors ward report design).
+// Charts inline SVG; reference values computed across all 1,183 NWL LSOAs.
+// ─────────────────────────────────────────────────────────────────────────
 window.generateLSOAReport = function(code) {
-  // Find matching GeoJSON feature for the LSOA to read embedded props (name, ward, etc.)
   const feat = (LSOA_IMD && LSOA_IMD.features) ?
     LSOA_IMD.features.find(f => f.properties && f.properties.code === code) : null;
   const props = (feat && feat.properties) || { code };
   const d = (LSOA_DATA && LSOA_DATA[code]) || {};
   const inds = d.indicators || d || {};
 
-  const fmt = v => (v === null || v === undefined || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
-  const decile = props.imd_decile || fmt(inds.imd_decile);
-  const rank   = props.imd_rank   || fmt(inds.imd_rank);
-  const score  = fmt(inds.imd_score);
-  const popN   = fmt(inds.census_population);
-  const goodH  = fmt(inds.census_good_health_pct);
-  const badH   = fmt(inds.census_bad_health_pct);
-  const disAny = fmt(inds.census_disability_any_pct);
-  const unemp  = fmt(inds.census_unemployed_pct);
+  // ── Helpers ──
+  const _ALL_LSOAS = (typeof LSOA_DATA === 'object') ? Object.values(LSOA_DATA) : [];
+  const _lsoaVals = (k) => _ALL_LSOAS
+    .map(r => parseFloat((r && r.indicators) ? r.indicators[k] : (r ? r[k] : null)))
+    .filter(v => !isNaN(v));
+  const _median = (vals) => {
+    if (!vals || !vals.length) return null;
+    const s = [...vals].sort((a,b) => a - b);
+    const m = Math.floor(s.length / 2);
+    return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
+  };
+  const _max = (vals) => (vals && vals.length ? vals.reduce((a,b) => a > b ? a : b) : null);
+  const _pctile = (k, v) => {
+    if (v == null || isNaN(v)) return null;
+    const vals = _lsoaVals(k);
+    if (!vals.length) return null;
+    const below = vals.filter(x => x < v).length;
+    return Math.round(100 * below / vals.length);
+  };
+  const _esc = s => (s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'));
+  const _fmt = v => (v == null || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
+  const _fmtN = (v, dp) => (v == null ? '—' : v.toLocaleString(undefined, {maximumFractionDigits: dp == null ? 1 : dp}));
+
+  // ── Inline SVG chart helpers (same shape as ward report) ──
+  function _chartHbar(rows, opts) {
+    opts = opts || {};
+    const W = opts.width || 360, rowH = opts.rowH || 18;
+    const padL = opts.padL || 130, padR = opts.padR || 56, padT = opts.padT || 6;
+    const dp = opts.dp == null ? 1 : opts.dp, u = opts.unit || '';
+    const data = (rows || []).map(r => ({...r, v: r.v == null ? null : parseFloat(r.v)}));
+    const dmax = opts.max != null ? opts.max :
+                 Math.max(0.0001, ...data.map(r => Math.max(r.v || 0, r.ref || 0)));
+    const H = padT + data.length * rowH + 8, barW = W - padL - padR;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ch-hbar">`;
+    data.forEach((r, i) => {
+      const y = padT + i * rowH + rowH/2;
+      const v = r.v == null ? 0 : Math.max(0, r.v);
+      const w = (v / dmax) * barW, c = r.c || '#3b6eaf';
+      svg += `<text x="${padL - 8}" y="${y + 3.5}" text-anchor="end" font-size="10" fill="#444">${_esc(r.l)}</text>`;
+      svg += `<rect x="${padL}" y="${y - 6}" width="${barW}" height="11" fill="#f1f1ec" rx="2"/>`;
+      if (r.v != null) {
+        svg += `<rect x="${padL}" y="${y - 6}" width="${w}" height="11" fill="${c}" rx="2"/>`;
+        svg += `<text x="${padL + Math.max(w, 6) + 4}" y="${y + 3.5}" font-size="10" fill="#333" font-variant-numeric="tabular-nums">${_fmtN(r.v, dp)}${u ? ' ' + u : ''}</text>`;
+      } else {
+        svg += `<text x="${padL + 4}" y="${y + 3.5}" font-size="10" fill="#bbb">no data</text>`;
+      }
+      if (r.ref != null && !isNaN(r.ref)) {
+        const rx = padL + (Math.max(0, r.ref) / dmax) * barW;
+        svg += `<line x1="${rx}" y1="${y - 8}" x2="${rx}" y2="${y + 7}" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="2,1.5"/>`;
+      }
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+  function _chartCompare(rows, opts) {
+    opts = opts || {};
+    const W = opts.width || 360, rowH = 22;
+    const padL = opts.padL || 150, padR = 60;
+    const dp = opts.dp == null ? 1 : opts.dp, u = opts.unit || '%';
+    const data = (rows || []).map(r => ({...r, v: r.v == null ? null : parseFloat(r.v), ref: r.ref == null ? null : parseFloat(r.ref)}));
+    const dmax = Math.max(0.0001, ...data.map(r => Math.max(r.v || 0, r.ref || 0)), opts.minMax || 1);
+    const H = 6 + data.length * rowH + 12, barW = W - padL - padR;
+    const GOOD = '#2c8a4a', BAD = '#c9534a';
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ch-compare">`;
+    data.forEach((r, i) => {
+      const y = 6 + i * rowH + rowH/2;
+      const wv = r.v != null ? (Math.max(0, r.v) / dmax) * barW : 0;
+      const wr = r.ref != null ? (Math.max(0, r.ref) / dmax) * barW : null;
+      const above = (r.v != null && r.ref != null) ? (r.v > r.ref) : null;
+      const isWh = !!r.wh;
+      const c = above == null ? '#888' : (isWh === above ? BAD : GOOD);
+      svg += `<text x="${padL - 8}" y="${y + 3.5}" text-anchor="end" font-size="10" fill="#444">${_esc(r.l)}</text>`;
+      svg += `<rect x="${padL}" y="${y - 6}" width="${barW}" height="11" fill="#f1f1ec" rx="2"/>`;
+      if (r.v != null) {
+        svg += `<rect x="${padL}" y="${y - 6}" width="${wv}" height="11" fill="${c}" rx="2"/>`;
+        svg += `<text x="${padL + Math.max(wv, 6) + 4}" y="${y + 3.5}" font-size="10" fill="#333" font-variant-numeric="tabular-nums">${_fmtN(r.v, dp)}${u}</text>`;
+      } else {
+        svg += `<text x="${padL + 4}" y="${y + 3.5}" font-size="10" fill="#bbb">no data</text>`;
+      }
+      if (wr != null) {
+        svg += `<line x1="${padL + wr}" y1="${y - 8}" x2="${padL + wr}" y2="${y + 7}" stroke="#1a1a1a" stroke-width="1.6"/>`;
+      }
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+  function _chartRadar(axes, opts) {
+    opts = opts || {};
+    const size = opts.size || 220, cx = size/2, cy = size/2 + 4, R = size * 0.36;
+    const N = axes.length;
+    const data = axes.map(a => ({...a, v: a.v == null ? null : parseFloat(a.v), max: parseFloat(a.max) || 1}));
+    const angle = i => -Math.PI/2 + (i / N) * 2 * Math.PI;
+    const pt = (i, frac) => {
+      const a = angle(i);
+      return [cx + Math.cos(a) * R * Math.max(0, Math.min(1, frac)),
+              cy + Math.sin(a) * R * Math.max(0, Math.min(1, frac))];
+    };
+    let svg = `<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" class="ch-radar">`;
+    [0.25, 0.5, 0.75, 1.0].forEach(frac => {
+      const pts = data.map((_, i) => pt(i, frac).join(',')).join(' ');
+      svg += `<polygon points="${pts}" fill="none" stroke="#e8e8e2" stroke-width="0.8"/>`;
+    });
+    data.forEach((_, i) => {
+      const [x, y] = pt(i, 1);
+      svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e8e8e2" stroke-width="0.8"/>`;
+    });
+    if (data.some(a => a.ref != null)) {
+      const refPts = data.map((a, i) => pt(i, (a.ref || 0) / a.max).join(',')).join(' ');
+      svg += `<polygon points="${refPts}" fill="none" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="3,2"/>`;
+    }
+    const dataPts = data.map((a, i) => pt(i, (a.v || 0) / a.max).join(',')).join(' ');
+    svg += `<polygon points="${dataPts}" fill="rgba(184,60,60,.30)" stroke="#b83c3c" stroke-width="1.5"/>`;
+    data.forEach((a, i) => {
+      if (a.v == null) return;
+      const [x, y] = pt(i, a.v / a.max);
+      svg += `<circle cx="${x}" cy="${y}" r="2.6" fill="#b83c3c" stroke="#fff" stroke-width="1"/>`;
+    });
+    data.forEach((a, i) => {
+      const ang = angle(i);
+      const lx = cx + Math.cos(ang) * (R + 14);
+      const ly = cy + Math.sin(ang) * (R + 14) + 3;
+      const anchor = Math.cos(ang) > 0.2 ? 'start' : (Math.cos(ang) < -0.2 ? 'end' : 'middle');
+      svg += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="9.5" fill="#333">${_esc(a.l)}</text>`;
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+  function _chartStack(parts, opts) {
+    opts = opts || {};
+    const W = opts.width || 360, H = 18;
+    const total = parts.reduce((a, b) => a + (parseFloat(b.v) || 0), 0) || 1;
+    let x = 0;
+    let svg = `<svg viewBox="0 0 ${W} ${H + 16}" xmlns="http://www.w3.org/2000/svg" class="ch-stack">`;
+    parts.forEach(p => {
+      const v = parseFloat(p.v) || 0, w = (v / total) * W;
+      svg += `<rect x="${x}" y="0" width="${w}" height="${H}" fill="${p.c}"/>`;
+      if (w > 28) svg += `<text x="${x + w/2}" y="${H/2 + 3.2}" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="600">${v.toFixed(0)}%</text>`;
+      x += w;
+    });
+    let lx = 0;
+    parts.forEach(p => {
+      const v = parseFloat(p.v);
+      const lblTxt = p.l + (isNaN(v) ? '' : ' ' + v.toFixed(0) + '%');
+      const lblW = lblTxt.length * 5.0 + 16;
+      svg += `<rect x="${lx}" y="${H + 5}" width="9" height="9" fill="${p.c}" rx="1"/>`;
+      svg += `<text x="${lx + 12}" y="${H + 13}" font-size="9" fill="#444">${_esc(lblTxt)}</text>`;
+      lx += lblW;
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // ── Headline values ──
+  const decile = props.imd_decile != null ? props.imd_decile : _fmt(inds.imd_decile);
+  const rank   = props.imd_rank   != null ? props.imd_rank   : _fmt(inds.imd_rank);
+  const score  = _fmt(inds.imd_score);
+  const popN   = _fmt(inds.census_population);
+  const goodH  = _fmt(inds.census_good_health_pct);
+  const badH   = _fmt(inds.census_bad_health_pct);
+  const disAny = _fmt(inds.census_disability_any_pct);
+  const unemp  = _fmt(inds.census_unemployed_pct);
 
   const depLabel = decile == null ? '—' :
                    decile <= 2 ? 'Core20 (most deprived 20%)' :
@@ -4005,59 +4160,184 @@ window.generateLSOAReport = function(code) {
                    decile <= 5 ? 'Moderate deprivation' :
                    decile >= 8 ? 'Low deprivation' : 'Average';
 
-  // IMD domain scores — all present in lsoa_data.json
-  const imdDomains = [
-    { k:'income_score',       l:'Income' },
-    { k:'employment_score',   l:'Employment' },
-    { k:'education_score',    l:'Education, skills & training' },
-    { k:'health_score',       l:'Health & disability' },
-    { k:'crime_score',        l:'Crime' },
-    { k:'barriers_score',     l:'Barriers to housing & services' },
-    { k:'environment_score',  l:'Living environment' },
-  ];
-  const imdDomainRows = imdDomains.map(f => {
-    const v = fmt(inds[f.k]);
-    if (v === null) return '';
-    return `<tr><td>${f.l}</td><td class="v">${v.toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`;
-  }).filter(Boolean).join('');
+  // ── Inline ray-cast point-in-polygon against this LSOA's geometry ──
+  const _lsoaGeom = feat ? feat.geometry : null;
+  function _ringContains(ring, lat, lng) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = ring[i][0], yi = ring[i][1];
+      const xj = ring[j][0], yj = ring[j][1];
+      const intersect = ((yi > lat) !== (yj > lat)) &&
+        (lng < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-12) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+  function _inLSOA(lat, lng) {
+    if (lat == null || lng == null || !_lsoaGeom) return false;
+    if (_lsoaGeom.type === 'Polygon') return _ringContains(_lsoaGeom.coordinates[0], lat, lng);
+    if (_lsoaGeom.type === 'MultiPolygon') return _lsoaGeom.coordinates.some(poly => _ringContains(poly[0], lat, lng));
+    return false;
+  }
+  const _matchSpatial = (arr) => {
+    if (!Array.isArray(arr)) return 0;
+    let n = 0;
+    arr.forEach(d => {
+      const lat = d.lat != null ? d.lat : (d.marker && (() => { try { return d.marker.getLatLng().lat; } catch(e) { return null; } })());
+      const lng = d.lng != null ? d.lng : (d.marker && (() => { try { return d.marker.getLatLng().lng; } catch(e) { return null; } })());
+      if (_inLSOA(lat, lng)) n++;
+    });
+    return n;
+  };
+  const _bySpatial = (arr) => {
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(d => {
+      const lat = d.lat != null ? d.lat : (d.marker && (() => { try { return d.marker.getLatLng().lat; } catch(e) { return null; } })());
+      const lng = d.lng != null ? d.lng : (d.marker && (() => { try { return d.marker.getLatLng().lng; } catch(e) { return null; } })());
+      return _inLSOA(lat, lng);
+    });
+  };
 
-  // Census 2021 — all LSOA-level fields
-  const censusFields = [
-    { k:'census_population',                 l:'Population' },
-    { k:'census_non_white_pct',              l:'Non-White (%)' },
-    { k:'census_born_outside_uk_pct',        l:'Born outside UK (%)' },
-    { k:'census_good_health_pct',            l:'Good/very good health (%)' },
-    { k:'census_bad_health_pct',             l:'Bad/very bad health (%)' },
-    { k:'census_disability_any_pct',         l:'Disability, any (%)' },
-    { k:'census_disability_lot_pct',         l:'Disability, limited a lot (%)' },
-    { k:'census_provides_unpaid_care_pct',   l:'Provides unpaid care (%)' },
-    { k:'census_unemployed_pct',             l:'Unemployed (%)' },
-    { k:'census_higher_managerial_pct',      l:'Higher managerial (%)' },
-    { k:'census_routine_semi_routine_pct',   l:'Routine/semi-routine (%)' },
-    { k:'census_level4_qual_pct',            l:'Level 4+ qualifications (%)' },
-    { k:'census_no_qual_pct',                l:'No qualifications (%)' },
-    { k:'census_owned_pct',                  l:'Owner occupied (%)' },
-    { k:'census_social_rented_pct',          l:'Social rented (%)' },
-    { k:'census_private_rented_pct',         l:'Private rented (%)' },
-    { k:'census_no_car_pct',                 l:'No car/van (%)' },
-  ];
-  const censusRows = censusFields.map(f => {
-    const v = fmt(inds[f.k]);
-    if (v === null) return '';
-    const display = f.k === 'census_population'
-      ? Math.round(v).toLocaleString()
-      : v.toLocaleString(undefined,{maximumFractionDigits:1});
-    return `<tr><td>${f.l}</td><td class="v">${display}</td></tr>`;
-  }).filter(Boolean).join('');
+  // ── Service counts inside this LSOA ──
+  const gpN     = _matchSpatial(typeof GPS !== 'undefined' ? GPS : []);
+  const pharmN  = _matchSpatial(typeof pharmData !== 'undefined' ? pharmData : []);
+  const dentN   = _matchSpatial(typeof dentalData !== 'undefined' ? dentalData : []);
+  const hospN   = _matchSpatial(typeof HOSP !== 'undefined' ? HOSP : []);
+  const schN    = _matchSpatial(typeof schoolsData !== 'undefined' ? schoolsData : []);
+  const ccN     = _matchSpatial(typeof ccData !== 'undefined' ? ccData : []);
+  const libN    = _matchSpatial(typeof libData !== 'undefined' ? libData : []);
+  const esolN   = _matchSpatial(typeof esolData !== 'undefined' ? esolData : []);
+  const vcseN   = _matchSpatial(typeof vcseData !== 'undefined' ? vcseData : []);
+  const _gp     = _bySpatial(typeof GPS !== 'undefined' ? GPS : []);
+  const _pharm  = _bySpatial(typeof pharmData !== 'undefined' ? pharmData : []);
+  const _dental = _bySpatial(typeof dentalData !== 'undefined' ? dentalData : []);
+  const _hosp   = _bySpatial(typeof HOSP !== 'undefined' ? HOSP : []);
+  const _schools= _bySpatial(typeof schoolsData !== 'undefined' ? schoolsData : []);
+  const _cc     = _bySpatial(typeof ccData !== 'undefined' ? ccData : []);
+  const _libs   = _bySpatial(typeof libData !== 'undefined' ? libData : []);
+  const _esol   = _bySpatial(typeof esolData !== 'undefined' ? esolData : []);
+  const _vcse   = _bySpatial(typeof vcseData !== 'undefined' ? vcseData : []);
+  const _green  = _bySpatial(typeof GRN !== 'undefined' ? GRN : []);
 
-  // Mini-map: the LSOA polygon on top of its parent ward (if we have the geometry)
+  // ── Charts: demographics ──
+  const ethStack = _chartStack([
+    { l:'White',  v: inds.census_white_pct,        c:'#5b8db8' },
+    { l:'Asian',  v: inds.census_asian_pct,        c:'#d47a2c' },
+    { l:'Black',  v: inds.census_black_pct,        c:'#6b4e71' },
+    { l:'Mixed',  v: inds.census_mixed_pct,        c:'#8ca757' },
+    { l:'Other',  v: inds.census_other_ethnic_pct, c:'#999' },
+  ], { width: 360 });
+  const ageStack = _chartStack([
+    { l:'<16',    v: inds.census_under16_pct,     c:'#2ea8a0' },
+    { l:'16–64',  v: inds.census_working_age_pct, c:'#3b6eaf' },
+    { l:'65+',    v: inds.census_over65_pct,      c:'#a05a9e' },
+  ], { width: 360 });
+  const compareCensus = _chartCompare([
+    { l:'Born outside UK',     v: inds.census_born_outside_uk_pct,    ref: _median(_lsoaVals('census_born_outside_uk_pct')),    wh: false, dp: 0 },
+    { l:'No qualifications',   v: inds.census_no_qual_pct,            ref: _median(_lsoaVals('census_no_qual_pct')),            wh: true,  dp: 0 },
+    { l:'Level 4+ qual',       v: inds.census_level4_qual_pct,        ref: _median(_lsoaVals('census_level4_qual_pct')),        wh: false, dp: 0 },
+    { l:'Higher managerial',   v: inds.census_higher_managerial_pct,  ref: _median(_lsoaVals('census_higher_managerial_pct')),  wh: false, dp: 0 },
+    { l:'Routine/semi',        v: inds.census_routine_semi_routine_pct, ref: _median(_lsoaVals('census_routine_semi_routine_pct')), wh: true,  dp: 0 },
+  ], { width: 380 });
+
+  // ── Charts: health & deprivation ──
+  const healthBars = _chartCompare([
+    { l:'Good/very good health',       v: inds.census_good_health_pct,           ref: _median(_lsoaVals('census_good_health_pct')),           wh: false, dp: 0 },
+    { l:'Bad/very bad health',         v: inds.census_bad_health_pct,            ref: _median(_lsoaVals('census_bad_health_pct')),            wh: true,  dp: 1 },
+    { l:'Disability (any)',            v: inds.census_disability_any_pct,        ref: _median(_lsoaVals('census_disability_any_pct')),        wh: true,  dp: 1 },
+    { l:'Disability — limited a lot',  v: inds.census_disability_lot_pct,        ref: _median(_lsoaVals('census_disability_lot_pct')),        wh: true,  dp: 1 },
+    { l:'Provides unpaid care',        v: inds.census_provides_unpaid_care_pct,  ref: _median(_lsoaVals('census_provides_unpaid_care_pct')),  wh: false, dp: 1 },
+    { l:'Fuel poverty',                v: inds.fuel_poverty_pct,                 ref: _median(_lsoaVals('fuel_poverty_pct')),                 wh: true,  dp: 1 },
+    { l:'Unemployed',                  v: inds.census_unemployed_pct,            ref: _median(_lsoaVals('census_unemployed_pct')),            wh: true,  dp: 1 },
+    { l:'Claimant rate (16-64)',       v: inds.claimant_rate_pct,                ref: _median(_lsoaVals('claimant_rate_pct')),                wh: true,  dp: 1 },
+  ], { width: 380 });
+
+  // IMD radar — LSOA is the native geography for these
+  const imdRadar = _chartRadar([
+    { l:'Income',      v: _fmt(inds.income_score),       ref: _median(_lsoaVals('income_score')),       max: _max(_lsoaVals('income_score'))       || 1 },
+    { l:'Employment',  v: _fmt(inds.employment_score),   ref: _median(_lsoaVals('employment_score')),   max: _max(_lsoaVals('employment_score'))   || 1 },
+    { l:'Education',   v: _fmt(inds.education_score),    ref: _median(_lsoaVals('education_score')),    max: _max(_lsoaVals('education_score'))    || 1 },
+    { l:'Health',      v: _fmt(inds.health_score),       ref: _median(_lsoaVals('health_score')),       max: _max(_lsoaVals('health_score'))       || 1 },
+    { l:'Crime',       v: _fmt(inds.crime_score),        ref: _median(_lsoaVals('crime_score')),        max: _max(_lsoaVals('crime_score'))        || 1 },
+    { l:'Barriers',    v: _fmt(inds.barriers_score),     ref: _median(_lsoaVals('barriers_score')),     max: _max(_lsoaVals('barriers_score'))     || 1 },
+    { l:'Environment', v: _fmt(inds.environment_score),  ref: _median(_lsoaVals('environment_score')),  max: _max(_lsoaVals('environment_score'))  || 1 },
+  ], { size: 260 });
+
+  // ── Crime breakdown — 10 categories at LSOA level (no sexual offences) ──
+  const crimeCats = [
+    { k:'crime_violence_12mo',          l:'Violence' },
+    { k:'crime_theft_12mo',             l:'Theft' },
+    { k:'crime_burglary_12mo',          l:'Burglary' },
+    { k:'crime_robbery_12mo',           l:'Robbery' },
+    { k:'crime_vehicle_12mo',           l:'Vehicle offences' },
+    { k:'crime_drug_offences_12mo',     l:'Drug offences' },
+    { k:'crime_public_order_12mo',      l:'Public order' },
+    { k:'crime_arson_12mo',             l:'Arson & criminal damage' },
+    { k:'crime_weapons_12mo',           l:'Possession of weapons' },
+    { k:'crime_misc_society_12mo',      l:'Misc. against society' },
+  ];
+  const crimeRows = crimeCats.map(c => ({
+    l: c.l,
+    v: _fmt(inds[c.k]),
+    ref: _median(_lsoaVals(c.k)),
+    c: '#7a3a3a',
+  })).filter(r => r.v != null).sort((a,b) => (b.v||0) - (a.v||0));
+  const crimeSVG = crimeRows.length ? _chartHbar(crimeRows, { width: 760, padL: 170, dp: 0, unit: '' }) : '';
+  const crimeTotal = _fmt(inds.crime_total);
+
+  // ── Green & blue space access (LSOA-native) ──
+  const greenRows = [
+    { l:'Green OR blue ≤15min',    v: _fmt(inds.gb_commitment_pct),       c:'#2E7D32' },
+    { l:'Green ≤15min',            v: _fmt(inds.green_commitment_pct),    c:'#388E3C' },
+    { l:'Doorstep (<200m)',        v: _fmt(inds.green_doorstep_pct),      c:'#66BB6A' },
+    { l:'Local (<300m, ≥2 ha)',    v: _fmt(inds.green_local_pct),         c:'#43A047' },
+    { l:'Neighbourhood (<1km)',    v: _fmt(inds.green_neighbourhood_pct), c:'#1B5E20' },
+    { l:'Blue space ≤15min',       v: _fmt(inds.blue_commitment_pct),     c:'#0288D1' },
+  ];
+  const greenSVG = _chartHbar(greenRows, { width: 380, padL: 150, max: 100, dp: 0, unit: '%' });
+
+  // ── Locations block helper ──
+  function _locBlock(title, items, fmt, extra) {
+    const cls = 'locblock' + (extra ? ' ' + extra : '');
+    if (!items || !items.length) return `<div class="${cls}"><h4>${_esc(title)} <span class="count">0</span></h4><div class="empty">none</div></div>`;
+    const lis = items.map(d => `<li>${fmt(d)}</li>`).join('');
+    return `<div class="${cls}"><h4>${_esc(title)} <span class="count">${items.length}</span></h4><ol>${lis}</ol></div>`;
+  }
+
+  // KPI rendering helpers
+  const _kpi = (lbl, val, sub, extra) => {
+    const dim = (val == null || val === '' || val === '—');
+    return `<div class="kpi">
+      <div class="kpi-lbl">${_esc(lbl)}</div>
+      <div class="kpi-val${dim ? ' dim' : ''}">${dim ? '—' : val}</div>
+      ${sub ? `<div class="kpi-sub">${_esc(sub)}</div>` : ''}
+      ${extra || ''}
+    </div>`;
+  };
+  const _ctxBar = (pctile, polarity) => {
+    if (pctile == null) return '';
+    const left  = polarity === 'higher-better' ? '#c9534a' : '#2c8a4a';
+    const right = polarity === 'higher-better' ? '#2c8a4a' : '#c9534a';
+    return `<div class="kpi-ctx">
+      <div class="kpi-ctx-bar" style="background:linear-gradient(90deg,${left},#f0c14a,${right})">
+        <div class="kpi-ctx-tick" style="left:${pctile}%"></div>
+      </div>
+      <div class="kpi-ctx-cap">P${pctile} in NWL</div>
+    </div>`;
+  };
+
+  const goodHpct  = _pctile('census_good_health_pct', goodH);
+  const badHpct   = _pctile('census_bad_health_pct',  badH);
+  const disAnyPct = _pctile('census_disability_any_pct', disAny);
+  const imdPct    = _pctile('imd_score', score);
+
+  // ── Mini-map: LSOA polygon highlighted within its parent ward ──
   let miniMapSVG = '';
   try {
     if (feat && feat.geometry) {
-      // Find parent ward polygon from GJ for context
-      const wardName = props.ward;
+      const wardNm = props.ward;
       const wardFeat = (typeof GJ !== 'undefined' && GJ.features)
-        ? GJ.features.find(f => f.properties && f.properties.WD24NM === wardName)
+        ? GJ.features.find(f => f.properties && f.properties.WD24NM === wardNm)
         : null;
       const allCoords = [];
       const collect = g => {
@@ -4073,7 +4353,7 @@ window.generateLSOAReport = function(code) {
           if (lng<minLng) minLng=lng; if (lng>maxLng) maxLng=lng;
           if (lat<minLat) minLat=lat; if (lat>maxLat) maxLat=lat;
         }
-        const W=260,H=200,PAD=8;
+        const W=240,H=150,PAD=8;
         const midLat=(minLat+maxLat)/2, lngScale=Math.cos(midLat*Math.PI/180);
         const dLng=(maxLng-minLng)*lngScale, dLat=(maxLat-minLat);
         const s=Math.min((W-2*PAD)/dLng,(H-2*PAD)/dLat);
@@ -4093,16 +4373,15 @@ window.generateLSOAReport = function(code) {
         const wardPath = wardFeat
           ? `<path d="${geomPath(wardFeat.geometry)}" fill="#eeeee8" stroke="#a8a8a0" stroke-width="0.8"/>`
           : '';
-        // Decile colour — matches legend in the sidebar
         const DECILE_COLORS = {1:'#67000d',2:'#a50f15',3:'#cb181d',4:'#ef3b2c',5:'#fb6a4a',6:'#fc9272',7:'#a1d99b',8:'#74c476',9:'#31a354',10:'#006d2c'};
         const lsoaFill = DECILE_COLORS[decile] || '#e67e22';
         const lsoaPath = `<path d="${geomPath(feat.geometry)}" fill="${lsoaFill}" fill-opacity="0.75" stroke="#1a1a1a" stroke-width="1.4"/>`;
-        miniMapSVG = `<svg class="minimap" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Location of LSOA ${code} within ${wardName}">
+        miniMapSVG = `<svg class="minimap" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Location of LSOA ${_esc(code)} within ${_esc(wardNm||'')}">
           <rect width="${W}" height="${H}" fill="#f6f6f1"/>
           ${wardPath}
           ${lsoaPath}
         </svg>
-        <div class="minimap-cap">${props.name || code} within ${wardName || ''}</div>`;
+        <div class="minimap-cap">${_esc(props.name || code)} within ${_esc(wardNm || '')}</div>`;
       }
     }
   } catch(e) { /* decorative */ }
@@ -4110,90 +4389,185 @@ window.generateLSOAReport = function(code) {
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
   const wardName = props.ward || '';
   const borough  = props.borough || '';
-
-  const bigStat = (lbl, val, sub) => {
-    const hasVal = val !== null && val !== undefined && val !== '';
-    return `<div class="hstat">
-      <div class="hstat-val ${hasVal ? '' : 'dim'}">${hasVal ? val : '—'}</div>
-      <div class="hstat-lbl">${lbl}</div>
-      ${sub ? `<div class="hstat-sub">${sub}</div>` : ''}
-    </div>`;
-  };
-
   const isCore20 = decile != null && decile <= 2;
-  const core20Badge = isCore20
-    ? `<div style="display:inline-block;margin-top:8px;margin-left:6px;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;background:#fde6ee;color:#8b0035;border:1px solid #f0b5cb">Core20 LSOA</div>`
-    : '';
-
-  const imdDomainSection = imdDomainRows
-    ? `<section class="cat"><h3>IMD 2025 domain scores</h3><table class="kv">${imdDomainRows}</table><div style="font-size:10px;color:#888;margin-top:4px">Higher score = more deprivation on that domain.</div></section>`
-    : '';
-  const censusSection = censusRows
-    ? `<section class="cat"><h3>Census 2021 (LSOA-level)</h3><table class="kv">${censusRows}</table></section>`
-    : '';
-  const noData = !imdDomainRows && !censusRows;
+  const core20Badge = isCore20 ? `<span class="badge core20">Core20 LSOA</span>` : '';
+  const decileBadge = decile != null ? `<span class="badge imd">IMD decile ${decile}/10</span>` : '';
 
   const html = `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
-<title>${props.name || code} — LSOA Report</title>
+<title>${_esc(props.name || code)} — LSOA profile</title>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#f4f4ef; color:#1a1a1a; margin:0; padding:32px 24px; line-height:1.5; }
-  .report { max-width: 880px; margin: 0 auto; background:#fff; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,.06); overflow:hidden; }
-  .hero { padding: 28px 32px 22px; border-bottom: 1px solid #eee; display:flex; gap:22px; align-items:flex-start; }
-  .hero .hero-text { flex:1; min-width:0; }
-  .hero .hero-map { flex:0 0 260px; }
-  .minimap { width:260px; height:200px; border:1px solid #e6e6df; border-radius:6px; background:#f6f6f1; display:block; }
-  .minimap-cap { font-size:10px; color:#888; text-align:center; margin-top:4px; }
-  .hero .kicker { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.08em; }
-  .hero h1 { margin:4px 0 2px; font-size:26px; font-weight:700; letter-spacing:-0.01em; }
-  .hero .sub { color:#555; font-size:13px; }
-  .headline { display:grid; grid-template-columns: repeat(4, 1fr); gap:0; border-top:1px solid #eee; }
-  .hstat { padding:18px 14px; text-align:center; border-right:1px solid #f0f0ec; }
-  .hstat:last-child { border-right: none; }
-  .hstat-val { font-size:24px; font-weight:700; color:#1a1a1a; line-height:1.1; }
-  .hstat-val.dim { color:#bbb; font-weight:400; }
-  .hstat-lbl { font-size:10px; color:#666; margin-top:3px; text-transform:uppercase; letter-spacing:.04em; }
-  .hstat-sub { font-size:10px; color:#999; margin-top:1px; }
-  .body { padding: 22px 32px 28px; }
-  .cat { margin-bottom: 20px; page-break-inside: avoid; }
-  .cat h3 { font-size:13px; margin:0 0 8px; color:#333; border-bottom:2px solid #1a1a1a; padding-bottom:5px; letter-spacing:.02em; }
-  table.kv { width:100%; border-collapse: collapse; font-size:12px; }
-  table.kv td { padding:5px 0; border-bottom:1px solid #f3f3ef; vertical-align:top; }
-  table.kv td:first-child { color:#555; }
-  table.kv td.v { font-weight:500; color:#1a1a1a; text-align:right; font-variant-numeric: tabular-nums; }
-  .no-data { padding:20px; background:#fef8e7; border-left:3px solid #E89B1B; margin:20px 0; font-size:12px; color:#7a4a00; border-radius:0 6px 6px 0; }
-  .footer { padding: 16px 32px 22px; background:#fafaf6; border-top:1px solid #eee; font-size:11px; color:#666; }
-  .actions { max-width:880px; margin: 14px auto 0; display:flex; gap:8px; justify-content:flex-end; }
-  .actions button { padding:8px 14px; border:1px solid #ddd; background:#fff; border-radius:6px; font-size:12px; cursor:pointer; color:#333; }
+  /* Dense single-flow layout, mirrors ward report. */
+  @page { size: A4 portrait; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#eceae3; color:#1a1a1a; margin:0; padding:14px; line-height:1.4; font-size:12px; }
+  .report { width: 880px; max-width: 100%; margin: 0 auto; background:#fff; box-shadow:0 2px 14px rgba(0,0,0,.08); border-radius:6px; overflow:hidden; }
+  .hero { display:flex; gap:18px; padding:18px 22px 14px; border-bottom:1px solid #eee; align-items:flex-start; }
+  .hero-text { flex:1; min-width:0; }
+  .hero-text .kicker { font-size:10.5px; color:#888; text-transform:uppercase; letter-spacing:.1em; margin-bottom:3px; font-weight:600; }
+  .hero-text h1 { margin:0; font-size:26px; font-weight:700; letter-spacing:-0.015em; line-height:1.1; }
+  .hero-text .sub { color:#555; font-size:13px; margin-top:5px; }
+  .hero-text .badges { margin-top:8px; }
+  .badge { display:inline-block; margin-right:5px; padding:2px 10px; border-radius:14px; font-size:10.5px; font-weight:600; vertical-align:middle; }
+  .badge.core20 { background:#fde6ee; color:#8b0035; border:1px solid #f0b5cb; }
+  .badge.imd { background:#1a1a1a; color:#fff; }
+  .hero-map { flex:0 0 240px; }
+  .minimap { width:240px; height:150px; border:1px solid #e6e6df; border-radius:4px; background:#f6f6f1; display:block; }
+  .minimap-cap { font-size:9.5px; color:#888; text-align:center; margin-top:3px; }
+  .kpis { display:grid; grid-template-columns: repeat(6, 1fr); border-top:1px solid #eee; border-bottom:1px solid #eee; }
+  .kpi { padding:11px 8px 10px; text-align:center; border-right:1px solid #f0f0ec; }
+  .kpi:last-child { border-right:none; }
+  .kpi-lbl { font-size:9.5px; color:#666; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; font-weight:600; }
+  .kpi-val { font-size:22px; font-weight:700; color:#1a1a1a; line-height:1.05; font-variant-numeric: tabular-nums; }
+  .kpi-val.dim { color:#bbb; font-weight:400; }
+  .kpi-sub { font-size:9.5px; color:#999; margin-top:2px; }
+  .kpi-ctx { margin-top:5px; }
+  .kpi-ctx-bar { position:relative; height:4px; border-radius:2px; }
+  .kpi-ctx-tick { position:absolute; top:-2px; bottom:-2px; width:2px; background:#1a1a1a; border-radius:1px; }
+  .kpi-ctx-cap { font-size:9px; color:#666; margin-top:2px; }
+  .services-wrap { padding:0; }
+  .services-title { font-size:10.5px; color:#666; text-transform:uppercase; letter-spacing:.08em; padding:9px 22px 4px; font-weight:600; }
+  .services { display:grid; grid-template-columns: repeat(9, 1fr); background:#fafaf6; border-top:1px solid #eee; border-bottom:1px solid #eee; }
+  .svc { padding:9px 3px 8px; text-align:center; border-right:1px solid #f0f0ec; }
+  .svc:last-child { border-right:none; }
+  .svc-val { font-size:18px; font-weight:700; color:#185FA5; line-height:1.1; font-variant-numeric: tabular-nums; }
+  .svc-val.dim { color:#bbb; font-weight:400; }
+  .svc-lbl { font-size:9.5px; color:#666; margin-top:2px; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+  .content { padding: 14px 22px 16px; }
+  .section-h { font-size:10.5px; color:#666; text-transform:uppercase; letter-spacing:.1em; margin: 14px 0 8px; font-weight:600; padding-bottom:3px; border-bottom:1px solid #e8e8e2; page-break-after: avoid; }
+  .section-h:first-of-type { margin-top:0; }
+  .row { display:flex; gap:12px; margin-bottom:12px; }
+  .row.row-2 > .panel { flex:1; min-width:0; }
+  .panel { background:#fafaf7; border:1px solid #eee; border-radius:5px; padding:10px 12px 8px; page-break-inside: avoid; }
+  .panel h3 { font-size:11px; margin:0 0 6px; color:#333; text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+  svg.ch-stack, svg.ch-hbar, svg.ch-compare { width:100%; height:auto; display:block; }
+  svg.ch-radar { display:block; margin: 0 auto; max-width: 100%; }
+  .locations { padding: 4px 22px 14px; }
+  .locations h2 { font-size:13px; margin: 14px 0 8px; color:#1a1a1a; padding-bottom:4px; border-bottom:1.5px solid #1a1a1a; letter-spacing:.04em; text-transform:uppercase; }
+  .locations-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 18px; }
+  .locblock { page-break-inside: avoid; min-width: 0; }
+  .locblock h4 { font-size:11px; margin:0 0 4px; color:#333; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+  .locblock h4 .count { background:#1a1a1a; color:#fff; border-radius:8px; padding:1px 6px; font-size:9px; margin-left:5px; vertical-align:middle; }
+  .locblock ol { margin:0; padding-left:18px; font-size:11px; color:#333; }
+  .locblock li { margin-bottom:3px; line-height:1.35; }
+  .locblock li .meta { color:#888; font-size:10px; }
+  .locblock .empty { font-size:10.5px; color:#bbb; font-style:italic; }
+  .locblock.span-2 { grid-column: span 2; }
+  .legend { font-size:9.5px; color:#888; margin-top:4px; }
+  .legend-tick { display:inline-block; width:1px; height:9px; background:#1a1a1a; margin: 0 2px 0 0; vertical-align:middle; }
+  .footer { padding: 10px 22px 14px; background:#fafaf6; border-top:1px solid #eee; font-size:10px; color:#666; line-height:1.5; }
+  .footer strong { color:#333; }
+  .actions { max-width:880px; margin: 10px auto 0; display:flex; gap:8px; justify-content:flex-end; }
+  .actions button { padding:6px 12px; border:1px solid #ddd; background:#fff; border-radius:5px; font-size:12px; cursor:pointer; color:#333; }
   .actions button:hover { border-color:#999; }
-  @media print { body { background:#fff; padding:0; } .report { box-shadow:none; border-radius:0; max-width:none; } .actions { display:none; } .cat { page-break-inside: avoid; } }
-  @media (max-width: 720px) { .hero { flex-direction:column; } .hero .hero-map { flex:0 0 auto; } }
+  @media print { body { background:#fff; padding:0; font-size:10.5px; } .report { box-shadow:none; border-radius:0; width:100%; } .actions { display:none; } .panel, .hero, .kpis, .services, .locblock { page-break-inside: avoid; } }
 </style>
 </head><body>
 <div class="report">
+
   <div class="hero">
     <div class="hero-text">
-      <div class="kicker">NW London LSOA report · ${today}</div>
-      <h1>${props.name || code}</h1>
-      <div class="sub">${code}${wardName ? ' · Ward: ' + wardName : ''}${borough ? ' · ' + borough : ''}</div>
-      ${core20Badge}
+      <div class="kicker">NW London LSOA profile · ${_esc(today)}</div>
+      <h1>${_esc(props.name || code)}</h1>
+      <div class="sub">${_esc(code)}${wardName ? ' · Ward: ' + _esc(wardName) : ''}${borough ? ' · ' + _esc(borough) : ''}${rank ? ' · IMD rank ' + Math.round(rank).toLocaleString() + ' of 32,844 nationally' : ''}</div>
+      <div class="badges">
+        ${decileBadge}
+        ${core20Badge}
+      </div>
     </div>
     ${miniMapSVG ? `<div class="hero-map">${miniMapSVG}</div>` : ''}
   </div>
-  <div class="headline">
-    ${bigStat('IMD decile', decile != null ? decile + ' / 10' : null, depLabel)}
-    ${bigStat('IMD rank', rank != null ? rank.toLocaleString() : null, 'of 32,844 LSOAs')}
-    ${bigStat('Population', popN != null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
-    ${bigStat('Good health', goodH != null ? goodH.toFixed(0) + '%' : null, 'of residents')}
+
+  <div class="kpis">
+    ${_kpi('Population',     popN  != null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
+    ${_kpi('IMD score',      score != null ? score.toFixed(1) : null,   'higher = more deprived', _ctxBar(imdPct, 'lower-better'))}
+    ${_kpi('IMD decile',     decile != null ? decile + '/10' : null, depLabel)}
+    ${_kpi('Good health',    goodH != null ? goodH.toFixed(0) + '%' : null, 'of residents', _ctxBar(goodHpct, 'higher-better'))}
+    ${_kpi('Bad health',     badH  != null ? badH.toFixed(1) + '%' : null, 'of residents', _ctxBar(badHpct, 'lower-better'))}
+    ${_kpi('Disability',     disAny != null ? disAny.toFixed(1) + '%' : null, 'any condition', _ctxBar(disAnyPct, 'lower-better'))}
   </div>
-  <div class="body">
-    ${noData ? '<div class="no-data"><strong>No LSOA indicator data loaded.</strong><br>lsoa_data.json may not have loaded yet. Reload the map or check the browser console.</div>' : ''}
-    ${imdDomainSection}
-    ${censusSection}
+
+  <div class="services-wrap">
+    <div class="services-title">Services in this LSOA (counts inside polygon)</div>
+    <div class="services">
+      <div class="svc"><div class="svc-val ${gpN ? '' : 'dim'}">${gpN  || '—'}</div><div class="svc-lbl">GP</div></div>
+      <div class="svc"><div class="svc-val ${pharmN ? '' : 'dim'}">${pharmN || '—'}</div><div class="svc-lbl">Pharmacy</div></div>
+      <div class="svc"><div class="svc-val ${dentN ? '' : 'dim'}">${dentN  || '—'}</div><div class="svc-lbl">Dental</div></div>
+      <div class="svc"><div class="svc-val ${hospN ? '' : 'dim'}">${hospN  || '—'}</div><div class="svc-lbl">Hospital</div></div>
+      <div class="svc"><div class="svc-val ${schN ? '' : 'dim'}">${schN   || '—'}</div><div class="svc-lbl">Schools</div></div>
+      <div class="svc"><div class="svc-val ${ccN ? '' : 'dim'}">${ccN    || '—'}</div><div class="svc-lbl">Comm ctr</div></div>
+      <div class="svc"><div class="svc-val ${libN ? '' : 'dim'}">${libN   || '—'}</div><div class="svc-lbl">Library</div></div>
+      <div class="svc"><div class="svc-val ${esolN ? '' : 'dim'}">${esolN  || '—'}</div><div class="svc-lbl">ESOL</div></div>
+      <div class="svc"><div class="svc-val ${vcseN ? '' : 'dim'}">${vcseN  || '—'}</div><div class="svc-lbl">VCSE</div></div>
+    </div>
   </div>
+
+  <div class="content">
+    <div class="section-h">Demographics — who lives here</div>
+    <div class="row row-2">
+      <div class="panel"><h3>Ethnicity (Census 2021)</h3>${ethStack}</div>
+      <div class="panel"><h3>Age (Census 2021)</h3>${ageStack}${inds.census_over85_pct != null ? `<div class="legend">85+: ${parseFloat(inds.census_over85_pct).toFixed(1)}% of residents</div>` : ''}</div>
+    </div>
+    <div class="row">
+      <div class="panel" style="flex:1">
+        <h3>Demographic indicators vs NWL LSOA median</h3>
+        ${compareCensus}
+        <div class="legend"><span class="legend-tick"></span> NWL median (1,183 LSOAs) · <span style="color:#c9534a">red</span> = concern, <span style="color:#2c8a4a">green</span> = strength</div>
+      </div>
+    </div>
+
+    <div class="section-h">Health, deprivation &amp; IMD domains</div>
+    <div class="row">
+      <div class="panel" style="flex:0 0 280px">
+        <h3>IMD 2025 — 7-domain radar</h3>
+        ${imdRadar}
+        <div class="legend">Red polygon = this LSOA · dashed = NWL LSOA median · axes normalised to NWL max</div>
+      </div>
+      <div class="panel" style="flex:1">
+        <h3>Health &amp; economic indicators vs NWL LSOA median</h3>
+        ${healthBars}
+      </div>
+    </div>
+
+    <div class="section-h">Green &amp; blue space access</div>
+    <div class="row">
+      <div class="panel" style="flex:1">
+        <h3>% of UPRNs within walking distance of qualifying greenspace</h3>
+        ${greenSVG}
+        <div class="legend">Source: Defra ANGSt / Friends of the Earth (LSOA, 2023)</div>
+      </div>
+    </div>
+
+    ${crimeRows.length ? `<div class="section-h">Crime — last 12 months${crimeTotal != null ? ` · total ${Math.round(crimeTotal).toLocaleString()}` : ''}</div>
+    <div class="row">
+      <div class="panel" style="flex:1">
+        <h3>MPS recorded crime — Apr 2025 to Mar 2026</h3>
+        ${crimeSVG}
+        <div class="legend"><span class="legend-tick"></span> NWL LSOA median · sorted by this LSOA's count · sexual offences not published at LSOA level</div>
+      </div>
+    </div>` : ''}
+  </div>
+
+  <div class="locations">
+    <h2>Physical locations in this LSOA</h2>
+    <div class="locations-grid">
+      ${_locBlock('GP practices',         _gp,      g => `<strong>${_esc(g.n||g.name||'')}</strong> <span class="meta">${_esc(g.a||g.addr||'')}${g.pc?' · '+_esc(g.pc):''}</span>`)}
+      ${_locBlock('Pharmacies',           _pharm,   p => `<strong>${_esc(p.name||p.n||'')}</strong> <span class="meta">${_esc(p.addr||p.a||'')}${p.postcode||p.pc?' · '+_esc(p.postcode||p.pc):''}</span>`)}
+      ${_locBlock('Dental practices',     _dental,  d => `<strong>${_esc(d.name||'')}</strong> <span class="meta">${d.postcode?_esc(d.postcode):''}${d.nhs_contracted===true?' · NHS/mixed':d.nhs_contracted===false?' · Private':''}</span>`)}
+      ${_locBlock('Hospitals & clinics',  _hosp,    h => `<strong>${_esc(h.n||'')}</strong> <span class="meta">${_esc(h.a||'')}${h.t?' · '+_esc(h.t):''}</span>`, 'span-2')}
+      ${_locBlock('Schools',              _schools, s => `<strong>${_esc(s.name||'')}</strong> <span class="meta">${s.phase?_esc(s.phase):''}${s.type?' · '+_esc(s.type):''}${s.postcode?' · '+_esc(s.postcode):''}${s.pupils?' · '+s.pupils+' pupils':''}${s.fsm_pct?' · FSM '+s.fsm_pct+'%':''}</span>`, 'span-2')}
+      ${_locBlock('Community centres',    _cc,      c => `<strong>${_esc(c.name||'')}</strong> <span class="meta">${_esc(c.address||'')}${c.postcode?' · '+_esc(c.postcode):''}</span>`)}
+      ${_locBlock('Libraries',            _libs,    l => `<strong>${_esc(l.name||'')}</strong> <span class="meta">${_esc(l.address||'')}${l.postcode?' · '+_esc(l.postcode):''}${l.status?' · '+_esc(l.status):''}</span>`)}
+      ${_locBlock('Formal ESOL providers',_esol,    e => `<strong>${_esc(e.name||'')}</strong> <span class="meta">${e.type?_esc(e.type):''}${e.postcode?' · '+_esc(e.postcode):''}</span>`)}
+      ${_locBlock('VCSE organisations',   _vcse,    v => `<strong>${_esc(v.name||'')}</strong> <span class="meta">${_esc(v.addr||'')}</span>`, 'span-2')}
+      ${_locBlock('Parks & greenspaces',  _green,   g => `<strong>${_esc(g.n||'')}</strong> <span class="meta">${_esc(g.a||'')}${g.sz?' · '+_esc(g.sz):''}</span>`)}
+    </div>
+  </div>
+
   <div class="footer">
-    <strong>Sources:</strong> MHCLG Indices of Multiple Deprivation 2025 (LSOA-level, all 7 domains) · ONS Census 2021 (Nomis bulk topic-summary tables, LSOA geography).
+    <strong>Data sources:</strong> MHCLG Indices of Deprivation 2019 (LSOA-level, all 7 domains) · ONS Census 2021 (NOMIS topic-summary tables) · Met Police MPS via London Datastore (crime, Apr 2025 – Mar 2026, 10 categories at LSOA level — sexual offences not published) · DESNZ LILEE (fuel poverty) · NOMIS / DWP (claimant rate) · Defra ANGSt / Friends of the Earth (green &amp; blue space, 2023) · NHS Digital ODS, GLA ESOL Planning Map, DfE GIAS (services).
+    <div style="margin-top:6px">Service counts use spatial point-in-polygon test against this LSOA's boundary. "vs NWL median" bars compute against all 1,183 NWL LSOAs.</div>
   </div>
 </div>
 <div class="actions">

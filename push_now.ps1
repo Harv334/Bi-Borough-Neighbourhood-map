@@ -1318,6 +1318,35 @@ PNG — "Prepare screen for screenshot" mode (the fix that finally works)
 - _screenshotState module-level var ensures
   the user can't accidentally enter screenshot
   mode twice.
+
+GitHub Pages — slim lsoa_data.json (67 MB → 2 MB)
+-------------------------------------------------
+- Pages deployment was failing with "Deployment
+  failed, try again later" on both deploy-pages
+  v4 and v5. Per the actions/deploy-pages issue
+  tracker (#406, intermittent failures starting
+  Jan 2026), large artifacts trigger this
+  intermittently — and our artifact was bloated
+  by lsoa_data.json at 67 MB containing every
+  LSOA in England (33,755 records) when the
+  dashboard only ever uses NW London's 1,183
+  LSOAs.
+- Fix: filtered lsoa_data.json to just the
+  LSOA codes present in the dashboard's
+  embedded LSOA_IMD geojson (1,183 NWL LSOAs).
+  The dashboard never reads any LSOA outside
+  this set, so no functional regression.
+- Result: lsoa_data.json 67 MB → 2 MB (33×
+  smaller). Total tracked artifact size
+  dropped from ~98 MB to ~33 MB, well under
+  the Pages soft limit. JSON also serialised
+  with separators=(",", ":") to drop
+  pretty-print whitespace.
+- Filter logic: parsed const LSOA_IMD = {…}
+  out of index.html, collected the unique
+  LSOA21CD values, kept only those keys in
+  lsoa_data.json. The 1,183 NWL codes all
+  matched, so no data lost.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

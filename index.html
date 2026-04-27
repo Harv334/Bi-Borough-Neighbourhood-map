@@ -5672,32 +5672,23 @@ async function _prepareScreenForScreenshot(opts) {
   if (pngBtn) pngBtn.addEventListener('click', async () => {
     const focused = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all') ? focusedBorough : null;
     const opts = [
-      { key: 'prepare-nwl',     label: '⭐ Prepare screen for screenshot — Entire NW London',
-        desc: 'Whitens everything outside NWL, then you take your own screenshot (Win+Shift+S). Pixel-perfect, no alignment issues.' },
+      { key: 'prepare-nwl', label: 'Entire NW London',
+        desc: 'Frames the map to all 8 NWL boroughs and whitens everything outside. Then take your own screenshot (Win+Shift+S on Windows, Cmd+Shift+4 on Mac).' },
     ];
     if (focused) opts.push({
-      key: 'prepare-borough', label: `⭐ Prepare screen for screenshot — Focused borough (${focused})`,
-      desc: 'Whitens everything outside the focused borough, then you screenshot manually.'
+      key: 'prepare-borough', label: `Focused borough (${focused})`,
+      desc: 'Frames to the focused borough only and whitens everything outside.'
     });
-    opts.push(
-      { key: 'prepare-current', label: '⭐ Prepare screen for screenshot — Current view',
-        desc: 'Whitens outside NWL but keeps your current pan/zoom. Then screenshot manually.' },
-      { key: 'wysiwyg',     label: 'Auto-download — Current view',
-        desc: 'Capture exactly what is on screen now via html2canvas. Fast but may have rendering quirks.' },
-      { key: 'nwl',         label: 'Auto-download — Entire NW London',
-        desc: 'Re-frame to all 8 NWL boroughs and auto-download. May have alignment issues.' },
-    );
-    const extras = '<label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#444;cursor:pointer"><input type="checkbox" id="png-white-outside"> (Auto-download only) Paint everything outside NW London white</label>';
-    const choice = await _exportDialog('Download map as PNG', opts, extras);
+    opts.push({
+      key: 'prepare-current', label: 'Current view (no re-framing)',
+      desc: 'Keeps your current pan/zoom and whitens outside NWL. Useful if you want a specific area.'
+    });
+    const choice = await _exportDialog('Prepare map for screenshot', opts);
     if (!choice) return;
-    if (choice.key.startsWith('prepare-')) {
-      const mode = choice.key === 'prepare-nwl' ? 'nwl'
-                 : choice.key === 'prepare-borough' ? 'borough'
-                 : 'wysiwyg';
-      _prepareScreenForScreenshot({ mode, whiteOutside: true });
-      return;
-    }
-    _downloadMapPng({ mode: choice.key, whiteOutside: !!choice.flags['png-white-outside'] });
+    const mode = choice.key === 'prepare-nwl' ? 'nwl'
+               : choice.key === 'prepare-borough' ? 'borough'
+               : 'wysiwyg';
+    _prepareScreenForScreenshot({ mode, whiteOutside: true });
   });
 
   if (csvBtn) csvBtn.addEventListener('click', async () => {

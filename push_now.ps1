@@ -1155,6 +1155,113 @@ PNG export — back to bare-metal screenshot
   Removed code: ~80 lines.
 - The user's view is restored after capture
   via setView(savedCenter, savedZoom).
+
+Iteration round 5 — root-cause fixes
+====================================
+
+Ward profile — IMD score now displays
+-------------------------------------
+- Bug: imd_score_ward field is null in every
+  ward. The actual ward-level pop-weighted IMD
+  score lives in `imd_score` on each ward
+  indicator block (e.g. Roundwood = 50.6682).
+  The OV_FIELD_ALIAS at index.html:1356 already
+  resolves imd_score_ward → imd_score for
+  overlay rendering, but the ward-report code
+  reads inds directly without going through the
+  alias.
+- Fix: changed _fmt(inds.imd_score_ward) →
+  _fmt(inds.imd_score), and the same swap for
+  _wardVals('imd_score_ward') → _wardVals(
+  'imd_score') and _pctile('imd_score_ward', …)
+  → _pctile('imd_score', …). IMD score badge,
+  KPI strip, IMD rank-in-NWL line, and percentile
+  micro-bar all populate now.
+
+Ward profile — spatial counts now work
+--------------------------------------
+- Bug: dental, hospital, ESOL, VCSE, greenspace
+  counts were all dashes. Root cause: the
+  spatial test relied on pointInWardLayer
+  (defined at index.html:1831), which falls
+  back to `roughPointInBounds` when leafletPip
+  isn't loaded — and either it isn't, or wLyr
+  isn't ready when the report popup runs.
+- Fix: replaced the pointInWardLayer dependency
+  with a small inline ray-casting point-in-
+  polygon (`_inWard`) that reads the ward's
+  geometry directly from GJ.features matched by
+  WD24CD = wcode. Stable algorithm (Sunday's
+  even-odd test), no Leaflet/leafletPip
+  dependency, works whether wLyr is ready or
+  not.
+- Tested mentally against the report flow —
+  HOSP (lat/lng on each record), dentalData
+  (lat/lng on push), vcseData (lat/lng on push),
+  esolData (lat/lng spread from JSON), and
+  GRN (lat/lng on each record) all have the
+  required coords, so _matchSpatial now returns
+  real counts and _bySpatial returns real
+  records for the locations grid.
+
+PNG export — options dialog (Current/NWL/Borough)
+-------------------------------------------------
+- Replaced single-action PNG button with a
+  picker dialog: "Current view" (recommended),
+  "Entire NW London", "Focused borough" (only
+  when a borough is focused). Each option is
+  documented in the dialog so users see
+  upfront what they'll get.
+- "Current view" mode skips fitBounds entirely
+  — pure html2canvas of the visible map after
+  letting the user pan/zoom how they like.
+  Eliminates every projection-state bug we've
+  been chasing because there's no map move
+  between view-on-screen and capture.
+- Optional checkbox in the dialog: "Paint
+  everything outside NW London white". When
+  on, an L.polygon overlay with outer world
+  ring + inner borough rings is added BEFORE
+  capture. Leaflet renders this polygon at the
+  same projection state as the basemap, so
+  the white area always lines up with the
+  borough boundaries — no more top-left
+  alignment bug.
+- Removed the post-capture Canvas-2D mask /
+  bbox-crop / fitBounds-pad-stack — all of
+  that complexity was the source of the
+  alignment bugs. The export pipeline is now
+  optional fitBounds → optional white overlay
+  → html2canvas → toBlob → save. No more
+  cleverness.
+
+CSV export — options dialog (overlay/layers/both)
+-------------------------------------------------
+- Replaced the auto-export-everything CSV
+  button with a picker:
+    Overlay data only — ward/LSOA choropleth
+       values for the active overlay (1 file).
+    Visible point layers only — 1 CSV per
+       toggled-on point layer, scoped to the
+       current borough focus.
+    Everything visible — both of the above.
+- Reuses the existing _downloadOverlayCsv()
+  and _downloadPointLayersCsv() functions; the
+  dialog just decides which one(s) to call.
+
+Export dialog — shared modal helper
+-----------------------------------
+- New _exportDialog(title, options, extras)
+  helper renders a centered modal with a list
+  of card-style option buttons and an optional
+  extras block (used for the white-outside
+  checkbox in PNG mode). Background click +
+  Cancel button + Escape both close it. Pure
+  inline-styled DOM, no CSS dependency.
+- Promise-based API: returns {key, flags} on
+  selection, null on cancel. Same helper used
+  for both PNG and CSV pickers, can be reused
+  for future export modes.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

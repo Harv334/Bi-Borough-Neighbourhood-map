@@ -2830,30 +2830,45 @@ window.generateWardReport = function(wn) {
   }
 
   // ── Service counts inside the ward ──────────────────────────────────────
-  // Strategy (in priority order):
-  //   1. Use ward-level indicator if available (gp_practice_count, pharmacy_count)
-  //      because that's the authoritative figure from ward_data.json.
-  //   2. Use ward_code attribute on the JSON record if present (schools / CC /
-  //      libraries — exact match, no spatial test needed).
-  //   3. Fall back to spatial test against the ward polygon (hospitals, dental,
-  //      VCSE, ESOL, greenspace).
-  // The previous version of this block silently returned 0 when wLyr was null
-  // or layers hadn't loaded yet — leaving every count as a dash. The new
-  // version always returns a number when the underlying data is loaded.
+  // Inline ray-casting point-in-polygon against the ward's GJ feature.
+  // Bypasses pointInWardLayer (which depends on leafletPip + a live wLyr
+  // and was silently returning 0 in many states). Reads geometry from
+  // GJ.features matched by WD24CD = wcode. Coords in GeoJSON are [lng,lat].
   const wcode = (wdata && wdata.code) || '';
+  const _wardGeom = (() => {
+    if (!wcode || typeof GJ === 'undefined' || !GJ.features) return null;
+    const f = GJ.features.find(x => x.properties && x.properties.WD24CD === wcode);
+    return f ? f.geometry : null;
+  })();
+  function _ringContains(ring, lat, lng) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = ring[i][0], yi = ring[i][1];
+      const xj = ring[j][0], yj = ring[j][1];
+      const intersect = ((yi > lat) !== (yj > lat)) &&
+        (lng < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-12) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+  function _inWard(lat, lng) {
+    if (lat == null || lng == null || !_wardGeom) return false;
+    if (_wardGeom.type === 'Polygon') return _ringContains(_wardGeom.coordinates[0], lat, lng);
+    if (_wardGeom.type === 'MultiPolygon') return _wardGeom.coordinates.some(poly => _ringContains(poly[0], lat, lng));
+    return false;
+  }
+
   const _matchByWardCode = (arr) => {
     if (!Array.isArray(arr) || !wcode) return null;
     return arr.filter(d => d && d.ward_code === wcode).length;
   };
   const _matchSpatial = (arr) => {
-    if (!Array.isArray(arr) || typeof pointInWardLayer !== 'function') return 0;
+    if (!Array.isArray(arr)) return 0;
     let n = 0;
     arr.forEach(d => {
-      try {
-        const lat = d.lat != null ? d.lat : (d.marker && d.marker.getLatLng().lat);
-        const lng = d.lng != null ? d.lng : (d.marker && d.marker.getLatLng().lng);
-        if (lat != null && lng != null && pointInWardLayer(lat, lng, wn)) n++;
-      } catch(e) {}
+      const lat = d.lat != null ? d.lat : (d.marker && (() => { try { return d.marker.getLatLng().lat; } catch(e) { return null; } })());
+      const lng = d.lng != null ? d.lng : (d.marker && (() => { try { return d.marker.getLatLng().lng; } catch(e) { return null; } })());
+      if (_inWard(lat, lng)) n++;
     });
     return n;
   };
@@ -2861,41 +2876,28 @@ window.generateWardReport = function(wn) {
   // GP & pharmacy: prefer the ward indicator (authoritative)
   let gpN     = (inds.gp_practice_count && parseInt(inds.gp_practice_count)) || 0;
   let pharmN  = (inds.pharmacy_count    && parseInt(inds.pharmacy_count))    || 0;
-  // If pharmacy_count indicator missing, fall back to spatial
-  if (!pharmN) pharmN = _matchSpatial(pharmData);
-  // Hospitals — spatial only (not in ward_data.json indicators)
+  if (!pharmN) pharmN = _matchSpatial(typeof pharmData !== 'undefined' ? pharmData : []);
   let hospN  = _matchSpatial(typeof HOSP !== 'undefined' ? HOSP : []);
-  // Dental — spatial
   let dentN  = _matchSpatial(typeof dentalData !== 'undefined' ? dentalData : []);
-  // VCSE — spatial
   let vcseN  = _matchSpatial(typeof vcseData !== 'undefined' ? vcseData : []);
-  // Greenspace — spatial (uses GRN array if loaded)
   let grnN   = _matchSpatial(typeof GRN !== 'undefined' ? GRN : []);
-  // Schools / CC / Libraries — match by ward_code (exact, attached during build).
-  // Falls back to spatial test if ward_code is missing or arrays not loaded.
   let schN   = _matchByWardCode(typeof schoolsData !== 'undefined' ? schoolsData : []);
   if (schN == null) schN = _matchSpatial(typeof schoolsData !== 'undefined' ? schoolsData : []);
   let ccN    = _matchByWardCode(typeof ccData !== 'undefined' ? ccData : []);
   if (ccN == null) ccN = _matchSpatial(typeof ccData !== 'undefined' ? ccData : []);
   let libN   = _matchByWardCode(typeof libData !== 'undefined' ? libData : []);
   if (libN == null) libN = _matchSpatial(typeof libData !== 'undefined' ? libData : []);
-  // ESOL — no ward_code in source CSV, spatial only
   let esolN  = _matchSpatial(typeof esolData !== 'undefined' ? esolData : []);
 
-  // ── Build comprehensive physical-locations lists for the in-ward content.
-  // These power the "Physical locations in this ward" section at the bottom.
-  // For schools / CC / libraries we use ward_code (exact attribution from
-  // source CSVs); for everything else spatial point-in-polygon.
+  // Lists for the comprehensive "Physical locations in this ward" section.
   const _byWardCode = (arr) => Array.isArray(arr) && wcode
     ? arr.filter(d => d && d.ward_code === wcode) : [];
   const _bySpatial = (arr) => {
-    if (!Array.isArray(arr) || typeof pointInWardLayer !== 'function') return [];
+    if (!Array.isArray(arr)) return [];
     return arr.filter(d => {
-      try {
-        const lat = d.lat != null ? d.lat : (d.marker && d.marker.getLatLng().lat);
-        const lng = d.lng != null ? d.lng : (d.marker && d.marker.getLatLng().lng);
-        return lat != null && lng != null && pointInWardLayer(lat, lng, wn);
-      } catch(e) { return false; }
+      const lat = d.lat != null ? d.lat : (d.marker && (() => { try { return d.marker.getLatLng().lat; } catch(e) { return null; } })());
+      const lng = d.lng != null ? d.lng : (d.marker && (() => { try { return d.marker.getLatLng().lng; } catch(e) { return null; } })());
+      return _inWard(lat, lng);
     });
   };
   const _schools  = _byWardCode(typeof schoolsData !== 'undefined' ? schoolsData : []);
@@ -2916,8 +2918,12 @@ window.generateWardReport = function(wn) {
   const unempPct = _fmt(inds.census_unemployed_pct);
   const c20L     = _fmt(inds.core20_lsoa_count);
   const totL     = _fmt(inds.total_lsoa_count);
-  const imdW     = _fmt(inds.imd_score_ward);
-  const imdMedian = _median(_wardVals('imd_score_ward'));
+  // Ward-level pop-weighted IMD score lives in `imd_score` on each ward
+  // indicator block (the legacy `imd_score_ward` field is null). The
+  // OV_FIELD_ALIAS map at line ~1356 already resolves imd_score_ward to
+  // imd_score for overlay rendering; report reads it directly.
+  const imdW     = _fmt(inds.imd_score);
+  const imdMedian = _median(_wardVals('imd_score'));
 
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
   const borough = (wdata && wdata.lad) || '';
@@ -3129,16 +3135,16 @@ window.generateWardReport = function(wn) {
   // Build IMD composite KPI with rank-in-NWL context
   const imdRank = (() => {
     if (imdW == null) return null;
-    const ws = _wardVals('imd_score_ward').sort((a,b) => b - a); // highest first
+    const ws = _wardVals('imd_score').sort((a,b) => b - a); // highest first
     const r = ws.findIndex(v => v <= imdW) + 1;
     return r > 0 ? r : null;
   })();
-  const totalWards = _wardVals('imd_score_ward').length;
+  const totalWards = _wardVals('imd_score').length;
   const goodHpct  = _pctile('census_good_health_pct', goodHlt);
   const badHpct   = _pctile('census_bad_health_pct',  badHlt);
   const disAnyPct = _pctile('census_disability_any_pct', disAny);
   const unempPctR = _pctile('census_unemployed_pct',  unempPct);
-  const imdPct    = _pctile('imd_score_ward', imdW);
+  const imdPct    = _pctile('imd_score', imdW);
 
   const html = `<!doctype html>
 <html lang="en"><head>
@@ -5138,7 +5144,15 @@ function _stampCaption(canvas, caption) {
   ctx.restore();
 }
 
-async function _downloadMapPng() {
+// PNG download with caller-supplied options.
+//   opts.mode = 'wysiwyg' (capture exactly what's on screen now, no fitBounds)
+//             | 'nwl'      (fit to all NWL boroughs, then capture)
+//             | 'borough'  (fit to focused borough — uses focusedBorough state)
+//   opts.whiteOutside = true → paint solid white over everything outside the
+//                              scope polygon (uses Leaflet polygon overlay so
+//                              projection stays aligned with the basemap)
+async function _downloadMapPng(opts) {
+  opts = opts || { mode: 'wysiwyg', whiteOutside: false };
   const btn = document.getElementById('tb-png');
   const mapEl = document.getElementById('map');
   if (!mapEl || typeof html2canvas !== 'function' || typeof map === 'undefined') {
@@ -5190,28 +5204,73 @@ async function _downloadMapPng() {
     if (dlBadge) dlBadge.style.visibility = 'hidden';
     ctrlCorners.forEach(el => { el.style.visibility = 'hidden'; });
 
-    // Step 1: fit the map to the scope — all NWL boroughs, or just the
-    // focused borough if borough-focus is active. This IS a map move,
-    // unlike the previous WYSIWYG approach, because the user explicitly
-    // asked for an NWL-only download regardless of where they've panned.
-    // View is restored in finally.
-    const scopeBounds = _pngScopeBounds();
-    if (scopeBounds) {
-      await new Promise(resolve => {
-        let done = false;
-        const finish = () => { if (!done) { done = true; resolve(); } };
-        try { map.once('moveend', finish); } catch (e) { /* no-op */ }
-        try {
-          // Generous padding so no part of the scope polygon is touching the
-          // edge of the canvas — that's what was producing the "cut off" look
-          // on the eastern boroughs (Westminster/K&C/H&F).
-          map.fitBounds(scopeBounds, { padding: [60, 60], animate: false });
-          movedMap = true;
-        } catch (e) { finish(); return; }
-        setTimeout(finish, 500);
-      });
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-      await new Promise(r => setTimeout(r, 160));
+    // Step 1: optionally fit the map to a scope (NWL or focused borough).
+    // 'wysiwyg' mode skips this entirely — the user keeps whatever pan/zoom
+    // they have on screen.
+    let scopeBounds = null;
+    if (opts.mode === 'nwl' || opts.mode === 'borough') {
+      // _pngScopeBounds reads focusedBorough state. For 'nwl' explicitly we
+      // want all 8 boroughs regardless of focus state — we override.
+      const savedFocus = (typeof focusedBorough !== 'undefined') ? focusedBorough : 'all';
+      try {
+        if (opts.mode === 'nwl') focusedBorough = 'all';
+        scopeBounds = _pngScopeBounds();
+      } finally {
+        if (opts.mode === 'nwl') focusedBorough = savedFocus;
+      }
+      if (scopeBounds) {
+        await new Promise(resolve => {
+          let done = false;
+          const finish = () => { if (!done) { done = true; resolve(); } };
+          try { map.once('moveend', finish); } catch (e) { /* no-op */ }
+          try {
+            map.fitBounds(scopeBounds, { padding: [40, 40], animate: false });
+            movedMap = true;
+          } catch (e) { finish(); return; }
+          setTimeout(finish, 500);
+        });
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        await new Promise(r => setTimeout(r, 160));
+      }
+    }
+
+    // Step 1b: optionally add a Leaflet polygon overlay that paints solid
+    // white over everything outside the scope polygon. Using a Leaflet
+    // polygon (not an SVG sibling) means Leaflet handles the projection —
+    // the white area always lines up with the basemap because Leaflet
+    // renders both at the same zoom/center.
+    var whiteOverlay = null;
+    if (opts.whiteOutside) {
+      try {
+        const feats = _pngScopeFeatures();
+        if (feats && feats.length) {
+          // Outer ring covers a wide bbox (UK + buffer); inner rings are
+          // borough polygons. Leaflet's L.Polygon with multiple rings
+          // does even-odd fill automatically.
+          const outerRing = [[51.0, -2.0], [51.0, 2.0], [53.0, 2.0], [53.0, -2.0]];
+          const allRings = [outerRing];
+          feats.forEach(f => {
+            const g = f && f.geometry; if (!g) return;
+            const pushRing = ring => {
+              // Leaflet expects [lat, lng]; GeoJSON is [lng, lat].
+              allRings.push(ring.map(c => [c[1], c[0]]));
+            };
+            if (g.type === 'Polygon') g.coordinates.forEach(pushRing);
+            else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(pushRing));
+          });
+          whiteOverlay = L.polygon(allRings, {
+            color: '#ffffff',
+            fillColor: '#ffffff',
+            fillOpacity: 1.0,
+            weight: 0,
+            interactive: false,
+            fillRule: 'evenodd',
+          }).addTo(map);
+          whiteOverlay.bringToFront();
+        }
+      } catch (e) {
+        console.warn('white-outside overlay failed:', e);
+      }
     }
 
     // Wait for tiles to load at the new view.
@@ -5262,8 +5321,8 @@ async function _downloadMapPng() {
     console.error('PNG export error', e);
     alert('PNG export failed — some basemap tiles may be blocked by CORS. Try again after the tiles finish loading.');
   } finally {
-    // Mask is now painted onto the output canvas post-capture, so there's
-    // no SVG element in the DOM to clean up here.
+    // Remove the white-outside overlay if it was added.
+    try { if (typeof whiteOverlay !== 'undefined' && whiteOverlay) map.removeLayer(whiteOverlay); } catch(e) {}
     if (dlBadge) dlBadge.style.visibility = dlPrevVis;
     ctrlCorners.forEach((el, i) => { el.style.visibility = ctrlPrevVis[i] || ''; });
     // Restore the user's view — we fitted to the scope for capture.
@@ -5467,14 +5526,83 @@ function _downloadPointLayersCsv() {
   return total;
 }
 
+// ── Export dialog modal ─────────────────────────────────────────────────
+// Tiny modal helper: takes a title + array of options + fires the chosen
+// option's onClick. Used for both PNG and CSV export pickers.
+function _exportDialog(title, options, extras) {
+  return new Promise(resolve => {
+    const back = document.createElement('div');
+    back.style.cssText = 'position:fixed;inset:0;background:rgba(20,20,20,.45);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif';
+    const modal = document.createElement('div');
+    modal.style.cssText = 'background:#fff;border-radius:8px;box-shadow:0 12px 36px rgba(0,0,0,.25);padding:18px 20px;min-width:340px;max-width:480px';
+    modal.innerHTML = `
+      <div style="font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:4px">${title}</div>
+      <div style="font-size:12px;color:#666;margin-bottom:14px">Pick what you want in the file.</div>
+      <div class="ed-options"></div>
+      ${extras ? `<div style="margin-top:12px;padding-top:10px;border-top:1px solid #eee">${extras}</div>` : ''}
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+        <button class="ed-cancel" style="padding:7px 14px;border:1px solid #ddd;background:#fff;border-radius:5px;font-size:12px;cursor:pointer;color:#555">Cancel</button>
+      </div>`;
+    const optWrap = modal.querySelector('.ed-options');
+    options.forEach((o, i) => {
+      const b = document.createElement('button');
+      b.style.cssText = 'display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;border:1px solid #e0e0e0;background:#fafaf7;border-radius:6px;font-size:13px;cursor:pointer;color:#1a1a1a';
+      b.innerHTML = `<div style="font-weight:600">${o.label}</div>${o.desc ? `<div style="font-size:11px;color:#666;margin-top:2px">${o.desc}</div>` : ''}`;
+      b.addEventListener('mouseenter', () => b.style.background = '#f0efea');
+      b.addEventListener('mouseleave', () => b.style.background = '#fafaf7');
+      b.addEventListener('click', () => {
+        // Collect any extras (checkboxes etc.)
+        const flags = {};
+        modal.querySelectorAll('input[type="checkbox"]').forEach(cb => { flags[cb.name || cb.id] = cb.checked; });
+        document.body.removeChild(back);
+        resolve({ key: o.key, flags });
+      });
+      optWrap.appendChild(b);
+    });
+    modal.querySelector('.ed-cancel').addEventListener('click', () => {
+      document.body.removeChild(back);
+      resolve(null);
+    });
+    back.appendChild(modal);
+    back.addEventListener('click', e => { if (e.target === back) { document.body.removeChild(back); resolve(null); } });
+    document.body.appendChild(back);
+  });
+}
+
 (function _wireExportButtons() {
   const pngBtn = document.getElementById('tb-png');
   const csvBtn = document.getElementById('tb-csv');
-  if (pngBtn) pngBtn.addEventListener('click', _downloadMapPng);
-  if (csvBtn) csvBtn.addEventListener('click', () => {
-    _downloadOverlayCsv();
-    // Also export every visible point layer as its own CSV.
-    try { _downloadPointLayersCsv(); } catch(e) { console.warn('point-layer CSV export failed', e); }
+
+  if (pngBtn) pngBtn.addEventListener('click', async () => {
+    const focused = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all') ? focusedBorough : null;
+    const opts = [
+      { key: 'wysiwyg', label: 'Current view (recommended)',
+        desc: 'Capture exactly what is on screen now. Pan/zoom first, then choose this. No re-framing, no projection issues.' },
+      { key: 'nwl', label: 'Entire NW London',
+        desc: 'Re-frame the map to fit all 8 NWL boroughs, then capture.' },
+    ];
+    if (focused) opts.push({ key: 'borough', label: `Focused borough (${focused})`,
+      desc: 'Re-frame to the currently focused borough only.' });
+    const extras = '<label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#444;cursor:pointer"><input type="checkbox" id="png-white-outside"> Paint everything outside NW London white</label>';
+    const choice = await _exportDialog('Download map as PNG', opts, extras);
+    if (!choice) return;
+    _downloadMapPng({ mode: choice.key, whiteOutside: !!choice.flags['png-white-outside'] });
+  });
+
+  if (csvBtn) csvBtn.addEventListener('click', async () => {
+    const choice = await _exportDialog('Download data as CSV', [
+      { key: 'overlay', label: 'Overlay data only',
+        desc: 'Ward or LSOA values for the currently-active overlay (e.g. fuel poverty, IMD score). One CSV.' },
+      { key: 'layers', label: 'Visible point layers only',
+        desc: 'One CSV per toggled-on point layer (VCSE, GP, schools, dental, etc.) scoped to the current borough focus.' },
+      { key: 'both', label: 'Everything visible',
+        desc: 'Overlay CSV plus one CSV per visible point layer.' },
+    ]);
+    if (!choice) return;
+    if (choice.key === 'overlay' || choice.key === 'both') _downloadOverlayCsv();
+    if (choice.key === 'layers'  || choice.key === 'both') {
+      try { _downloadPointLayersCsv(); } catch(e) { console.warn('point-layer CSV export failed', e); }
+    }
   });
 })();
 

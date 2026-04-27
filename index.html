@@ -1119,7 +1119,7 @@ const CATS = [
     { k: "cst_number_of_faith_centres",                                   l: "Faith centres",                                 g: "ward" },
     { k: "cst_passive_green_space",                                       l: "Passive green space (proportion)",              g: "ward" },
     { k: "cst_gentrification_change_in_occupational_classes",             l: "Gentrification — change in occupational classes", g: "ward" },
-  ]},,
+  ]},
   { key: "health_fingertips", label: "Health & wellbeing (Fingertips, MSOA \u2192 ward)", ico: "⚕", fields: [
     { k: "ft_93280", l: "Fuel poverty (low income, low energy efficiency methodology)", g: "ward" },
     { k: "ft_93097", l: "Unemployment: people claiming out of work benefit (aged 16 to 64)", g: "ward" },
@@ -1760,8 +1760,9 @@ function fmtNum(v, decimals=0) {
 function ovLabel(k) {
   if (!k || k === 'none') return '';
   for (const cat of CATS) {
+    if (!cat) continue;  // guard against undefined entries from a malformed CATS literal
     for (const f of (cat.fields || [])) {
-      if (f.k === k) return f.l;
+      if (f && f.k === k) return f.l;
     }
   }
   return k;
@@ -7209,26 +7210,4 @@ loadData();
       }
     });
     function updateCount() {
-      if (typeof LSOA_IMD === "undefined" || !LSOA_IMD || !LSOA_IMD.features) {
-        setTimeout(updateCount, 500);
-        return;
-      }
-      const total = LSOA_IMD.features.length;
-      const c20 = LSOA_IMD.features.filter(f => {
-        const d = f.properties && f.properties.imd_decile;
-        return d === 1 || d === 2;
-      }).length;
-      const el = document.getElementById("core20-count");
-      if (el) el.textContent = c20 + " of " + total + " LSOAs in deciles 1-2";
-    }
-    updateCount();
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", wire);
-  } else {
-    wire();
-  }
-})();
-</script>
-</body>
-</html>
+      if (typeof LSOA_IMD === "undefined" || !

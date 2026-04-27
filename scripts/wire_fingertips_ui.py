@@ -142,6 +142,11 @@ def main():
         html = cats_close_re.sub(lambda m: new_cat_block + m.group(1), html, count=1)
         print(f"  CATS: appended new {CATS_KEY} category with {len(indicators)} fields")
 
+    # Defence: collapse any accidental `}, ,` (caused by re-running the append
+    # branch when the existing fingertips block can't be detected) — produces
+    # an undefined entry inside CATS that crashes ovLabel on every hover.
+    html = re.sub(r'\}\s*,\s*,', '},', html)
+
     # ── 2. OV_CFG entries (the choropleth domain config — file calls it OV_CFG, not OV_DOMAIN) ──
     dom_re = re.compile(r'(const OV_CFG\s*=\s*\{)([\s\S]*?)(\n\};\s*\n)', flags=re.MULTILINE)
     m_dom = dom_re.search(html)

@@ -14,7 +14,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue .git\HEAD.lock
 # mis-parsed as flags).
 $msgPath = Join-Path $env:TEMP "nwl_commit_msg.txt"
 $msg = @'
-data(crime,civic,esol,ui): MPS crime + civic strength + GLA ESOL planning layers + UI
+data+ui(crime,civic,esol,profile): MPS crime + civic + ESOL + ward A4 profile + PNG fix
 
 Adopts the official ONS LSOA (2021) -> Electoral Ward (May 2024)
 best-fit lookup as the authoritative LSOA->ward mapping, replacing
@@ -583,6 +583,134 @@ New scripts (ESOL planning)
 - scripts/build_esol_layers.py: kept as a thin stub
   that runpy-delegates to build_esol_v2.py for
   backwards compatibility.
+
+PNG export — fix blank interior (tile CORS)
+-------------------------------------------
+- Root cause: Leaflet's tile layer was created without
+  crossOrigin: 'anonymous'. Even though html2canvas
+  was invoked with useCORS:true, the underlying <img>
+  tags lacked CORS attribute, so the browser refused
+  to copy tile pixels onto the export canvas. Result:
+  the SVG mask rendered correctly (perfect NWL shape)
+  but the interior was solid white because tiles were
+  unreadable.
+- Fix: switched the basemap from raw OSM tiles
+  (https://{s}.tile.openstreetmap.org/...) to CARTO
+  Voyager (https://{s}.basemaps.cartocdn.com/voyager/
+  ...) with crossOrigin:'anonymous' and subdomains
+  a..d. CARTO sends Access-Control-Allow-Origin: *
+  on tile responses, so html2canvas can now copy the
+  tile pixels into the export.
+- Side benefit: Voyager has lighter, less visually
+  noisy cartography than OSM-mapnik — better behind
+  choropleth fills and cleaner as a slide background.
+- Side benefit: OSM's tile usage policy explicitly
+  forbids using their main tile servers for app
+  rendering at any volume; CARTO is intended for
+  embedding.
+
+Ward profile — redesigned as A4 at-a-glance page
+-------------------------------------------------
+- Replaced the table-heavy ward report with a single
+  print-ready A4 page (210x297mm @ 96dpi → 794x1123
+  px). All charts inline SVG — no external chart
+  library, single-file principle preserved.
+- Layout (top to bottom):
+    HERO — kicker, ward name, borough, population,
+      IMD rank-in-NWL, neighbourhood pill, Core20
+      badge, IMD-score badge, mini-map (240x140 px,
+      ward in colour, borough context grey, pharmacy
+      dots).
+    KPI STRIP — 6 cards: Population, IMD score (with
+      NWL-percentile micro-bar, lower=better gradient),
+      Good health % (higher=better), Bad health %,
+      Disability %, Core20 LSOAs ratio. Each card has
+      a "you are here" coloured gradient bar showing
+      this ward's percentile within NWL.
+    SERVICES STRIP — 9 cards: GP, Pharmacy, Dental,
+      Hospital, Schools, Community centres, Libraries,
+      ESOL providers, VCSE orgs (counts inside ward
+      polygon via spatial test against marker layers).
+    DEMOGRAPHICS ROW — 3 panels: ethnicity stacked bar
+      (5 bands), age stacked bar (3 bands + 85+ note),
+      ward-vs-NWL-median compare bars (born outside UK,
+      no qualifications, level 4+ qual, higher
+      managerial, routine/semi-routine, no-people-
+      English households).
+    HEALTH & DEPRIVATION ROW — 2 panels: 7-axis IMD
+      domain radar (income, employment, education,
+      health, crime, barriers, environment) with NWL
+      ward-mean reference ring; ward-vs-NWL compare
+      bars for 8 health/economic indicators (good
+      health, bad health, disability any, disability
+      lot, unpaid care, fuel poverty, unemployed,
+      claimant rate). Domain values computed as the
+      mean over the ward's LSOA-level domain scores;
+      reference = mean across all NWL LSOAs.
+    CRIME — sorted horizontal bar of 11 MPS categories
+      (last 12 months, Apr 2025–Mar 2026) with a
+      dashed NWL-median tick on each row. Total
+      annotated in the panel header.
+    CIVIC STRENGTH + GREEN/BLUE — 2 panels: 7 CST
+      indicators normalised to NWL percentile (0..100,
+      higher = stronger), and 6 green/blue space
+      access indicators (mean of ward LSOAs).
+    PAGE 2 (print) — GP practices named list +
+      pharmacies named list (page-break-before).
+    FOOTER — full source attribution.
+- New chart helpers (all inline SVG, all factored as
+  closures inside generateWardReport):
+    _chartHbar(rows, opts)     — horizontal bar +
+                                 optional NWL-median
+                                 reference tick.
+    _chartCompare(rows, opts)  — ward-vs-reference
+                                 bars; bar colours red
+                                 when worse, green
+                                 when better, given
+                                 each row's polarity
+                                 ('wh' flag).
+    _chartRadar(axes, opts)    — N-axis radar/spider;
+                                 4-ring grid, optional
+                                 dashed NWL reference
+                                 ring, polygon fill +
+                                 dots for ward values.
+    _chartStack(parts, opts)   — stacked horizontal
+                                 bar with inline %
+                                 labels and a 2-line
+                                 legend underneath.
+- New stat helpers:
+    _wardVals(k)  — collect all NWL ward values for
+                    indicator k.
+    _median(vs)   — sample median.
+    _max(vs)      — max.
+    _pctile(k, v) — % of NWL wards below v on k.
+    _wardLSOADomains(wcode)   — mean of LSOA-level
+                                IMD domains for the
+                                ward's LSOAs.
+    _nwlLSOADomainMeans()     — NWL-wide LSOA-level
+                                domain means (radar
+                                reference ring).
+    _domainMax(k)             — max observed across
+                                ALL NWL LSOAs for k
+                                (radar normaliser).
+    _wardLsoaMean(field)      — mean of LSOA values
+                                for the selected
+                                ward (used for green/
+                                blue space at ward
+                                level).
+- Service counts in the strip use the existing
+  pointInWardLayer() spatial test plus pre-cached
+  _lad attributes where present. The four GLA ESOL
+  layers (schools, community centres, libraries,
+  formal ESOL providers) are now also counted.
+- Print styles use @page A4 portrait + 12mm margin,
+  page-break-inside:avoid on every panel/row, and
+  page-break-before:always on the GP/pharmacy lists
+  so the at-a-glance view fits on one page and the
+  detail lists overflow to page 2.
+- LSOA report (generateLSOAReport) is unchanged for
+  now — same redesign approach can be applied in a
+  follow-up commit.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

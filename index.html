@@ -1508,9 +1508,15 @@ const BOROUGH_GJ = {"type":"FeatureCollection","features":[{"type":"Feature","pr
 // ═══════════════════════════════════════════════════════════════════════════
 // Start zoomed out at NW London ward level — fitBounds on wLyr refines once wards load.
 const map = L.map('map', { center:[51.540,-0.300], zoom:10, zoomControl:true });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  maxZoom: 19
+// CartoDB Voyager basemap — CORS-enabled, lighter cartography (better behind
+// choropleth fills + as a slide background) and OSM-policy compliant.
+// crossOrigin:'anonymous' is REQUIRED so html2canvas can read tile pixels
+// during PNG export — without it the export produces a blank interior.
+L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd',
+  maxZoom: 20,
+  crossOrigin: 'anonymous',
+  attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors · © <a href="https://carto.com/attributions">CARTO</a>'
 }).addTo(map);
 
 // Static layers
@@ -2617,6 +2623,11 @@ window.deselectLSOA = function() {
 // ═══════════════════════════════════════════════════════════════════════════
 // WARD REPORT — opens a standalone, printable HTML report in a new window
 // ═══════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────
+// Ward report — A4 at-a-glance profile (single printable page).
+// All charts inline SVG (no external libraries) so the popup remains
+// fully self-contained.
+// ─────────────────────────────────────────────────────────────────────────
 window.generateWardReport = function(wn) {
   const n = norm(wn);
   const wdata = Object.values(WARD_DATA).find(w => norm(w.name) === n) ||
@@ -2626,44 +2637,411 @@ window.generateWardReport = function(wn) {
   const nk = wdata && wdata.neighbourhood;
   const nb = nk ? NEIGHBOURHOODS[nk] : null;
 
+  // ── Helpers: NWL-wide reference stats so the report can frame this ward
+  //     against its peers (median, percentile). All wards live in WARD_DATA.
+  const _ALL_WARDS = Object.values(WARD_DATA);
+  const _wardVals = (k) => _ALL_WARDS
+    .map(w => parseFloat((w.indicators || {})[k]))
+    .filter(v => !isNaN(v));
+  const _median = (vals) => {
+    if (!vals || !vals.length) return null;
+    const s = [...vals].sort((a,b) => a - b);
+    const m = Math.floor(s.length / 2);
+    return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
+  };
+  const _max = (vals) => (vals && vals.length ? vals.reduce((a,b) => a > b ? a : b) : null);
+  const _pctile = (k, v) => {
+    if (v == null || isNaN(v)) return null;
+    const vals = _wardVals(k);
+    if (!vals.length) return null;
+    const below = vals.filter(x => x < v).length;
+    return Math.round(100 * below / vals.length);
+  };
+  const _esc = s => (s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'));
+  const _fmt = v => (v == null || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
+  const _fmtN = (v, dp) => (v == null ? '—' : v.toLocaleString(undefined, {maximumFractionDigits: dp == null ? 1 : dp}));
+
+  // ── Inline-SVG chart primitives ────────────────────────────────────────
+  // Horizontal bar chart with optional reference tick (NWL median).
+  // rows: [{ l: label, v: value, ref?: median, c?: bar-colour, sub?: trailing text }]
+  // opts: { width, rowH, padL, max, unit, dp, refLabel }
+  function _chartHbar(rows, opts) {
+    opts = opts || {};
+    const W = opts.width || 360;
+    const rowH = opts.rowH || 18;
+    const padL = opts.padL || 130;
+    const padR = opts.padR || 56;
+    const padT = opts.padT || 6;
+    const dp   = opts.dp == null ? 1 : opts.dp;
+    const u    = opts.unit || '';
+    const data = (rows || []).map(r => ({...r, v: r.v == null ? null : parseFloat(r.v)}));
+    const dmax = opts.max != null ? opts.max :
+                 Math.max(0.0001, ...data.map(r => Math.max(r.v || 0, r.ref || 0)));
+    const H = padT + data.length * rowH + 8;
+    const barW = W - padL - padR;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ch-hbar">`;
+    data.forEach((r, i) => {
+      const y = padT + i * rowH + rowH/2;
+      const v = r.v == null ? 0 : Math.max(0, r.v);
+      const w = (v / dmax) * barW;
+      const c = r.c || '#3b6eaf';
+      svg += `<text x="${padL - 8}" y="${y + 3.5}" text-anchor="end" font-size="10" fill="#444">${_esc(r.l)}</text>`;
+      svg += `<rect x="${padL}" y="${y - 6}" width="${barW}" height="11" fill="#f1f1ec" rx="2"/>`;
+      if (r.v != null) {
+        svg += `<rect x="${padL}" y="${y - 6}" width="${w}" height="11" fill="${c}" rx="2"/>`;
+        const valTxt = _fmtN(r.v, dp) + (u ? ' ' + u : '');
+        svg += `<text x="${padL + Math.max(w, 6) + 4}" y="${y + 3.5}" font-size="10" fill="#333" font-variant-numeric="tabular-nums">${valTxt}</text>`;
+      } else {
+        svg += `<text x="${padL + 4}" y="${y + 3.5}" font-size="10" fill="#bbb">no data</text>`;
+      }
+      // NWL median reference tick
+      if (r.ref != null && !isNaN(r.ref)) {
+        const rx = padL + (Math.max(0, r.ref) / dmax) * barW;
+        svg += `<line x1="${rx}" y1="${y - 8}" x2="${rx}" y2="${y + 7}" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="2,1.5"/>`;
+      }
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // Side-by-side compare bar (ward vs NWL median) — single label.
+  function _chartCompare(rows, opts) {
+    opts = opts || {};
+    const W = opts.width || 360;
+    const rowH = 22;
+    const padL = opts.padL || 150;
+    const padR = 60;
+    const dp   = opts.dp == null ? 1 : opts.dp;
+    const u    = opts.unit || '%';
+    const data = (rows || []).map(r => ({...r, v: r.v == null ? null : parseFloat(r.v), ref: r.ref == null ? null : parseFloat(r.ref)}));
+    const dmax = Math.max(0.0001, ...data.map(r => Math.max(r.v || 0, r.ref || 0)) , opts.minMax || 1);
+    const H = 6 + data.length * rowH + 12;
+    const barW = W - padL - padR;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ch-compare">`;
+    data.forEach((r, i) => {
+      const y = 6 + i * rowH + rowH/2;
+      const wv = r.v != null ? (Math.max(0, r.v) / dmax) * barW : 0;
+      const wr = r.ref != null ? (Math.max(0, r.ref) / dmax) * barW : null;
+      const above = (r.v != null && r.ref != null) ? (r.v > r.ref) : null;
+      const isWh = !!r.wh;
+      // wh:true → higher = worse (red when above), lower = better
+      // wh:false → higher = better (green when above)
+      const c = above == null ? '#888'
+              : (isWh === above ? '#c9534a' : '#2c8a4a');
+      svg += `<text x="${padL - 8}" y="${y + 3.5}" text-anchor="end" font-size="10" fill="#444">${_esc(r.l)}</text>`;
+      svg += `<rect x="${padL}" y="${y - 6}" width="${barW}" height="11" fill="#f1f1ec" rx="2"/>`;
+      if (r.v != null) {
+        svg += `<rect x="${padL}" y="${y - 6}" width="${wv}" height="11" fill="${c}" rx="2"/>`;
+        svg += `<text x="${padL + Math.max(wv, 6) + 4}" y="${y + 3.5}" font-size="10" fill="#333" font-variant-numeric="tabular-nums">${_fmtN(r.v, dp)}${u}</text>`;
+      } else {
+        svg += `<text x="${padL + 4}" y="${y + 3.5}" font-size="10" fill="#bbb">no data</text>`;
+      }
+      if (wr != null) {
+        svg += `<line x1="${padL + wr}" y1="${y - 8}" x2="${padL + wr}" y2="${y + 7}" stroke="#1a1a1a" stroke-width="1.6"/>`;
+      }
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // Radar / spider chart for IMD domains. axes: [{l, v, max}] — value normalised to /max.
+  function _chartRadar(axes, opts) {
+    opts = opts || {};
+    const size = opts.size || 220;
+    const cx = size / 2, cy = size / 2 + 4;
+    const R  = size * 0.36;
+    const N  = axes.length;
+    const data = axes.map(a => ({...a, v: a.v == null ? null : parseFloat(a.v), max: parseFloat(a.max) || 1}));
+    const angle = i => -Math.PI/2 + (i / N) * 2 * Math.PI;
+    const pt = (i, frac) => {
+      const a = angle(i);
+      return [cx + Math.cos(a) * R * Math.max(0, Math.min(1, frac)),
+              cy + Math.sin(a) * R * Math.max(0, Math.min(1, frac))];
+    };
+    let svg = `<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" class="ch-radar">`;
+    // Concentric grid rings (4 rings = 25/50/75/100% of axis max)
+    [0.25, 0.5, 0.75, 1.0].forEach(frac => {
+      const pts = data.map((_, i) => pt(i, frac).join(',')).join(' ');
+      svg += `<polygon points="${pts}" fill="none" stroke="#e8e8e2" stroke-width="0.8"/>`;
+    });
+    // Spokes
+    data.forEach((_, i) => {
+      const [x, y] = pt(i, 1);
+      svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e8e8e2" stroke-width="0.8"/>`;
+    });
+    // NWL median ring (if refs present)
+    const hasRef = data.some(a => a.ref != null);
+    if (hasRef) {
+      const refPts = data.map((a, i) => pt(i, (a.ref || 0) / a.max).join(',')).join(' ');
+      svg += `<polygon points="${refPts}" fill="none" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="3,2"/>`;
+    }
+    // Data polygon
+    const dataPts = data.map((a, i) => pt(i, (a.v || 0) / a.max).join(',')).join(' ');
+    svg += `<polygon points="${dataPts}" fill="rgba(184,60,60,.30)" stroke="#b83c3c" stroke-width="1.5"/>`;
+    // Data dots
+    data.forEach((a, i) => {
+      if (a.v == null) return;
+      const [x, y] = pt(i, a.v / a.max);
+      svg += `<circle cx="${x}" cy="${y}" r="2.6" fill="#b83c3c" stroke="#fff" stroke-width="1"/>`;
+    });
+    // Axis labels — push outside the outermost ring
+    data.forEach((a, i) => {
+      const ang = angle(i);
+      const lx = cx + Math.cos(ang) * (R + 14);
+      const ly = cy + Math.sin(ang) * (R + 14) + 3;
+      const anchor = Math.cos(ang) > 0.2 ? 'start' : (Math.cos(ang) < -0.2 ? 'end' : 'middle');
+      svg += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="9.5" fill="#333">${_esc(a.l)}</text>`;
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // Stacked horizontal bar (e.g. ethnicity, age). parts: [{l, v, c}]
+  function _chartStack(parts, opts) {
+    opts = opts || {};
+    const W = opts.width || 360, H = 18;
+    const total = parts.reduce((a, b) => a + (parseFloat(b.v) || 0), 0) || 1;
+    let x = 0;
+    let svg = `<svg viewBox="0 0 ${W} ${H + 16}" xmlns="http://www.w3.org/2000/svg" class="ch-stack">`;
+    parts.forEach(p => {
+      const v = parseFloat(p.v) || 0;
+      const w = (v / total) * W;
+      svg += `<rect x="${x}" y="0" width="${w}" height="${H}" fill="${p.c}"/>`;
+      if (w > 28) {
+        svg += `<text x="${x + w/2}" y="${H/2 + 3.2}" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="600">${v.toFixed(0)}%</text>`;
+      }
+      x += w;
+    });
+    // Legend underneath
+    let lx = 0;
+    parts.forEach(p => {
+      const v = parseFloat(p.v);
+      const lblTxt = p.l + (isNaN(v) ? '' : ' ' + v.toFixed(0) + '%');
+      const lblW = lblTxt.length * 5.0 + 16;
+      svg += `<rect x="${lx}" y="${H + 5}" width="9" height="9" fill="${p.c}" rx="1"/>`;
+      svg += `<text x="${lx + 12}" y="${H + 13}" font-size="9" fill="#444">${_esc(lblTxt)}</text>`;
+      lx += lblW;
+    });
+    svg += `</svg>`;
+    return svg;
+  }
+
   // Count services inside this ward
   let gpN = 0, hospN = 0, pharmN = 0, grnN = 0, dentN = 0, vcseN = 0;
+  let schN = 0, ccN = 0, libN = 0, esolN = 0;
   if (typeof pointInWardLayer === 'function') {
     try { HOSP.forEach(d => { if (pointInWardLayer(d.lat, d.lng, wn)) hospN++; }); } catch(e){}
     try { GRN.forEach(d  => { if (pointInWardLayer(d.lat, d.lng, wn)) grnN++; }); } catch(e){}
     try { if (Array.isArray(pharmData)) pharmData.forEach(d => { if (pointInWardLayer(d.lat, d.lng, wn)) pharmN++; }); } catch(e){}
     try { if (Array.isArray(dentalData)) dentalData.forEach(d => { if (pointInWardLayer(d.lat, d.lng, wn)) dentN++; }); } catch(e){}
     try { if (Array.isArray(vcseData))   vcseData.forEach(d   => { if (pointInWardLayer(d.lat, d.lng, wn)) vcseN++; }); } catch(e){}
+    // ESOL planning datasets — markers carry no _lad pre-cache; fall back to spatial test.
+    try { if (Array.isArray(schoolsData)) schoolsData.forEach(d => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) schN++; }); } catch(e){}
+    try { if (Array.isArray(ccData))      ccData.forEach(d      => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) ccN++;  }); } catch(e){}
+    try { if (Array.isArray(libData))     libData.forEach(d     => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) libN++; }); } catch(e){}
+    try { if (Array.isArray(esolData))    esolData.forEach(d    => { const m = d.marker; if (m && pointInWardLayer(m.getLatLng().lat, m.getLatLng().lng, wn)) esolN++; }); } catch(e){}
   }
   gpN = (inds.gp_practice_count && parseInt(inds.gp_practice_count)) || 0;
 
-  // Headline stats (ward-level only)
-  const fmt = v => (v === null || v === undefined || v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
-  const popN     = fmt(inds.census_population);
-  const goodHlt  = fmt(inds.census_good_health_pct);
-  const badHlt   = fmt(inds.census_bad_health_pct);
-  const disAny   = fmt(inds.census_disability_any_pct);
-  const unempPct = fmt(inds.census_unemployed_pct);
-  const c20L     = fmt(inds.core20_lsoa_count);
-  const totL     = fmt(inds.total_lsoa_count);
+  // Headline stats (ward-level only) + NWL reference values for context
+  const popN     = _fmt(inds.census_population);
+  const goodHlt  = _fmt(inds.census_good_health_pct);
+  const badHlt   = _fmt(inds.census_bad_health_pct);
+  const disAny   = _fmt(inds.census_disability_any_pct);
+  const disLot   = _fmt(inds.census_disability_lot_pct);
+  const unempPct = _fmt(inds.census_unemployed_pct);
+  const c20L     = _fmt(inds.core20_lsoa_count);
+  const totL     = _fmt(inds.total_lsoa_count);
+  const imdW     = _fmt(inds.imd_score_ward);
+  const imdMedian = _median(_wardVals('imd_score_ward'));
 
-  // Build category rows from the canonical CATS config (same as sidebar)
-  const catRows = CATS.map(cat => {
-    const rows = cat.fields.map(f => {
-      const val = inds[f.k];
-      if (val === null || val === undefined || val === '') return '';
-      const isNum = !isNaN(parseFloat(val));
-      const display = isNum ? parseFloat(val).toLocaleString(undefined, {maximumFractionDigits:1}) : val;
-      return `<tr><td>${f.l} <span class="g g-${f.g}">${f.g}</span></td><td class="v">${display}</td></tr>`;
-    }).filter(Boolean).join('');
-    if (!rows) return '';
-    return `<section class="cat"><h3>${cat.ico} ${cat.label}</h3><table class="kv">${rows}</table></section>`;
-  }).join('');
-
-  const noData = !catRows;
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
   const borough = (wdata && wdata.lad) || '';
   const population = popN ? popN.toLocaleString() : '—';
+
+  // ── KPI helper: large stat card with optional NWL-percentile micro-bar ──
+  const _kpi = (lbl, val, sub, extra) => {
+    const dim = (val == null || val === '' || val === '—');
+    return `<div class="kpi">
+      <div class="kpi-lbl">${_esc(lbl)}</div>
+      <div class="kpi-val${dim ? ' dim' : ''}">${dim ? '—' : val}</div>
+      ${sub ? `<div class="kpi-sub">${_esc(sub)}</div>` : ''}
+      ${extra || ''}
+    </div>`;
+  };
+  // Build a tiny "you are here" bar showing where this ward sits in NWL
+  const _ctxBar = (pctile, polarity) => {
+    if (pctile == null) return '';
+    // polarity: 'lower-better' → green left, red right; 'higher-better' → reversed
+    const left = polarity === 'higher-better' ? '#c9534a' : '#2c8a4a';
+    const right = polarity === 'higher-better' ? '#2c8a4a' : '#c9534a';
+    return `<div class="kpi-ctx">
+      <div class="kpi-ctx-bar" style="background:linear-gradient(90deg,${left},#f0c14a,${right})">
+        <div class="kpi-ctx-tick" style="left:${pctile}%"></div>
+      </div>
+      <div class="kpi-ctx-cap">P${pctile} in NWL</div>
+    </div>`;
+  };
+
+  // ── Demographics: ethnicity + age stacked bars, plus ward-vs-NWL compare ──
+  const ethStack = _chartStack([
+    { l:'White', v: inds.census_white_pct,        c:'#5b8db8' },
+    { l:'Asian', v: inds.census_asian_pct,        c:'#d47a2c' },
+    { l:'Black', v: inds.census_black_pct,        c:'#6b4e71' },
+    { l:'Mixed', v: inds.census_mixed_pct,        c:'#8ca757' },
+    { l:'Other', v: inds.census_other_ethnic_pct, c:'#999' },
+  ], { width: 360 });
+  const ageStack = _chartStack([
+    { l:'<16',   v: inds.census_under16_pct,     c:'#2ea8a0' },
+    { l:'16–64', v: inds.census_working_age_pct, c:'#3b6eaf' },
+    { l:'65+',   v: inds.census_over65_pct,      c:'#a05a9e' },
+  ], { width: 360 });
+
+  const compareCensus = _chartCompare([
+    { l:'Born outside UK',   v: inds.census_born_outside_uk_pct,    ref: _median(_wardVals('census_born_outside_uk_pct')),    wh: false, dp: 0 },
+    { l:'No qualifications', v: inds.census_no_qual_pct,            ref: _median(_wardVals('census_no_qual_pct')),            wh: true,  dp: 0 },
+    { l:'Level 4+ qual',     v: inds.census_level4_qual_pct,        ref: _median(_wardVals('census_level4_qual_pct')),        wh: false, dp: 0 },
+    { l:'Higher managerial', v: inds.census_higher_managerial_pct,  ref: _median(_wardVals('census_higher_managerial_pct')),  wh: false, dp: 0 },
+    { l:'Routine/semi',      v: inds.census_routine_semi_routine_pct, ref: _median(_wardVals('census_routine_semi_routine_pct')), wh: true,  dp: 0 },
+    { l:'No people English (HH)', v: inds.census_english_hh_none_pct, ref: _median(_wardVals('census_english_hh_none_pct')), wh: true,  dp: 0 },
+  ], { width: 380 });
+
+  // ── Health & deprivation: IMD-domain radar + ward-level health bars ──
+  // IMD domain ward-aggregate fields aren't all wired at ward level — fall
+  // back to the LSOA imd_score field so the radar is still informative for
+  // the headline composite. Domains use the LSOA-level scores from the
+  // selected ward's Core20 LSOAs, averaged.
+  // For now: use the ward-level imd_score_ward as the centre indicator and
+  // pull domain-by-LSOA averages where available.
+  function _wardLSOADomains(wcode) {
+    if (!wcode || typeof LSOA_DATA !== 'object') return null;
+    const acc = {};
+    let n = 0;
+    for (const v of Object.values(LSOA_DATA)) {
+      if ((v.ward_code || (v.indicators && v.indicators.ward_code)) !== wcode) continue;
+      const d = v.indicators || v;
+      ['income_score','employment_score','education_score','health_score','crime_score','barriers_score','environment_score'].forEach(k => {
+        const x = parseFloat(d[k]);
+        if (!isNaN(x)) acc[k] = (acc[k] || 0) + x;
+      });
+      n++;
+    }
+    if (!n) return null;
+    Object.keys(acc).forEach(k => acc[k] = acc[k] / n);
+    return acc;
+  }
+  // NWL ward-mean of each LSOA domain — used as the radar reference ring.
+  function _nwlLSOADomainMeans() {
+    if (typeof LSOA_DATA !== 'object') return {};
+    const acc = {}; let n = 0;
+    for (const v of Object.values(LSOA_DATA)) {
+      const d = v.indicators || v;
+      ['income_score','employment_score','education_score','health_score','crime_score','barriers_score','environment_score'].forEach(k => {
+        const x = parseFloat(d[k]);
+        if (!isNaN(x)) acc[k] = (acc[k] || 0) + x;
+      });
+      n++;
+    }
+    if (!n) return {};
+    Object.keys(acc).forEach(k => acc[k] = acc[k] / n);
+    return acc;
+  }
+  const wardCode = (wdata && wdata.code) || '';
+  const wDomains = _wardLSOADomains(wardCode) || {};
+  const nDomains = _nwlLSOADomainMeans();
+  // Each domain max = (max observed across ALL NWL LSOAs) so the radar is
+  // properly normalised. Income/employment scores are 0..1, others 0..~50.
+  function _domainMax(k) {
+    if (typeof LSOA_DATA !== 'object') return 1;
+    let m = 0;
+    for (const v of Object.values(LSOA_DATA)) {
+      const x = parseFloat((v.indicators || v)[k]);
+      if (!isNaN(x) && x > m) m = x;
+    }
+    return m || 1;
+  }
+  const radarSVG = _chartRadar([
+    { l:'Income',      v: wDomains.income_score,      ref: nDomains.income_score,      max: _domainMax('income_score') },
+    { l:'Employment',  v: wDomains.employment_score,  ref: nDomains.employment_score,  max: _domainMax('employment_score') },
+    { l:'Education',   v: wDomains.education_score,   ref: nDomains.education_score,   max: _domainMax('education_score') },
+    { l:'Health',      v: wDomains.health_score,      ref: nDomains.health_score,      max: _domainMax('health_score') },
+    { l:'Crime',       v: wDomains.crime_score,       ref: nDomains.crime_score,       max: _domainMax('crime_score') },
+    { l:'Barriers',    v: wDomains.barriers_score,    ref: nDomains.barriers_score,    max: _domainMax('barriers_score') },
+    { l:'Environment', v: wDomains.environment_score, ref: nDomains.environment_score, max: _domainMax('environment_score') },
+  ], { size: 260 });
+
+  const healthBars = _chartCompare([
+    { l:'Good/very good health', v: inds.census_good_health_pct,        ref: _median(_wardVals('census_good_health_pct')),        wh: false, dp: 0 },
+    { l:'Bad/very bad health',   v: inds.census_bad_health_pct,         ref: _median(_wardVals('census_bad_health_pct')),         wh: true,  dp: 1 },
+    { l:'Disability (any)',      v: inds.census_disability_any_pct,     ref: _median(_wardVals('census_disability_any_pct')),     wh: true,  dp: 1 },
+    { l:'Disability — limited a lot', v: inds.census_disability_lot_pct, ref: _median(_wardVals('census_disability_lot_pct')),    wh: true,  dp: 1 },
+    { l:'Provides unpaid care',  v: inds.census_provides_unpaid_care_pct, ref: _median(_wardVals('census_provides_unpaid_care_pct')), wh: false, dp: 1 },
+    { l:'Fuel poverty',          v: inds.fuel_poverty_pct,              ref: _median(_wardVals('fuel_poverty_pct')),              wh: true,  dp: 1 },
+    { l:'Unemployed',            v: inds.census_unemployed_pct,         ref: _median(_wardVals('census_unemployed_pct')),         wh: true,  dp: 1 },
+    { l:'Claimant rate (16-64)', v: inds.claimant_rate_pct,             ref: _median(_wardVals('claimant_rate_pct')),             wh: true,  dp: 1 },
+  ], { width: 380 });
+
+  // ── Crime breakdown — 11 MPS categories sorted descending, NWL median tick ──
+  const crimeCats = [
+    { k:'crime_violence_12mo',          l:'Violence' },
+    { k:'crime_theft_12mo',             l:'Theft' },
+    { k:'crime_burglary_12mo',          l:'Burglary' },
+    { k:'crime_robbery_12mo',           l:'Robbery' },
+    { k:'crime_vehicle_12mo',           l:'Vehicle offences' },
+    { k:'crime_drug_offences_12mo',     l:'Drug offences' },
+    { k:'crime_public_order_12mo',      l:'Public order' },
+    { k:'crime_arson_12mo',             l:'Arson & criminal damage' },
+    { k:'crime_weapons_12mo',           l:'Possession of weapons' },
+    { k:'crime_sexual_offences_12mo',   l:'Sexual offences' },
+    { k:'crime_misc_society_12mo',      l:'Misc. against society' },
+  ];
+  const crimeRows = crimeCats.map(c => ({
+    l: c.l,
+    v: _fmt(inds[c.k]),
+    ref: _median(_wardVals(c.k)),
+    c: '#7a3a3a',
+  })).filter(r => r.v != null).sort((a,b) => (b.v||0) - (a.v||0));
+  const crimeSVG = crimeRows.length ? _chartHbar(crimeRows, { width: 760, padL: 170, dp: 0, unit: '' }) : '';
+  const crimeTotal = _fmt(inds.crime_total);
+
+  // ── Civic strength — 7 indicators, ward percentile in NWL ──
+  const civicFields = [
+    { k:'cst_number_of_community_sport_and_physical_activity_offerings', l:'Sport & activity offerings' },
+    { k:'cst_number_of_community_interest_companies_cics',               l:'Community Interest Companies' },
+    { k:'cst_number_and_proximity_of_libraries',                         l:'Libraries — count & proximity' },
+    { k:'cst_number_and_proximity_of_community_centres',                 l:'Community centres — count & proximity' },
+    { k:'cst_number_and_proximity_of_cultural_spaces',                   l:'Cultural spaces — count & proximity' },
+    { k:'cst_number_of_faith_centres',                                   l:'Faith centres' },
+    { k:'cst_passive_green_space',                                       l:'Passive green space' },
+  ];
+  const civicRows = civicFields.map(f => {
+    const v = _fmt(inds[f.k]);
+    const pct = _pctile(f.k, v);
+    return { l: f.l, v: pct == null ? null : pct, sub: v == null ? '' : ` (${v.toLocaleString(undefined,{maximumFractionDigits:2})})`, c:'#1a5c2e' };
+  });
+  const civicSVG = _chartHbar(civicRows, { width: 760, padL: 200, max: 100, dp: 0, unit: 'pctile' });
+
+  // ── Green & blue space (LSOA-aggregated to ward via mean of contained LSOAs) ──
+  function _wardLsoaMean(field) {
+    if (!wardCode || typeof LSOA_DATA !== 'object') return null;
+    const vs = [];
+    for (const v of Object.values(LSOA_DATA)) {
+      if ((v.ward_code || (v.indicators && v.indicators.ward_code)) !== wardCode) continue;
+      const x = parseFloat((v.indicators || v)[field]);
+      if (!isNaN(x)) vs.push(x);
+    }
+    if (!vs.length) return null;
+    return vs.reduce((a,b) => a+b, 0) / vs.length;
+  }
+  const greenRows = [
+    { l:'Green OR blue ≤15min',    v: _wardLsoaMean('gb_commitment_pct'),       c:'#2E7D32' },
+    { l:'Green ≤15min',            v: _wardLsoaMean('green_commitment_pct'),    c:'#388E3C' },
+    { l:'Doorstep (<200m)',        v: _wardLsoaMean('green_doorstep_pct'),      c:'#66BB6A' },
+    { l:'Local (<300m, ≥2 ha)',    v: _wardLsoaMean('green_local_pct'),         c:'#43A047' },
+    { l:'Neighbourhood (<1km)',    v: _wardLsoaMean('green_neighbourhood_pct'), c:'#1B5E20' },
+    { l:'Blue space ≤15min',       v: _wardLsoaMean('blue_commitment_pct'),     c:'#0288D1' },
+  ];
+  const greenSVG = _chartHbar(greenRows, { width: 380, padL: 150, max: 100, dp: 0, unit: '%' });
 
   // ── Mini-map SVG: ward polygon on a borough-context backdrop ────────────
   // Find the ward + borough features in GJ, project lng/lat into a 260×200 SVG.
@@ -2744,136 +3122,221 @@ window.generateWardReport = function(wn) {
     }
   } catch(e) { /* minimap is decorative — fail silent */ }
 
-  const bigStat = (lbl, val, sub) => {
-    const hasVal = val !== null && val !== undefined && val !== '';
-    return `<div class="hstat">
-      <div class="hstat-val ${hasVal ? '' : 'dim'}">${hasVal ? val : '—'}</div>
-      <div class="hstat-lbl">${lbl}</div>
-      ${sub ? `<div class="hstat-sub">${sub}</div>` : ''}
-    </div>`;
-  };
-
-  // Core20 flag
+  // Core20 flag (renders inline next to the ward name in the hero)
   const isCore20 = !!(wdata && wdata.is_core20);
   const core20Badge = isCore20
-    ? `<div style="display:inline-block;margin-top:8px;margin-left:6px;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;background:#fde6ee;color:#8b0035;border:1px solid #f0b5cb">Core20 ward</div>`
+    ? `<span class="badge core20">Core20 ward</span>`
     : '';
 
-  // Crime-by-category section
-  const cbc = (wdata && wdata.crime_by_category) || {};
-  const cbcEntries = Object.entries(cbc).sort((a,b) => b[1] - a[1]);
-  const crimeCatRows = cbcEntries.map(([cat, n]) => {
-    const label = cat.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    return `<tr><td>${label}</td><td class="v">${n.toLocaleString()}</td></tr>`;
-  }).join('');
-  const crimeCatSection = crimeCatRows
-    ? `<section class="cat"><h3>Crime by category</h3><table class="kv">${crimeCatRows}</table></section>`
-    : '';
-
-  // GP practices named list
+  // GP practices named list (kept on page 2)
   const gps = (wdata && wdata.gp_list) || [];
-  const gpRows = gps.map(g => `<tr><td><strong>${g.name || '-'}</strong><br><span style="font-size:10px;color:#777">${g.addr || ''} ${g.postcode || ''}</span></td><td class="v" style="font-size:11px;color:#666">${g.tel || ''}</td></tr>`).join('');
+  const gpRows = gps.map(g => `<tr><td><strong>${_esc(g.name || '-')}</strong><br><span style="font-size:10px;color:#777">${_esc(g.addr || '')} ${_esc(g.postcode || '')}</span></td><td class="v" style="font-size:11px;color:#666">${_esc(g.tel || '')}</td></tr>`).join('');
   const gpListSection = gpRows
-    ? `<section class="cat"><h3>GP practices in this ward (${gps.length})</h3><table class="kv">${gpRows}</table></section>`
+    ? `<section class="lst"><h3>GP practices in this ward (${gps.length})</h3><table class="kv">${gpRows}</table></section>`
     : '';
 
   // Pharmacies named list
   const phs = (wdata && wdata.pharmacy_list) || [];
-  const phRows = phs.map(p => `<tr><td><strong>${p.name || '-'}</strong></td><td class="v" style="font-size:11px;color:#666">${p.addr || ''} ${p.postcode || ''}</td></tr>`).join('');
+  const phRows = phs.map(p => `<tr><td><strong>${_esc(p.name || '-')}</strong></td><td class="v" style="font-size:11px;color:#666">${_esc(p.addr || '')} ${_esc(p.postcode || '')}</td></tr>`).join('');
   const pharmacyListSection = phRows
-    ? `<section class="cat"><h3>Pharmacies in this ward (${phs.length})</h3><table class="kv">${phRows}</table></section>`
+    ? `<section class="lst"><h3>Pharmacies in this ward (${phs.length})</h3><table class="kv">${phRows}</table></section>`
     : '';
+
+  // Build IMD composite KPI with rank-in-NWL context
+  const imdRank = (() => {
+    if (imdW == null) return null;
+    const ws = _wardVals('imd_score_ward').sort((a,b) => b - a); // highest first
+    const r = ws.findIndex(v => v <= imdW) + 1;
+    return r > 0 ? r : null;
+  })();
+  const totalWards = _wardVals('imd_score_ward').length;
+  const goodHpct  = _pctile('census_good_health_pct', goodHlt);
+  const badHpct   = _pctile('census_bad_health_pct',  badHlt);
+  const disAnyPct = _pctile('census_disability_any_pct', disAny);
+  const unempPctR = _pctile('census_unemployed_pct',  unempPct);
+  const imdPct    = _pctile('imd_score_ward', imdW);
 
   const html = `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
-<title>${wdata ? wdata.name : wn} — Ward Report</title>
+<title>${_esc(wdata ? wdata.name : wn)} — Ward profile</title>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#f4f4ef; color:#1a1a1a; margin:0; padding:32px 24px; line-height:1.5; }
-  .report { max-width: 880px; margin: 0 auto; background:#fff; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,.06); overflow:hidden; }
-  .hero { padding: 28px 32px 22px; border-bottom: 1px solid #eee; display:flex; gap:22px; align-items:flex-start; }
-  .hero .hero-text { flex:1; min-width:0; }
-  .hero .hero-map { flex:0 0 260px; }
-  .minimap { width:260px; height:200px; border:1px solid #e6e6df; border-radius:6px; background:#f6f6f1; display:block; }
-  .minimap-cap { font-size:10px; color:#888; text-align:center; margin-top:4px; }
-  .hero .kicker { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.08em; }
-  .hero h1 { margin:4px 0 2px; font-size:28px; font-weight:700; letter-spacing:-0.01em; }
-  .hero .sub { color:#555; font-size:13px; }
-  .hero .nb { display:inline-block; margin-top:8px; padding:3px 11px; border-radius:20px; font-size:11px; font-weight:600; ${nb ? `background:${nb.bg};color:${nb.color};` : 'background:#eee;color:#555;'} }
-  @media (max-width: 720px) { .hero { flex-direction:column; } .hero .hero-map { flex:0 0 auto; } }
-  .headline { display:grid; grid-template-columns: repeat(4, 1fr); gap:0; border-top:1px solid #eee; }
-  .hstat { padding:18px 14px; text-align:center; border-right:1px solid #f0f0ec; }
-  .hstat:last-child { border-right: none; }
-  .hstat-val { font-size:24px; font-weight:700; color:#1a1a1a; line-height:1.1; }
-  .hstat-val.dim { color:#bbb; font-weight:400; }
-  .hstat-lbl { font-size:10px; color:#666; margin-top:3px; text-transform:uppercase; letter-spacing:.04em; }
-  .hstat-sub { font-size:10px; color:#999; margin-top:1px; }
-  .services { display:grid; grid-template-columns: repeat(5, 1fr); gap:0; background:#fafaf6; border-top:1px solid #eee; border-bottom:1px solid #eee; }
-  .svc { padding:14px 10px; text-align:center; border-right:1px solid #f0f0ec; }
+  /* A4 portrait at 96dpi ≈ 794×1123 px. Layout fits on one page.
+     GP/pharmacy lists overflow to a second page. */
+  @page { size: A4 portrait; margin: 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#eceae3; color:#1a1a1a; margin:0; padding:14px; line-height:1.4; }
+  .report { width: 794px; max-width: 100%; margin: 0 auto; background:#fff; box-shadow:0 2px 14px rgba(0,0,0,.08); border-radius:6px; overflow:hidden; }
+  /* HERO */
+  .hero { display:flex; gap:18px; padding:18px 22px 14px; border-bottom:1px solid #eee; align-items:flex-start; }
+  .hero-text { flex:1; min-width:0; }
+  .hero-text .kicker { font-size:10px; color:#888; text-transform:uppercase; letter-spacing:.1em; margin-bottom:2px; }
+  .hero-text h1 { margin:0; font-size:24px; font-weight:700; letter-spacing:-0.01em; line-height:1.15; }
+  .hero-text .sub { color:#555; font-size:12px; margin-top:3px; }
+  .hero-text .badges { margin-top:6px; }
+  .badge { display:inline-block; margin-right:5px; padding:2px 9px; border-radius:14px; font-size:10px; font-weight:600; vertical-align:middle; }
+  .badge.nb { ${nb ? `background:${nb.bg};color:${nb.color};` : 'background:#eee;color:#555;'} }
+  .badge.core20 { background:#fde6ee; color:#8b0035; border:1px solid #f0b5cb; }
+  .badge.imd { background:#1a1a1a; color:#fff; }
+  .hero-map { flex:0 0 240px; }
+  .minimap { width:240px; height:140px; border:1px solid #e6e6df; border-radius:4px; background:#f6f6f1; display:block; }
+  .minimap-cap { font-size:9px; color:#888; text-align:center; margin-top:2px; }
+  /* KPI strip — 6 cards */
+  .kpis { display:grid; grid-template-columns: repeat(6, 1fr); border-top:1px solid #eee; border-bottom:1px solid #eee; }
+  .kpi { padding:10px 8px; text-align:center; border-right:1px solid #f0f0ec; }
+  .kpi:last-child { border-right:none; }
+  .kpi-lbl { font-size:9px; color:#666; text-transform:uppercase; letter-spacing:.04em; margin-bottom:1px; }
+  .kpi-val { font-size:20px; font-weight:700; color:#1a1a1a; line-height:1.05; font-variant-numeric: tabular-nums; }
+  .kpi-val.dim { color:#bbb; font-weight:400; }
+  .kpi-sub { font-size:9px; color:#999; margin-top:1px; }
+  .kpi-ctx { margin-top:5px; }
+  .kpi-ctx-bar { position:relative; height:4px; border-radius:2px; }
+  .kpi-ctx-tick { position:absolute; top:-2px; bottom:-2px; width:2px; background:#1a1a1a; border-radius:1px; }
+  .kpi-ctx-cap { font-size:8.5px; color:#666; margin-top:2px; }
+  /* SERVICES strip */
+  .services { display:grid; grid-template-columns: repeat(9, 1fr); background:#fafaf6; border-bottom:1px solid #eee; }
+  .svc { padding:8px 4px; text-align:center; border-right:1px solid #f0f0ec; }
   .svc:last-child { border-right:none; }
-  .svc-val { font-size:20px; font-weight:700; color:#185FA5; }
-  .svc-lbl { font-size:10px; color:#666; margin-top:2px; text-transform:uppercase; letter-spacing:.03em; }
-  .body { padding: 22px 32px 28px; }
-  .cat { margin-bottom: 20px; page-break-inside: avoid; }
-  .cat h3 { font-size:13px; margin:0 0 8px; color:#333; border-bottom:2px solid #1a1a1a; padding-bottom:5px; letter-spacing:.02em; }
-  table.kv { width:100%; border-collapse: collapse; font-size:12px; }
-  table.kv td { padding:5px 0; border-bottom:1px solid #f3f3ef; vertical-align:top; }
-  table.kv td:first-child { color:#555; }
+  .svc-val { font-size:15px; font-weight:700; color:#185FA5; line-height:1.1; }
+  .svc-lbl { font-size:8.5px; color:#666; margin-top:1px; text-transform:uppercase; letter-spacing:.03em; }
+  /* CONTENT */
+  .content { padding: 14px 18px 16px; }
+  .row { display:flex; gap:14px; margin-bottom:14px; }
+  .row.row-3 > .panel { flex:1; min-width:0; }
+  .row.row-2 > .panel { flex:1; min-width:0; }
+  .panel { background:#fafaf7; border:1px solid #eee; border-radius:5px; padding:10px 12px 8px; page-break-inside: avoid; }
+  .panel h3 { font-size:11px; margin:0 0 6px; color:#333; text-transform:uppercase; letter-spacing:.06em; }
+  .panel .note { font-size:9.5px; color:#888; margin-top:4px; }
+  /* SVG charts */
+  svg.ch-stack, svg.ch-hbar, svg.ch-compare { width:100%; height:auto; display:block; }
+  svg.ch-radar { display:block; margin: 0 auto; }
+  /* page-2 lists */
+  .lst { padding: 12px 18px; page-break-inside: avoid; }
+  .lst h3 { font-size:12px; margin:8px 0 6px; color:#333; border-bottom:1.5px solid #1a1a1a; padding-bottom:3px; letter-spacing:.02em; }
+  table.kv { width:100%; border-collapse: collapse; font-size:11px; }
+  table.kv td { padding:4px 0; border-bottom:1px solid #f3f3ef; vertical-align:top; }
   table.kv td.v { font-weight:500; color:#1a1a1a; text-align:right; font-variant-numeric: tabular-nums; }
-  .g { display:inline-block; font-size:9px; padding:1px 5px; border-radius:3px; margin-left:4px; vertical-align:middle; font-weight:500; }
-  .g-ward { background:#e8f4e8; color:#1a5c2e; }
-  .g-lsoa { background:#fdebd0; color:#b8600c; }
-  .g-msoa { background:#e3edf9; color:#0c447c; }
-  .g-la   { background:#f3eaf7; color:#6a1b7a; }
-  .no-data { padding:20px; background:#fef8e7; border-left:3px solid #E89B1B; margin:20px 0; font-size:12px; color:#7a4a00; border-radius:0 6px 6px 0; }
-  .footer { padding: 16px 32px 22px; background:#fafaf6; border-top:1px solid #eee; font-size:11px; color:#666; }
+  .legend { font-size:9px; color:#888; margin-top:4px; }
+  .legend-tick { display:inline-block; width:1px; height:8px; background:#1a1a1a; margin: 0 2px 0 0; vertical-align:middle; }
+  .footer { padding: 10px 18px 14px; background:#fafaf6; border-top:1px solid #eee; font-size:9.5px; color:#666; }
   .footer strong { color:#333; }
-  .meta { font-size:10px; color:#999; margin-top:6px; }
-  .actions { max-width:880px; margin: 14px auto 0; display:flex; gap:8px; justify-content:flex-end; }
-  .actions button { padding:8px 14px; border:1px solid #ddd; background:#fff; border-radius:6px; font-size:12px; cursor:pointer; color:#333; }
+  .actions { max-width:794px; margin: 10px auto 0; display:flex; gap:8px; justify-content:flex-end; }
+  .actions button { padding:6px 12px; border:1px solid #ddd; background:#fff; border-radius:5px; font-size:12px; cursor:pointer; color:#333; }
   .actions button:hover { border-color:#999; }
   @media print {
     body { background:#fff; padding:0; }
-    .report { box-shadow:none; border-radius:0; max-width:none; }
+    .report { box-shadow:none; border-radius:0; width:100%; }
     .actions { display:none; }
-    .cat { page-break-inside: avoid; }
+    .row, .panel, .lst, .hero, .kpis, .services { page-break-inside: avoid; }
+    .lst:first-of-type { page-break-before: always; }
   }
 </style>
 </head><body>
 <div class="report">
+
+  <!-- HERO -->
   <div class="hero">
     <div class="hero-text">
-      <div class="kicker">NW London ward report · ${today}</div>
-      <h1>${wdata ? wdata.name : wn}</h1>
-      <div class="sub">${borough || ''}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population: ' + population : ''}</div>
-      ${nb ? `<div class="nb">${nb.label}</div>` : ''}${core20Badge}
+      <div class="kicker">NW London ward profile · ${_esc(today)}</div>
+      <h1>${_esc(wdata ? wdata.name : wn)}</h1>
+      <div class="sub">${_esc(borough)}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population ' + population : ''}${imdRank ? ' · IMD rank ' + imdRank + ' of ' + totalWards + ' NWL wards' : ''}</div>
+      <div class="badges">
+        ${nb ? `<span class="badge nb">${_esc(nb.label)}</span>` : ''}
+        ${core20Badge}
+        ${imdW != null ? `<span class="badge imd">IMD score ${imdW.toFixed(1)}</span>` : ''}
+      </div>
     </div>
     ${miniMapSVG ? `<div class="hero-map">${miniMapSVG}</div>` : ''}
   </div>
-  <div class="headline">
-    ${bigStat('Population', popN !== null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
-    ${bigStat('Good health', goodHlt !== null ? goodHlt.toFixed(0) + '%' : null, 'of residents')}
-    ${bigStat('Bad health', badHlt !== null ? badHlt.toFixed(1) + '%' : null, 'of residents')}
-    ${bigStat('Disability (any)', disAny !== null ? disAny.toFixed(1) + '%' : null, 'of residents')}
-    ${bigStat('Unemployed', unempPct !== null ? unempPct.toFixed(1) + '%' : null, '16-74 economically active')}
-    ${bigStat('Core20 LSOAs', (c20L !== null && totL !== null) ? c20L.toFixed(0) + ' of ' + totL.toFixed(0) : null, 'most deprived')}
+
+  <!-- KPI STRIP -->
+  <div class="kpis">
+    ${_kpi('Population',     popN  != null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
+    ${_kpi('IMD score',      imdW != null ? imdW.toFixed(1) : null,   'pop-weighted', _ctxBar(imdPct, 'lower-better'))}
+    ${_kpi('Good health',    goodHlt != null ? goodHlt.toFixed(0) + '%' : null, 'of residents', _ctxBar(goodHpct, 'higher-better'))}
+    ${_kpi('Bad health',     badHlt  != null ? badHlt.toFixed(1) + '%' : null, 'of residents', _ctxBar(badHpct, 'lower-better'))}
+    ${_kpi('Disability',     disAny  != null ? disAny.toFixed(1) + '%' : null, 'any condition', _ctxBar(disAnyPct, 'lower-better'))}
+    ${_kpi('Core20 LSOAs',   (c20L != null && totL != null) ? c20L.toFixed(0) + '/' + totL.toFixed(0) : null, 'most deprived')}
   </div>
+
+  <!-- SERVICES STRIP -->
   <div class="services">
-    <div class="svc"><div class="svc-val">${gpN || '—'}</div><div class="svc-lbl">GP practices</div></div>
-    <div class="svc"><div class="svc-val">${pharmN || '—'}</div><div class="svc-lbl">Pharmacies</div></div>
-    <div class="svc"><div class="svc-val">${hospN || '—'}</div><div class="svc-lbl">Hospitals</div></div>
-    <div class="svc"><div class="svc-val">${dentN || '—'}</div><div class="svc-lbl">Dental</div></div>
-    <div class="svc"><div class="svc-val">${vcseN || '—'}</div><div class="svc-lbl">VCSE orgs</div></div>
+    <div class="svc"><div class="svc-val">${gpN  || '—'}</div><div class="svc-lbl">GP</div></div>
+    <div class="svc"><div class="svc-val">${pharmN || '—'}</div><div class="svc-lbl">Pharm</div></div>
+    <div class="svc"><div class="svc-val">${dentN  || '—'}</div><div class="svc-lbl">Dental</div></div>
+    <div class="svc"><div class="svc-val">${hospN  || '—'}</div><div class="svc-lbl">Hospital</div></div>
+    <div class="svc"><div class="svc-val">${schN   || '—'}</div><div class="svc-lbl">Schools</div></div>
+    <div class="svc"><div class="svc-val">${ccN    || '—'}</div><div class="svc-lbl">Comm ctr</div></div>
+    <div class="svc"><div class="svc-val">${libN   || '—'}</div><div class="svc-lbl">Library</div></div>
+    <div class="svc"><div class="svc-val">${esolN  || '—'}</div><div class="svc-lbl">ESOL</div></div>
+    <div class="svc"><div class="svc-val">${vcseN  || '—'}</div><div class="svc-lbl">VCSE</div></div>
   </div>
-  <div class="body">
-    ${noData ? '<div class="no-data"><strong>No indicator data loaded.</strong><br>Run <code>python scripts/fetch_all_data.py</code> to populate ward_data.json, then reload the map.</div>' : catRows}
-    ${crimeCatSection}
-    ${gpListSection}
-    ${pharmacyListSection}
+
+  <div class="content">
+
+    <!-- DEMOGRAPHICS -->
+    <div class="row row-3">
+      <div class="panel">
+        <h3>Ethnicity (Census 2021)</h3>
+        ${ethStack}
+      </div>
+      <div class="panel">
+        <h3>Age (Census 2021)</h3>
+        ${ageStack}
+        ${inds.census_over85_pct != null ? `<div class="note">85+: ${parseFloat(inds.census_over85_pct).toFixed(1)}% of residents</div>` : ''}
+      </div>
+      <div class="panel">
+        <h3>Demographics vs NWL median</h3>
+        ${compareCensus}
+        <div class="legend"><span class="legend-tick"></span> NWL median &nbsp;·&nbsp; <span style="color:#c9534a">red</span> = worse, <span style="color:#2c8a4a">green</span> = better</div>
+      </div>
+    </div>
+
+    <!-- HEALTH & DEPRIVATION -->
+    <div class="row row-2">
+      <div class="panel" style="flex:0 0 280px">
+        <h3>IMD domains (mean of ward LSOAs)</h3>
+        ${radarSVG}
+        <div class="legend">Red fill = this ward · <span class="legend-tick"></span> dashed = NWL ward mean</div>
+      </div>
+      <div class="panel">
+        <h3>Health & economic indicators vs NWL median</h3>
+        ${healthBars}
+      </div>
+    </div>
+
+    <!-- CRIME -->
+    ${crimeRows.length ? `<div class="row">
+      <div class="panel" style="flex:1">
+        <h3>Crime by category — last 12 months ${crimeTotal != null ? `· total ${Math.round(crimeTotal).toLocaleString()}` : ''}</h3>
+        ${crimeSVG}
+        <div class="legend"><span class="legend-tick"></span> NWL median for each category &nbsp;·&nbsp; sorted by ward count</div>
+      </div>
+    </div>` : ''}
+
+    <!-- CIVIC STRENGTH + GREEN/BLUE -->
+    <div class="row row-2">
+      <div class="panel" style="flex:1.4">
+        <h3>Civic strength (NWL percentile, higher = stronger)</h3>
+        ${civicSVG}
+        <div class="legend">Source: London Civic Strength Index Round 3, London Datastore (2024)</div>
+      </div>
+      <div class="panel">
+        <h3>Green & blue space access (mean of ward LSOAs)</h3>
+        ${greenSVG}
+        <div class="legend">Source: Defra ANGSt / Friends of the Earth (LSOA, 2023)</div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- LISTS — page 2 in print -->
+  ${gpListSection}
+  ${pharmacyListSection}
+
   <div class="footer">
-    <strong>Sources:</strong> OHID Fingertips (life expectancy, mortality), ONS Census 2021 (demographics, health), DLUHC IMD 2019, DWP (claimant count), police.uk (crime), NHS Digital (GP/pharmacy/dental registers).<br>
-    <span class="meta">Geographies: <span class="g g-ward">ward</span> = ward-level, <span class="g g-msoa">msoa</span> = MSOA-level (approximated to ward), <span class="g g-la">la</span> = local authority level.</span>
+    <strong>Sources:</strong> ONS Census 2021 (demographics, health, household language, travel-to-work) · MHCLG Indices of Deprivation 2019 (mid-2022 pop-weighted) · Met Police MPS via London Datastore (crime, Apr 2025–Mar 2026) · London Civic Strength Index Round 3 (London Datastore, 2024) · DESNZ LILEE (fuel poverty) · NOMIS / DWP (claimant count) · NHS Digital ODS (GP, pharmacy, dental).
+    <div style="font-size:9px;color:#999;margin-top:4px">Service counts in services strip computed by spatial test against ward polygon. Bars marked "vs NWL median" use the median across all 168 NWL wards. NWL percentile = % of NWL wards below this ward's value.</div>
   </div>
 </div>
 <div class="actions">

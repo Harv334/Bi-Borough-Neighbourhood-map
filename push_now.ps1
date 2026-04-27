@@ -1032,6 +1032,129 @@ PNG export — re-add tight crop with generous pad
   CSS padding being too tight. 100px gives
   visibly comfortable breathing room around
   every borough outline at any zoom.
+
+PNG export — bbox from LatLngBounds, not per-vertex
+---------------------------------------------------
+- Per-vertex bbox computation (iterating every
+  polygon ring vertex with min/max accumulators)
+  was producing a bbox wider than NWL's true
+  rectangular extent, leaving the choropleth
+  pinned to the top-left of the cropped output
+  with surplus dimmed basemap on the right and
+  bottom. Likely cause: outlier MultiPolygon
+  pieces (Hounslow has several disconnected
+  polygons in the south + west) extending the
+  per-vertex bbox far past the rectangular
+  NWL extent.
+- Fix: compute the crop bbox from the scope
+  LatLngBounds corners directly. Get
+  scopeBounds.getNorthWest() and getSouthEast(),
+  project both to container points via
+  latLngToContainerPoint, and take min/max in
+  CSS pixels. This is exactly the rectangular
+  bounds Leaflet used for fitBounds — so the
+  crop frames the same rectangle that fitBounds
+  framed.
+- Mask painting still iterates per-vertex (it
+  needs the actual polygon shapes to punch
+  holes), but the crop is now decoupled from
+  the mask path and uses the simpler scope
+  bounds.
+- Padding reduced from 100px to 80px CSS
+  because the rectangular bounds already
+  include enough breathing room around the
+  natural polygon outline; we don't need to
+  further pad past that.
+- Crop only applied when cw < fullCanvas.width
+  OR ch < fullCanvas.height (i.e. when there's
+  actually surplus to remove); otherwise the
+  full canvas is the output.
+
+Iteration round 4 — fix root causes
+====================================
+
+Ward profile — drop broken IMD radar + green/blue
+-------------------------------------------------
+- The IMD-domains radar (mean of ward LSOAs)
+  was rendering with the data polygon missing
+  because the LSOA→ward join relied on
+  `ward_code` being present on each LSOA record
+  in lsoa_data.json — which it isn't (the
+  LSOA-to-ward mapping lives in
+  lsoa_boundaries.geojson, not in
+  lsoa_data.json). Removed the panel entirely
+  rather than rebuild the join just for one
+  chart. The 8 IMD domain scores remain
+  available in the Ward sidebar profile via
+  CATS for users who want them.
+- Removed the green/blue space access panel
+  too — those metrics are LSOA-level by nature
+  and were being awkwardly aggregated to ward
+  via a mean over the contained LSOAs. Better
+  to leave that data in the LSOA profile where
+  the user can see per-LSOA values directly.
+- Charts kept on the ward profile: ethnicity
+  stacked bar, age stacked bar, demographic-
+  vs-NWL compare bars, health/economic-vs-NWL
+  compare bars (good health, bad health,
+  disability any, disability lot, unpaid care,
+  fuel poverty, unemployed, claimant rate),
+  crime breakdown, civic strength NWL-percentile
+  bars.
+
+Ward profile — fix root cause of empty service counts
+-----------------------------------------------------
+- All four GLA ESOL Planning Map JSONs (schools,
+  community centres, libraries) carry `ward_code`
+  on each record. The ward profile should match
+  records to the selected ward by ward_code for
+  exact attribution (no spatial test needed).
+- Bug: wdata.code was undefined. The ward
+  records come from `WARD_DATA[name] =
+  WARD_DATA_BY_CODE[code]`, where the code
+  lives as the OBJECT KEY of WARD_DATA_BY_CODE
+  but isn't stamped onto the ward record
+  itself. So `(wdata && wdata.code) || ''`
+  always returned empty string, _byWardCode
+  always returned [], and no schools / CC /
+  library records ever matched.
+- Fix: in loadData, after building
+  WARD_DATA_BY_CODE, write `ward.code = code`
+  onto each ward record. Now wdata.code is
+  the WD24CD, _byWardCode matches against
+  schools.json / community_centres.json /
+  libraries.json correctly, and every
+  in-ward physical-locations list populates.
+
+PNG export — back to bare-metal screenshot
+------------------------------------------
+- Every mask + crop strategy I have tried has
+  introduced its own bug:
+    * SVG mask: misaligned on captured canvas
+      (choropleth ended up in top-left of the
+      output)
+    * Canvas-2D mask: worked, but per-vertex
+      bbox crop pulled by Hounslow MultiPolygon
+      outliers, choropleth squeezed into upper
+      portion of crop
+    * LatLngBounds-corner crop: produced
+      consistent rectangular output but image
+      still didn't match what the user expected
+- Fix: stop trying to be clever. The export is
+  now a pure screenshot of the map element
+  after fitBounds(scopeBounds) settles. No
+  mask, no crop, no compositing. The captured
+  viewport at fitBounds zoom IS the output.
+  If the user wants tighter framing they can
+  crop in Snipping Tool. If they want to focus
+  on a specific borough, the Borough focus
+  dropdown re-fits the map to that borough,
+  and the export captures THAT framed view.
+- Removed: SVG mask code, Canvas-2D
+  mask-paint, both bbox-crop branches.
+  Removed code: ~80 lines.
+- The user's view is restored after capture
+  via setView(savedCenter, savedZoom).
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

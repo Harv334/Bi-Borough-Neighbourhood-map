@@ -2971,68 +2971,7 @@ window.generateWardReport = function(wn) {
   ], { width: 380 });
 
   // ── Health & deprivation: IMD-domain radar + ward-level health bars ──
-  // IMD domain ward-aggregate fields aren't all wired at ward level — fall
-  // back to the LSOA imd_score field so the radar is still informative for
-  // the headline composite. Domains use the LSOA-level scores from the
-  // selected ward's Core20 LSOAs, averaged.
-  // For now: use the ward-level imd_score_ward as the centre indicator and
-  // pull domain-by-LSOA averages where available.
-  function _wardLSOADomains(wcode) {
-    if (!wcode || typeof LSOA_DATA !== 'object') return null;
-    const acc = {};
-    let n = 0;
-    for (const v of Object.values(LSOA_DATA)) {
-      if ((v.ward_code || (v.indicators && v.indicators.ward_code)) !== wcode) continue;
-      const d = v.indicators || v;
-      ['income_score','employment_score','education_score','health_score','crime_score','barriers_score','environment_score'].forEach(k => {
-        const x = parseFloat(d[k]);
-        if (!isNaN(x)) acc[k] = (acc[k] || 0) + x;
-      });
-      n++;
-    }
-    if (!n) return null;
-    Object.keys(acc).forEach(k => acc[k] = acc[k] / n);
-    return acc;
-  }
-  // NWL ward-mean of each LSOA domain — used as the radar reference ring.
-  function _nwlLSOADomainMeans() {
-    if (typeof LSOA_DATA !== 'object') return {};
-    const acc = {}; let n = 0;
-    for (const v of Object.values(LSOA_DATA)) {
-      const d = v.indicators || v;
-      ['income_score','employment_score','education_score','health_score','crime_score','barriers_score','environment_score'].forEach(k => {
-        const x = parseFloat(d[k]);
-        if (!isNaN(x)) acc[k] = (acc[k] || 0) + x;
-      });
-      n++;
-    }
-    if (!n) return {};
-    Object.keys(acc).forEach(k => acc[k] = acc[k] / n);
-    return acc;
-  }
   const wardCode = (wdata && wdata.code) || '';
-  const wDomains = _wardLSOADomains(wardCode) || {};
-  const nDomains = _nwlLSOADomainMeans();
-  // Each domain max = (max observed across ALL NWL LSOAs) so the radar is
-  // properly normalised. Income/employment scores are 0..1, others 0..~50.
-  function _domainMax(k) {
-    if (typeof LSOA_DATA !== 'object') return 1;
-    let m = 0;
-    for (const v of Object.values(LSOA_DATA)) {
-      const x = parseFloat((v.indicators || v)[k]);
-      if (!isNaN(x) && x > m) m = x;
-    }
-    return m || 1;
-  }
-  const radarSVG = _chartRadar([
-    { l:'Income',      v: wDomains.income_score,      ref: nDomains.income_score,      max: _domainMax('income_score') },
-    { l:'Employment',  v: wDomains.employment_score,  ref: nDomains.employment_score,  max: _domainMax('employment_score') },
-    { l:'Education',   v: wDomains.education_score,   ref: nDomains.education_score,   max: _domainMax('education_score') },
-    { l:'Health',      v: wDomains.health_score,      ref: nDomains.health_score,      max: _domainMax('health_score') },
-    { l:'Crime',       v: wDomains.crime_score,       ref: nDomains.crime_score,       max: _domainMax('crime_score') },
-    { l:'Barriers',    v: wDomains.barriers_score,    ref: nDomains.barriers_score,    max: _domainMax('barriers_score') },
-    { l:'Environment', v: wDomains.environment_score, ref: nDomains.environment_score, max: _domainMax('environment_score') },
-  ], { size: 260 });
 
   const healthBars = _chartCompare([
     { l:'Good/very good health', v: inds.census_good_health_pct,        ref: _median(_wardVals('census_good_health_pct')),        wh: false, dp: 0 },
@@ -3085,27 +3024,6 @@ window.generateWardReport = function(wn) {
   });
   const civicSVG = _chartHbar(civicRows, { width: 760, padL: 200, max: 100, dp: 0, unit: 'pctile' });
 
-  // ── Green & blue space (LSOA-aggregated to ward via mean of contained LSOAs) ──
-  function _wardLsoaMean(field) {
-    if (!wardCode || typeof LSOA_DATA !== 'object') return null;
-    const vs = [];
-    for (const v of Object.values(LSOA_DATA)) {
-      if ((v.ward_code || (v.indicators && v.indicators.ward_code)) !== wardCode) continue;
-      const x = parseFloat((v.indicators || v)[field]);
-      if (!isNaN(x)) vs.push(x);
-    }
-    if (!vs.length) return null;
-    return vs.reduce((a,b) => a+b, 0) / vs.length;
-  }
-  const greenRows = [
-    { l:'Green OR blue ≤15min',    v: _wardLsoaMean('gb_commitment_pct'),       c:'#2E7D32' },
-    { l:'Green ≤15min',            v: _wardLsoaMean('green_commitment_pct'),    c:'#388E3C' },
-    { l:'Doorstep (<200m)',        v: _wardLsoaMean('green_doorstep_pct'),      c:'#66BB6A' },
-    { l:'Local (<300m, ≥2 ha)',    v: _wardLsoaMean('green_local_pct'),         c:'#43A047' },
-    { l:'Neighbourhood (<1km)',    v: _wardLsoaMean('green_neighbourhood_pct'), c:'#1B5E20' },
-    { l:'Blue space ≤15min',       v: _wardLsoaMean('blue_commitment_pct'),     c:'#0288D1' },
-  ];
-  const greenSVG = _chartHbar(greenRows, { width: 380, padL: 150, max: 100, dp: 0, unit: '%' });
 
   // ── Mini-map SVG: ward polygon on a borough-context backdrop ────────────
   // Find the ward + borough features in GJ, project lng/lat into a 260×200 SVG.
@@ -3381,21 +3299,10 @@ window.generateWardReport = function(wn) {
 
     <div class="section-h">Health &amp; deprivation</div>
     <div class="row">
-      <div class="panel" style="flex:0 0 280px">
-        <h3>IMD domains — mean of ward LSOAs</h3>
-        ${radarSVG}
-        <div class="legend">Red polygon = this ward · dashed = NWL mean</div>
-      </div>
       <div class="panel" style="flex:1">
         <h3>Health &amp; economic indicators vs NWL median</h3>
         ${healthBars}
-      </div>
-    </div>
-    <div class="row">
-      <div class="panel" style="flex:1">
-        <h3>Green &amp; blue space access — mean of ward LSOAs</h3>
-        ${greenSVG}
-        <div class="legend">% of LSOA UPRNs within walking distance of qualifying greenspace · Defra ANGSt / FoE (2023)</div>
+        <div class="legend"><span class="legend-tick"></span> NWL median &nbsp;·&nbsp; bar colour shows direction (red = concern, green = strength)</div>
       </div>
     </div>
 
@@ -5312,12 +5219,13 @@ async function _downloadMapPng() {
     await new Promise(r => setTimeout(r, 220));
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-    // Step 2: capture the map FIRST, with no mask in the DOM. This avoids
-    // the html2canvas SVG-rendering quirks that were causing the mask to
-    // appear in the wrong place on the captured canvas (per user report —
-    // choropleth ended up in the top-left of the export). The mask is
-    // applied AFTER capture, in canvas-pixel space, projecting borough
-    // polygons against the same canvas we just drew into.
+    // Step 2: capture. Bare-metal screenshot of the map element after
+    // fitBounds. No SVG mask, no Canvas-2D mask, no post-capture crop —
+    // every layer of complexity introduced its own bug. The user wanted
+    // a download focused on the lat/lng of NW London, which is exactly
+    // what fitBounds gave us; the captured viewport at that view IS the
+    // output. If the user wants the eastern surplus removed they can
+    // crop in their own tool. This matches what's on screen, predictably.
     const dpr = window.devicePixelRatio || 1;
     const fullCanvas = await html2canvas(mapEl, {
       useCORS: true,
@@ -5327,80 +5235,12 @@ async function _downloadMapPng() {
       scale: dpr,
     });
 
-    // Measure true pixel ratio html2canvas produced.
     const xScale = mapEl.clientWidth
       ? (fullCanvas.width / mapEl.clientWidth)  : dpr;
     const yScale = mapEl.clientHeight
       ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
-    // Step 3: paint the dim mask onto the captured canvas using Canvas-2D
-    // Path2D + evenodd fill, AND collect the polygon bbox in canvas pixels
-    // for the tight crop in step 4. Polygons are projected NOW (post-capture,
-    // while the map state is identical to what was just rasterised) — no
-    // SVG, no DOM, no rendering-pipeline timing race.
-    const feats = _pngScopeFeatures();
-    let bxMin = Infinity, byMin = Infinity, bxMax = -Infinity, byMax = -Infinity;
-    if (feats && feats.length) {
-      try {
-        const ctx = fullCanvas.getContext('2d');
-        const path = new Path2D();
-        // Outer ring: full canvas extent.
-        path.rect(0, 0, fullCanvas.width, fullCanvas.height);
-        // Inner rings: each NWL borough polygon, projected from latLng to
-        // canvas pixels via the live Leaflet projection.
-        feats.forEach(f => {
-          const g = f && f.geometry; if (!g) return;
-          const rings = [];
-          if (g.type === 'Polygon') g.coordinates.forEach(r => rings.push(r));
-          else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(r => rings.push(r)));
-          rings.forEach(ring => {
-            if (!ring || ring.length < 3) return;
-            ring.forEach((c, i) => {
-              const p = map.latLngToContainerPoint(L.latLng(c[1], c[0]));
-              const cx = p.x * xScale;
-              const cy = p.y * yScale;
-              if (cx < bxMin) bxMin = cx;
-              if (cy < byMin) byMin = cy;
-              if (cx > bxMax) bxMax = cx;
-              if (cy > byMax) byMax = cy;
-              if (i === 0) path.moveTo(cx, cy); else path.lineTo(cx, cy);
-            });
-            path.closePath();
-          });
-        });
-        ctx.save();
-        ctx.fillStyle = 'rgba(255,255,255,0.55)';
-        ctx.fill(path, 'evenodd');
-        ctx.restore();
-      } catch (e) {
-        console.warn('PNG mask paint failed (output will be unmasked):', e);
-      }
-    }
-
-    // Step 4: crop to the polygon bbox + 100 CSS-px pad. fitBounds frames
-    // the polygon vertically (or horizontally — whichever is the shorter
-    // viewport dimension), but on wide displays leaves huge surplus on the
-    // long axis. Cropping eliminates that surplus. The pad is in CSS px so
-    // we multiply by xScale/yScale to get canvas pixels — generous enough
-    // to never clip the polygon outline.
-    let outCanvas = fullCanvas;
-    if (isFinite(bxMin) && (bxMax - bxMin) > 60 && (byMax - byMin) > 60) {
-      const padX = 100 * xScale;
-      const padY = 100 * yScale;
-      const cx = Math.max(0, Math.round(bxMin - padX));
-      const cy = Math.max(0, Math.round(byMin - padY));
-      const cw = Math.min(fullCanvas.width  - cx, Math.round((bxMax - bxMin) + padX * 2));
-      const ch = Math.min(fullCanvas.height - cy, Math.round((byMax - byMin) + padY * 2));
-      if (cw > 100 && ch > 100) {
-        outCanvas = document.createElement('canvas');
-        outCanvas.width = cw;
-        outCanvas.height = ch;
-        const cctx = outCanvas.getContext('2d');
-        cctx.fillStyle = '#ffffff';
-        cctx.fillRect(0, 0, cw, ch);
-        cctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
-      }
-    }
+    const outCanvas = fullCanvas;
     outCanvas._nwlDpr = Math.max(xScale, yScale);
 
     // Caption pill (scope · overlay · month YYYY).
@@ -6112,9 +5952,14 @@ async function loadData() {
 
     // Index by ward code first (unambiguous), then by the GJ display name so
     // disambiguated names like "Kilburn (Brent)" resolve to the right ward.
+    // Stamp the WD24CD onto each ward record itself (`ward.code`) so callers
+    // can look up the ward's code without doing an inverse search through
+    // WARD_DATA_BY_CODE — ward report uses this for ward_code matching against
+    // schools.json / community_centres.json / libraries.json.
     WARD_DATA = {};
     WARD_DATA_BY_CODE = {};
     for (const [code, ward] of Object.entries(wards)) {
+      ward.code = code;
       WARD_DATA_BY_CODE[code] = ward;
     }
     if (typeof GJ !== 'undefined' && GJ.features) {

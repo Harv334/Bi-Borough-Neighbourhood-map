@@ -2979,6 +2979,63 @@ window.generateWardReport = function(wn) {
   // ── Health & deprivation: IMD-domain radar + ward-level health bars ──
   const wardCode = (wdata && wdata.code) || '';
 
+  // 7-domain IMD radar — aggregate LSOA-level domain scores up to ward level
+  // by taking the mean across the ward's LSOAs. The LSOA → ward_code mapping
+  // lives in LSOA_IMD.features (built from the ONS WD24 best-fit lookup).
+  // NWL reference ring = mean across all 1,183 NWL LSOAs.
+  const _IMD_DOMAINS = [
+    { k:'income_score',      l:'Income' },
+    { k:'employment_score',  l:'Employment' },
+    { k:'education_score',   l:'Education' },
+    { k:'health_score',      l:'Health' },
+    { k:'crime_score',       l:'Crime' },
+    { k:'barriers_score',    l:'Barriers' },
+    { k:'environment_score', l:'Environment' },
+  ];
+  const _wardLSOACodes = (() => {
+    if (!wardCode || typeof LSOA_IMD === 'undefined' || !LSOA_IMD || !LSOA_IMD.features) return [];
+    return LSOA_IMD.features
+      .filter(f => f.properties && f.properties.ward_code === wardCode)
+      .map(f => f.properties.code);
+  })();
+  const _wardDomainMean = (k) => {
+    if (typeof LSOA_DATA !== 'object' || !_wardLSOACodes.length) return null;
+    const vs = [];
+    for (const code of _wardLSOACodes) {
+      const row = LSOA_DATA[code];
+      if (!row) continue;
+      const v = parseFloat((row.indicators || row)[k]);
+      if (!isNaN(v)) vs.push(v);
+    }
+    if (!vs.length) return null;
+    return vs.reduce((a,b) => a+b, 0) / vs.length;
+  };
+  const _nwlDomainMean = (k) => {
+    if (typeof LSOA_DATA !== 'object') return null;
+    const vs = [];
+    for (const row of Object.values(LSOA_DATA)) {
+      const v = parseFloat((row.indicators || row)[k]);
+      if (!isNaN(v)) vs.push(v);
+    }
+    if (!vs.length) return null;
+    return vs.reduce((a,b) => a+b, 0) / vs.length;
+  };
+  const _nwlDomainMax = (k) => {
+    if (typeof LSOA_DATA !== 'object') return 1;
+    let m = 0;
+    for (const row of Object.values(LSOA_DATA)) {
+      const v = parseFloat((row.indicators || row)[k]);
+      if (!isNaN(v) && v > m) m = v;
+    }
+    return m || 1;
+  };
+  const radarSVG = _chartRadar(_IMD_DOMAINS.map(d => ({
+    l: d.l,
+    v: _wardDomainMean(d.k),
+    ref: _nwlDomainMean(d.k),
+    max: _nwlDomainMax(d.k),
+  })), { size: 240 });
+
   const healthBars = _chartCompare([
     { l:'Good/very good health', v: inds.census_good_health_pct,        ref: _median(_wardVals('census_good_health_pct')),        wh: false, dp: 0 },
     { l:'Bad/very bad health',   v: inds.census_bad_health_pct,         ref: _median(_wardVals('census_bad_health_pct')),         wh: true,  dp: 1 },
@@ -3305,6 +3362,11 @@ window.generateWardReport = function(wn) {
 
     <div class="section-h">Health &amp; deprivation</div>
     <div class="row">
+      <div class="panel" style="flex:0 0 280px">
+        <h3>IMD 2025 — 7-domain radar</h3>
+        ${radarSVG}
+        <div class="legend">Red polygon = ward (mean of ${_wardLSOACodes.length} LSOAs) · dashed = NWL LSOA mean · axes normalised to NWL max</div>
+      </div>
       <div class="panel" style="flex:1">
         <h3>Health &amp; economic indicators vs NWL median</h3>
         ${healthBars}

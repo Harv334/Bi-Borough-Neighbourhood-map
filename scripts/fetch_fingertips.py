@@ -466,21 +466,33 @@ def fetch_msoa_data_for_lad(ftp, indicator_ids, msoa_area_type_id, lad_atid, lad
 # ──────────────────────────────────────────────────────────────────────────
 # Aggregate
 # ──────────────────────────────────────────────────────────────────────────
-def aggregate_to_ward(msoa_data, lsoa_to_msoa, lsoa_to_ward, lsoa_pop):
+def aggregate_to_ward(msoa_data, msoa_suppressed, lsoa_to_msoa, lsoa_to_ward, lsoa_pop):
+    """Returns:
+        out:        {indicator_id: {ward_code: ward_value}}
+        suppressed: {indicator_id: set(ward_code)} — wards whose MSOAs all
+                    returned empty/suppressed values for this indicator."""
     out = {}
+    suppressed = {}
     for iid, msoa_vals in msoa_data.items():
         ward_acc = {}
+        ward_supp_check = {}  # ward_code → [n_msoas_total, n_msoas_suppressed]
+        seen_msoas_per_ward = {}
         for lsoa, wcode in lsoa_to_ward.items():
             msoa = lsoa_to_msoa.get(lsoa)
             if not msoa:
                 continue
+            # Track which MSOAs covered this ward + how many were suppressed
+            if wcode not in seen_msoas_per_ward:
+                seen_msoas_per_ward[wcode] = set()
+            if msoa not in seen_msoas_per_ward[wcode]:
+                seen_msoas_per_ward[wcode].add(msoa)
+                slot_supp = ward_supp_check.setdefault(wcode, [0, 0])
+                slot_supp[0] += 1
+                if (iid, msoa) in msoa_suppressed:
+                    slot_supp[1] += 1
             v = msoa_vals.get(msoa)
             if v is None:
                 continue
-            # Skip NaN (suppressed Fingertips values) — they propagate through
-            # the pop-weighted mean and produce NaN ward values, which then
-            # break browser JSON parsing because Python writes NaN as a bare
-            # token that JSON.parse rejects.
             if isinstance(v, float) and v != v:
                 continue
             pop = lsoa_pop.get(lsoa)
@@ -490,7 +502,15 @@ def aggregate_to_ward(msoa_data, lsoa_to_msoa, lsoa_to_ward, lsoa_pop):
             slot[0] += pop * v
             slot[1] += pop
         out[iid] = {w: (n/d) for w, (n, d) in ward_acc.items() if d > 0}
-    return out
+        # A ward is "suppressed for this indicator" if ALL its MSOAs returned
+        # empty values AND the ward got no aggregated value.
+        ward_supp = set()
+        for wcode, (total, n_supp) in ward_supp_check.items():
+            if wcode not in out[iid] and total > 0 and n_supp == total:
+                ward_supp.add(wcode)
+        if ward_supp:
+            suppressed[iid] = ward_supp
+    return out, suppressed
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -589,6 +609,10 @@ def main():
     print("\n=== STEP 4: fetch MSOA data ===")
     iid_list = indicators['indicator_id'].tolist()
     msoa_data = {iid: {} for iid in iid_list}
+    # Track (indicator_id, msoa_code) pairs where Fingertips returned an empty
+    # value — i.e. suppressed at source. Used downstream to flag wards as
+    # "suppressed" rather than "no data" in the dashboard hover tooltip.
+    msoa_suppressed = set()
     raw_rows = []
 
     for lad_code, lad_name in NWL_LADS.items():
@@ -620,10 +644,21 @@ def main():
             try:
                 iid = int(row[c_iid])
                 code = str(row[c_code])
-                if not code.startswith('E02'):
-                    continue
-                v = float(row[c_value])
             except (ValueError, TypeError):
+                continue
+            if not code.startswith('E02'):
+                continue
+            raw_value_str = row[c_value]
+            # Detect suppression: empty string OR can't parse to float.
+            try:
+                v = float(raw_value_str)
+                if v != v:  # NaN
+                    msoa_suppressed.add((iid, code))
+                    continue
+            except (ValueError, TypeError):
+                # Empty string or non-numeric → suppressed at source.
+                if str(raw_value_str).strip() == '' or str(raw_value_str).lower() == 'nan':
+                    msoa_suppressed.add((iid, code))
                 continue
             period = str(row[c_period]) if c_period else ''
             existing = msoa_data.get(iid, {}).get(code)
@@ -632,6 +667,7 @@ def main():
             msoa_data.setdefault(iid, {})[code] = {'value': v, 'period': period}
             raw_rows.append({'indicator_id': iid, 'msoa_code': code, 'value': v, 'period': period, 'lad': lad_code})
         print(f"    rows kept: {sum(1 for k,v in msoa_data.items() if v)} indicators × MSOA pairs ({len(df)} rows fetched)")
+    print(f"  total (indicator × MSOA) pairs suppressed at source: {len(msoa_suppressed)}")
 
     # msoa_simple is built by the curation step below (after dupe/stale drops).
 
@@ -714,9 +750,16 @@ def main():
         json.dumps(meta_records, indent=2), encoding='utf-8')
 
     print("\n=== STEP 5: aggregate MSOA → ward ===")
-    ward_data = aggregate_to_ward(msoa_simple, lsoa_to_msoa, lsoa_to_ward, lsoa_pop)
+    # Filter msoa_suppressed to kept indicators only (curation already
+    # dropped some indicators we don't care about).
+    msoa_suppressed_kept = {(iid, code) for (iid, code) in msoa_suppressed
+                            if iid in keep_iids}
+    ward_data, ward_suppressed = aggregate_to_ward(
+        msoa_simple, msoa_suppressed_kept, lsoa_to_msoa, lsoa_to_ward, lsoa_pop)
     n_with = sum(1 for v in ward_data.values() if v)
+    n_supp_total = sum(len(s) for s in ward_suppressed.values())
     print(f"  ward aggregates produced for {n_with}/{len(ward_data)} indicators")
+    print(f"  (indicator × ward) cells flagged as suppressed at source: {n_supp_total}")
 
     # Persist outputs even on dry-run for inspection
     print("\n=== STEP 6: write metadata + raw CSV ===")
@@ -748,9 +791,6 @@ def main():
         for wcode, v in ward_vals.items():
             if v is None or wcode not in wd['wards']:
                 continue
-            # Skip NaN (Python serialises as bare 'NaN' which is invalid JSON
-            # and breaks the dashboard's fetch + parse). Defensive — the
-            # aggregation step also filters NaN now.
             if isinstance(v, float) and v != v:
                 n_skipped_nan += 1
                 continue
@@ -758,6 +798,25 @@ def main():
             wd['wards'][wcode]['indicators'][key] = round(v, 4)
             n_cells += 1
             n_wards.add(wcode)
+
+    # Write per-ward suppression flag list. The dashboard checks this at
+    # render time: if a Fingertips overlay value is missing AND the field key
+    # appears in fingertips_suppressed, show "Suppressed by Fingertips" in
+    # the hover tooltip rather than the generic "no data".
+    n_supp_cells = 0
+    # Reset existing flags first (so re-runs don't accumulate stale entries)
+    for w in wd['wards'].values():
+        if 'fingertips_suppressed' in w:
+            del w['fingertips_suppressed']
+    for iid, supp_wards in ward_suppressed.items():
+        key = f'ft_{iid}'
+        for wcode in supp_wards:
+            if wcode not in wd['wards']:
+                continue
+            wd['wards'][wcode].setdefault('fingertips_suppressed', [])
+            if key not in wd['wards'][wcode]['fingertips_suppressed']:
+                wd['wards'][wcode]['fingertips_suppressed'].append(key)
+                n_supp_cells += 1
     # Strip any pre-existing NaN values from prior fingertips fields — patcher
     # may have written them in earlier runs, before this fix existed.
     n_cleaned = 0
@@ -781,6 +840,7 @@ def main():
     print(f"  patched {n_cells} cells across {len(n_wards)} wards "
           f"(skipped {n_skipped_nan} NaN values during patch, "
           f"cleaned {n_cleaned} pre-existing NaN values)")
+    print(f"  flagged {n_supp_cells} (indicator × ward) cells as suppressed at source")
     print(f"\nDONE. Now run: py scripts/wire_fingertips_ui.py")
 
 

@@ -596,7 +596,42 @@
               <option value="cst_passive_green_space">Passive green space (proportion) · Ward</option>
               <option value="cst_gentrification_change_in_occupational_classes">Gentrification — change in occupational classes · Ward</option>
             </optgroup>
-          </select>
+                                                                      <optgroup label="Health (Fingertips, MSOA → ward)">
+                <option value="ft_93465">Alcohol-related conditions: admission episodes (all primary and secondary diagnoses) · Ward</option>
+                <option value="ft_93233">Chronic obstructive pulmonary disease (COPD): emergency hospital admissions · Ward</option>
+                <option value="ft_93229">Coronary heart disease: emergency hospital admissions · Ward</option>
+                <option value="ft_93227">Emergency hospital admissions: all causes · Ward</option>
+                <option value="ft_93115">Emergency hospital admissions: all causes (aged under 5) · Ward</option>
+                <option value="ft_93280">Fuel poverty (low income, low energy efficiency methodology) · Ward</option>
+                <option value="ft_93089">General fertility rate (women aged 15 to 44) · Ward</option>
+                <option value="ft_93232">Heart attack (myocardial infarction): emergency hospital admissions · Ward</option>
+                <option value="ft_93241">Hip fracture: emergency hospital admissions (aged 65 and over) · Ward</option>
+                <option value="ft_93240">Hospital admissions for alcohol attributable conditions, narrow definition · Ward</option>
+                <option value="ft_93239">Intentional self-harm: emergency hospital admissions · Ward</option>
+                <option value="ft_93283">Life expectancy at birth · Ward</option>
+                <option value="ft_93098">Long-term unemployment: people claiming out of work benefit for over 12 months (aged 16 to 64) · Ward</option>
+                <option value="ft_93092">Low birth weight of live babies · Ward</option>
+                <option value="ft_93250">Mortality from all causes · Ward</option>
+                <option value="ft_93252">Mortality from all causes (aged under 75) · Ward</option>
+                <option value="ft_93253">Mortality from cancer · Ward</option>
+                <option value="ft_93254">Mortality from cancer (aged under 75) · Ward</option>
+                <option value="ft_93255">Mortality from cardiovascular disease · Ward</option>
+                <option value="ft_93256">Mortality from cardiovascular disease (aged under 75) · Ward</option>
+                <option value="ft_93480">Mortality from causes considered preventable (aged under 75) · Ward</option>
+                <option value="ft_93257">Mortality from coronary heart disease · Ward</option>
+                <option value="ft_93260">Mortality from respiratory diseases · Ward</option>
+                <option value="ft_93259">Mortality from stroke · Ward</option>
+                <option value="ft_93105">Reception prevalence of obesity (including severe obesity), 3 years data combined · Ward</option>
+                <option value="ft_93106">Reception prevalence of overweight (including obesity), 3 years data combined · Ward</option>
+                <option value="ft_93231">Stroke: emergency hospital admissions · Ward</option>
+                <option value="ft_93097">Unemployment: people claiming out of work benefit (aged 16 to 64) · Ward</option>
+                <option value="ft_93114">Unintentional and deliberate injuries: emergency hospital admissions in children (aged under 5) · Ward</option>
+                <option value="ft_93219">Unintentional and deliberate injuries: hospital admissions in children (aged under 15) · Ward</option>
+                <option value="ft_93224">Unintentional and deliberate injuries: hospital admissions in young people (aged 15 to 24) · Ward</option>
+                <option value="ft_93107">Year 6 prevalence of obesity (including severe obesity), 3 years data combined · Ward</option>
+                <option value="ft_93108">Year 6 prevalence of overweight (including obesity), 3 years data combined · Ward</option>
+              </optgroup>
+            </select>
 
           <div class="scale-bar" id="scale">
             <div class="scale-labels"><span id="sc-lo">Low</span><span id="sc-mid" style="color:#aaa;font-variant-numeric:tabular-nums"></span><span id="sc-hi">High</span></div>
@@ -929,6 +964,40 @@ const OV_CFG = {
   cst_number_and_proximity_of_cultural_spaces:
                                    { lo:"Lower", hi:"Higher", wh:false, min:0,    max:700  },
   cst_number_of_faith_centres:     { lo:"Fewer", hi:"More",   wh:false, min:0,    max:15   },
+  ft_93280                      : { lo:"Lower", hi:"Higher", wh:true, min:5.5132, max:14.2429 },
+  ft_93097                      : { lo:"Lower", hi:"Higher", wh:true, min:0.7017, max:13.1514 },
+  ft_93098                      : { lo:"Lower", hi:"Higher", wh:true, min:-0.1326, max:2.784 },
+  ft_93105                      : { lo:"Lower", hi:"Higher", wh:true, min:4.8001, max:16.4726 },
+  ft_93106                      : { lo:"Lower", hi:"Higher", wh:true, min:11.8697, max:31.3188 },
+  ft_93107                      : { lo:"Lower", hi:"Higher", wh:true, min:9.3062, max:33.1308 },
+  ft_93108                      : { lo:"Lower", hi:"Higher", wh:true, min:15.1293, max:48.9512 },
+  ft_93089                      : { lo:"Lower", hi:"Higher", wh:false, min:26.6285, max:75.9128 },
+  ft_93092                      : { lo:"Lower", hi:"Higher", wh:true, min:2.9117, max:14.0331 },
+  ft_93115                      : { lo:"Lower", hi:"Higher", wh:true, min:23.7886, max:130.1168 },
+  ft_93114                      : { lo:"Lower", hi:"Higher", wh:true, min:33.0975, max:142.8947 },
+  ft_93219                      : { lo:"Lower", hi:"Higher", wh:true, min:28.1776, max:102.0726 },
+  ft_93224                      : { lo:"Lower", hi:"Higher", wh:true, min:18.9401, max:193.8746 },
+  ft_93227                      : { lo:"Lower", hi:"Higher", wh:true, min:35.429, max:161.0584 },
+  ft_93229                      : { lo:"Lower", hi:"Higher", wh:true, min:28.4227, max:231.7911 },
+  ft_93231                      : { lo:"Lower", hi:"Higher", wh:true, min:31.6739, max:215.929 },
+  ft_93232                      : { lo:"Lower", hi:"Higher", wh:true, min:26.0245, max:212.3568 },
+  ft_93233                      : { lo:"Lower", hi:"Higher", wh:true, min:3.4944, max:239.6648 },
+  ft_93239                      : { lo:"Lower", hi:"Higher", wh:true, min:8.263, max:97.0153 },
+  ft_93241                      : { lo:"Lower", hi:"Higher", wh:true, min:38.2914, max:127.4095 },
+  ft_93465                      : { lo:"Lower", hi:"Higher", wh:true, min:38.6552, max:199.7579 },
+  ft_93240                      : { lo:"Lower", hi:"Higher", wh:true, min:27.8614, max:167.9237 },
+  ft_93283                      : { lo:"Lower", hi:"Higher", wh:false, min:79.0728, max:89.6794 },
+  ft_93250                      : { lo:"Lower", hi:"Higher", wh:true, min:48.6908, max:173.9462 },
+  ft_93252                      : { lo:"Lower", hi:"Higher", wh:true, min:28.0535, max:220.1707 },
+  ft_93253                      : { lo:"Lower", hi:"Higher", wh:true, min:47.0495, max:131.6352 },
+  ft_93254                      : { lo:"Lower", hi:"Higher", wh:true, min:32.5767, max:178.153 },
+  ft_93255                      : { lo:"Lower", hi:"Higher", wh:true, min:33.0507, max:166.9683 },
+  ft_93256                      : { lo:"Lower", hi:"Higher", wh:true, min:10.5772, max:192.8863 },
+  ft_93257                      : { lo:"Lower", hi:"Higher", wh:true, min:24.0021, max:191.8678 },
+  ft_93259                      : { lo:"Lower", hi:"Higher", wh:true, min:16.5071, max:221.8785 },
+  ft_93260                      : { lo:"Lower", hi:"Higher", wh:true, min:32.9288, max:161.9386 },
+  ft_93480                      : { lo:"Lower", hi:"Higher", wh:true, min:24.047, max:307.7992 },
+
 };
 
 // Transparency state — controlled by sliders
@@ -1042,7 +1111,42 @@ const CATS = [
     { k: "cst_number_of_faith_centres",                                   l: "Faith centres",                                 g: "ward" },
     { k: "cst_passive_green_space",                                       l: "Passive green space (proportion)",              g: "ward" },
     { k: "cst_gentrification_change_in_occupational_classes",             l: "Gentrification — change in occupational classes", g: "ward" },
-  ]},
+  ]},,
+  { key: "health_fingertips", label: "Health & wellbeing (Fingertips, MSOA \u2192 ward)", ico: "⚕", fields: [
+    { k: "ft_93280", l: "Fuel poverty (low income, low energy efficiency methodology)", g: "ward" },
+    { k: "ft_93097", l: "Unemployment: people claiming out of work benefit (aged 16 to 64)", g: "ward" },
+    { k: "ft_93098", l: "Long-term unemployment: people claiming out of work benefit for over 12 months (aged 16 to 64)", g: "ward" },
+    { k: "ft_93105", l: "Reception prevalence of obesity (including severe obesity), 3 years data combined", g: "ward" },
+    { k: "ft_93106", l: "Reception prevalence of overweight (including obesity), 3 years data combined", g: "ward" },
+    { k: "ft_93107", l: "Year 6 prevalence of obesity (including severe obesity), 3 years data combined", g: "ward" },
+    { k: "ft_93108", l: "Year 6 prevalence of overweight (including obesity), 3 years data combined", g: "ward" },
+    { k: "ft_93089", l: "General fertility rate (women aged 15 to 44)", g: "ward" },
+    { k: "ft_93092", l: "Low birth weight of live babies", g: "ward" },
+    { k: "ft_93115", l: "Emergency hospital admissions: all causes (aged under 5)", g: "ward" },
+    { k: "ft_93114", l: "Unintentional and deliberate injuries: emergency hospital admissions in children (aged under 5)", g: "ward" },
+    { k: "ft_93219", l: "Unintentional and deliberate injuries: hospital admissions in children (aged under 15)", g: "ward" },
+    { k: "ft_93224", l: "Unintentional and deliberate injuries: hospital admissions in young people (aged 15 to 24)", g: "ward" },
+    { k: "ft_93227", l: "Emergency hospital admissions: all causes", g: "ward" },
+    { k: "ft_93229", l: "Coronary heart disease: emergency hospital admissions", g: "ward" },
+    { k: "ft_93231", l: "Stroke: emergency hospital admissions", g: "ward" },
+    { k: "ft_93232", l: "Heart attack (myocardial infarction): emergency hospital admissions", g: "ward" },
+    { k: "ft_93233", l: "Chronic obstructive pulmonary disease (COPD): emergency hospital admissions", g: "ward" },
+    { k: "ft_93239", l: "Intentional self-harm: emergency hospital admissions", g: "ward" },
+    { k: "ft_93241", l: "Hip fracture: emergency hospital admissions (aged 65 and over)", g: "ward" },
+    { k: "ft_93465", l: "Alcohol-related conditions: admission episodes (all primary and secondary diagnoses)", g: "ward" },
+    { k: "ft_93240", l: "Hospital admissions for alcohol attributable conditions, narrow definition", g: "ward" },
+    { k: "ft_93283", l: "Life expectancy at birth", g: "ward" },
+    { k: "ft_93250", l: "Mortality from all causes", g: "ward" },
+    { k: "ft_93252", l: "Mortality from all causes (aged under 75)", g: "ward" },
+    { k: "ft_93253", l: "Mortality from cancer", g: "ward" },
+    { k: "ft_93254", l: "Mortality from cancer (aged under 75)", g: "ward" },
+    { k: "ft_93255", l: "Mortality from cardiovascular disease", g: "ward" },
+    { k: "ft_93256", l: "Mortality from cardiovascular disease (aged under 75)", g: "ward" },
+    { k: "ft_93257", l: "Mortality from coronary heart disease", g: "ward" },
+    { k: "ft_93259", l: "Mortality from stroke", g: "ward" },
+    { k: "ft_93260", l: "Mortality from respiratory diseases", g: "ward" },
+    { k: "ft_93480", l: "Mortality from causes considered preventable (aged under 75)", g: "ward" }
+  ]}
 ];
 
 // Set of overlay keys that only have LSOA-level data (no ward aggregate).
@@ -1143,6 +1247,176 @@ const OV_META = {
   cst_number_and_proximity_of_cultural_spaces:
                                    { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "score",       desc: "Composite score reflecting the number of cultural spaces (museums, galleries, theatres) and their proximity to residents." },
   cst_number_of_faith_centres:     { src: "London Civic Strength Index (Round 3), London Datastore", yr: "2024", g: "Ward", u: "count",       desc: "Number of faith centres (churches, mosques, synagogues, temples and other places of worship) in the ward." },
+  ft_93280                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Fuel poverty (low income, low energy efficiency methodology). Polarity: RAG - Low is good" },
+  ft_93097                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Unemployment: people claiming out of work benefit (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93098                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Long-term unemployment: people claiming out of work benefit for over 12 months (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93105                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93106                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93107                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93108                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93089                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "General fertility rate (women aged 15 to 44). Polarity: Not applicable" },
+  ft_93092                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Low birth weight of live babies. Polarity: RAG - Low is good" },
+  ft_93115                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Emergency hospital admissions: all causes (aged under 5). Polarity: RAG - Low is good" },
+  ft_93114                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: emergency hospital admissions in children (aged under 5). Polarity: RAG - Low is good" },
+  ft_93219                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in children (aged under 15). Polarity: RAG - Low is good" },
+  ft_93224                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in young people (aged 15 to 24). Polarity: RAG - Low is good" },
+  ft_93227                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Emergency hospital admissions: all causes. Polarity: RAG - Low is good" },
+  ft_93229                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Coronary heart disease: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93231                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Stroke: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93232                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Heart attack (myocardial infarction): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93233                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Chronic obstructive pulmonary disease (COPD): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93239                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Intentional self-harm: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93241                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hip fracture: emergency hospital admissions (aged 65 and over). Polarity: RAG - Low is good" },
+  ft_93465                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Alcohol-related conditions: admission episodes (all primary and secondary diagnoses). Polarity: RAG - Low is good" },
+  ft_93240                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hospital admissions for alcohol attributable conditions, narrow definition. Polarity: RAG - Low is good" },
+  ft_93283                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "Years", desc: "Life expectancy at birth. Polarity: RAG - High is good" },
+  ft_93250                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes. Polarity: RAG - Low is good" },
+  ft_93252                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes (aged under 75). Polarity: RAG - Low is good" },
+  ft_93253                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer. Polarity: RAG - Low is good" },
+  ft_93254                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer (aged under 75). Polarity: RAG - Low is good" },
+  ft_93255                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease. Polarity: RAG - Low is good" },
+  ft_93256                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease (aged under 75). Polarity: RAG - Low is good" },
+  ft_93257                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from coronary heart disease. Polarity: RAG - Low is good" },
+  ft_93259                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from stroke. Polarity: RAG - Low is good" },
+  ft_93260                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from respiratory diseases. Polarity: RAG - Low is good" },
+  ft_93480                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from causes considered preventable (aged under 75). Polarity: RAG - Low is good" },
+
+  ft_93280                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Fuel poverty (low income, low energy efficiency methodology). Polarity: RAG - Low is good" },
+  ft_93097                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Unemployment: people claiming out of work benefit (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93098                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Long-term unemployment: people claiming out of work benefit for over 12 months (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93105                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93106                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93107                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93108                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93089                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "General fertility rate (women aged 15 to 44). Polarity: Not applicable" },
+  ft_93092                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Low birth weight of live babies. Polarity: RAG - Low is good" },
+  ft_93115                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Emergency hospital admissions: all causes (aged under 5). Polarity: RAG - Low is good" },
+  ft_93114                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: emergency hospital admissions in children (aged under 5). Polarity: RAG - Low is good" },
+  ft_93219                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in children (aged under 15). Polarity: RAG - Low is good" },
+  ft_93224                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in young people (aged 15 to 24). Polarity: RAG - Low is good" },
+  ft_93227                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Emergency hospital admissions: all causes. Polarity: RAG - Low is good" },
+  ft_93229                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Coronary heart disease: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93231                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Stroke: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93232                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Heart attack (myocardial infarction): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93233                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Chronic obstructive pulmonary disease (COPD): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93239                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Intentional self-harm: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93241                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hip fracture: emergency hospital admissions (aged 65 and over). Polarity: RAG - Low is good" },
+  ft_93465                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Alcohol-related conditions: admission episodes (all primary and secondary diagnoses). Polarity: RAG - Low is good" },
+  ft_93240                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hospital admissions for alcohol attributable conditions, narrow definition. Polarity: RAG - Low is good" },
+  ft_93283                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "Years", desc: "Life expectancy at birth. Polarity: RAG - High is good" },
+  ft_93250                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes. Polarity: RAG - Low is good" },
+  ft_93252                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes (aged under 75). Polarity: RAG - Low is good" },
+  ft_93253                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer. Polarity: RAG - Low is good" },
+  ft_93254                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer (aged under 75). Polarity: RAG - Low is good" },
+  ft_93255                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease. Polarity: RAG - Low is good" },
+  ft_93256                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease (aged under 75). Polarity: RAG - Low is good" },
+  ft_93257                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from coronary heart disease. Polarity: RAG - Low is good" },
+  ft_93259                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from stroke. Polarity: RAG - Low is good" },
+  ft_93260                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from respiratory diseases. Polarity: RAG - Low is good" },
+  ft_93480                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from causes considered preventable (aged under 75). Polarity: RAG - Low is good" },
+
+  ft_93280                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Fuel poverty (low income, low energy efficiency methodology). Polarity: RAG - Low is good" },
+  ft_93097                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Unemployment: people claiming out of work benefit (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93098                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Long-term unemployment: people claiming out of work benefit for over 12 months (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93105                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93106                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93107                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93108                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93089                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "General fertility rate (women aged 15 to 44). Polarity: Not applicable" },
+  ft_93092                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Low birth weight of live babies. Polarity: RAG - Low is good" },
+  ft_93115                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Emergency hospital admissions: all causes (aged under 5). Polarity: RAG - Low is good" },
+  ft_93114                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: emergency hospital admissions in children (aged under 5). Polarity: RAG - Low is good" },
+  ft_93219                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in children (aged under 15). Polarity: RAG - Low is good" },
+  ft_93224                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in young people (aged 15 to 24). Polarity: RAG - Low is good" },
+  ft_93227                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Emergency hospital admissions: all causes. Polarity: RAG - Low is good" },
+  ft_93229                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Coronary heart disease: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93231                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Stroke: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93232                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Heart attack (myocardial infarction): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93233                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Chronic obstructive pulmonary disease (COPD): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93239                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Intentional self-harm: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93241                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hip fracture: emergency hospital admissions (aged 65 and over). Polarity: RAG - Low is good" },
+  ft_93465                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Alcohol-related conditions: admission episodes (all primary and secondary diagnoses). Polarity: RAG - Low is good" },
+  ft_93240                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hospital admissions for alcohol attributable conditions, narrow definition. Polarity: RAG - Low is good" },
+  ft_93283                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "Years", desc: "Life expectancy at birth. Polarity: RAG - High is good" },
+  ft_93250                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes. Polarity: RAG - Low is good" },
+  ft_93252                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes (aged under 75). Polarity: RAG - Low is good" },
+  ft_93253                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer. Polarity: RAG - Low is good" },
+  ft_93254                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer (aged under 75). Polarity: RAG - Low is good" },
+  ft_93255                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease. Polarity: RAG - Low is good" },
+  ft_93256                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease (aged under 75). Polarity: RAG - Low is good" },
+  ft_93257                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from coronary heart disease. Polarity: RAG - Low is good" },
+  ft_93259                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from stroke. Polarity: RAG - Low is good" },
+  ft_93260                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from respiratory diseases. Polarity: RAG - Low is good" },
+  ft_93480                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from causes considered preventable (aged under 75). Polarity: RAG - Low is good" },
+
+  ft_93280                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Fuel poverty (low income, low energy efficiency methodology). Polarity: RAG - Low is good" },
+  ft_93097                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Unemployment: people claiming out of work benefit (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93098                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Long-term unemployment: people claiming out of work benefit for over 12 months (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93105                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93106                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93107                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93108                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93089                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "General fertility rate (women aged 15 to 44). Polarity: Not applicable" },
+  ft_93092                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Low birth weight of live babies. Polarity: RAG - Low is good" },
+  ft_93115                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Emergency hospital admissions: all causes (aged under 5). Polarity: RAG - Low is good" },
+  ft_93114                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: emergency hospital admissions in children (aged under 5). Polarity: RAG - Low is good" },
+  ft_93219                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in children (aged under 15). Polarity: RAG - Low is good" },
+  ft_93224                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in young people (aged 15 to 24). Polarity: RAG - Low is good" },
+  ft_93227                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Emergency hospital admissions: all causes. Polarity: RAG - Low is good" },
+  ft_93229                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Coronary heart disease: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93231                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Stroke: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93232                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Heart attack (myocardial infarction): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93233                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Chronic obstructive pulmonary disease (COPD): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93239                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Intentional self-harm: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93241                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hip fracture: emergency hospital admissions (aged 65 and over). Polarity: RAG - Low is good" },
+  ft_93465                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Alcohol-related conditions: admission episodes (all primary and secondary diagnoses). Polarity: RAG - Low is good" },
+  ft_93240                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hospital admissions for alcohol attributable conditions, narrow definition. Polarity: RAG - Low is good" },
+  ft_93283                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "Years", desc: "Life expectancy at birth. Polarity: RAG - High is good" },
+  ft_93250                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes. Polarity: RAG - Low is good" },
+  ft_93252                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes (aged under 75). Polarity: RAG - Low is good" },
+  ft_93253                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer. Polarity: RAG - Low is good" },
+  ft_93254                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer (aged under 75). Polarity: RAG - Low is good" },
+  ft_93255                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease. Polarity: RAG - Low is good" },
+  ft_93256                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease (aged under 75). Polarity: RAG - Low is good" },
+  ft_93257                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from coronary heart disease. Polarity: RAG - Low is good" },
+  ft_93259                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from stroke. Polarity: RAG - Low is good" },
+  ft_93260                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from respiratory diseases. Polarity: RAG - Low is good" },
+  ft_93480                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from causes considered preventable (aged under 75). Polarity: RAG - Low is good" },
+
+  ft_93280                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Fuel poverty (low income, low energy efficiency methodology). Polarity: RAG - Low is good" },
+  ft_93097                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Unemployment: people claiming out of work benefit (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93098                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Long-term unemployment: people claiming out of work benefit for over 12 months (aged 16 to 64). Polarity: RAG - Low is good" },
+  ft_93105                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93106                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Reception prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93107                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of obesity (including severe obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93108                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Year 6 prevalence of overweight (including obesity), 3 years data combined. Polarity: RAG - Low is good" },
+  ft_93089                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "General fertility rate (women aged 15 to 44). Polarity: Not applicable" },
+  ft_93092                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "%", desc: "Low birth weight of live babies. Polarity: RAG - Low is good" },
+  ft_93115                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 1,000", desc: "Emergency hospital admissions: all causes (aged under 5). Polarity: RAG - Low is good" },
+  ft_93114                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: emergency hospital admissions in children (aged under 5). Polarity: RAG - Low is good" },
+  ft_93219                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in children (aged under 15). Polarity: RAG - Low is good" },
+  ft_93224                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 10,000", desc: "Unintentional and deliberate injuries: hospital admissions in young people (aged 15 to 24). Polarity: RAG - Low is good" },
+  ft_93227                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Emergency hospital admissions: all causes. Polarity: RAG - Low is good" },
+  ft_93229                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Coronary heart disease: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93231                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Stroke: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93232                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Heart attack (myocardial infarction): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93233                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Chronic obstructive pulmonary disease (COPD): emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93239                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Intentional self-harm: emergency hospital admissions. Polarity: RAG - Low is good" },
+  ft_93241                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hip fracture: emergency hospital admissions (aged 65 and over). Polarity: RAG - Low is good" },
+  ft_93465                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Alcohol-related conditions: admission episodes (all primary and secondary diagnoses). Polarity: RAG - Low is good" },
+  ft_93240                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Hospital admissions for alcohol attributable conditions, narrow definition. Polarity: RAG - Low is good" },
+  ft_93283                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "Years", desc: "Life expectancy at birth. Polarity: RAG - High is good" },
+  ft_93250                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes. Polarity: RAG - Low is good" },
+  ft_93252                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from all causes (aged under 75). Polarity: RAG - Low is good" },
+  ft_93253                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer. Polarity: RAG - Low is good" },
+  ft_93254                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cancer (aged under 75). Polarity: RAG - Low is good" },
+  ft_93255                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease. Polarity: RAG - Low is good" },
+  ft_93256                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from cardiovascular disease (aged under 75). Polarity: RAG - Low is good" },
+  ft_93257                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from coronary heart disease. Polarity: RAG - Low is good" },
+  ft_93259                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from stroke. Polarity: RAG - Low is good" },
+  ft_93260                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from respiratory diseases. Polarity: RAG - Low is good" },
+  ft_93480                      : { src: "OHID Fingertips (Local Health, MSOA → ward via LSOA bridge)", yr: "latest", g: "Ward (MSOA-derived)", u: "per 100", desc: "Mortality from causes considered preventable (aged under 75). Polarity: RAG - Low is good" },
+
 };
 function ovMeta(k) { return OV_META[k] || null; }
 

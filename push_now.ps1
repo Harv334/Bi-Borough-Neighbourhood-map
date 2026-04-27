@@ -1347,6 +1347,62 @@ GitHub Pages — slim lsoa_data.json (67 MB → 2 MB)
   LSOA21CD values, kept only those keys in
   lsoa_data.json. The 1,183 NWL codes all
   matched, so no data lost.
+
+OHID Fingertips — fetcher + UI wiring scripts
+---------------------------------------------
+- Two new scripts to add OHID Fingertips MSOA-
+  level indicators to ward profiles:
+    scripts/fetch_fingertips.py
+    scripts/wire_fingertips_ui.py
+- Methodology: LSOA-bridge population-weighted
+  mean. Each MSOA value inherits down to its
+  child LSOAs (LSOAs nest cleanly in MSOAs);
+  ward value is then the LSOA-pop-weighted
+  mean of those inherited values across the
+  ward's LSOAs. Same method the dashboard's
+  IMD ward score (verified to ICHT 4dp) uses,
+  with one extra inheritance step at the front.
+- fetch_fingertips.py:
+    * Discovers all indicators published at
+      MSOA area types via Fingertips API.
+    * Hydrates indicator metadata (name, unit,
+      polarity, profile).
+    * Fetches the ONS LSOA(2021)→MSOA(2021)
+      lookup once and caches in .cache/.
+    * Pulls MSOA values for the 8 NWL LADs.
+    * Aggregates to ward via the LSOA bridge,
+      using imd_denominator_mid2022 as the
+      population weight.
+    * Patches ward_data.json with new fields
+      keyed `ft_{indicator_id}`.
+    * Writes scripts/fingertips_metadata.json
+      for the UI wiring step.
+    * Writes scripts/fingertips_msoa_raw.csv
+      for audit.
+- wire_fingertips_ui.py:
+    * Reads fingertips_metadata.json.
+    * Computes observed (min,max) of each
+      indicator across NWL wards (5% padding).
+    * Idempotently injects:
+        - CATS "health_fingertips" category
+        - OV_DOMAIN entries (min/max/wh)
+        - OV_META entries (name, unit,
+          polarity, source, desc)
+        - <option> entries inside a new
+          "Health (Fingertips, MSOA → ward)"
+          optgroup in the #ov dropdown
+    * Bivariate dropdown #ov2 left alone —
+      Fingertips fields are single-axis.
+- Workflow:
+    pip install fingertips_py pandas requests `
+        --break-system-packages
+    python scripts/fetch_fingertips.py [--limit N]
+    python scripts/wire_fingertips_ui.py
+- Polarity mapping: Fingertips publishes
+  "Low is good" / "High is good" / "No
+  judgement" for each indicator. Mapped to
+  the dashboard's `wh` flag (wh=true → red
+  bars when above NWL median).
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 

@@ -4407,10 +4407,14 @@ function renderTopBottom() {
   }
 
   // Build [id, name, value] tuples. Skip rows with no value for curOv.
+  // resolveOvField is critical here: imd_score_ward → imd_score (the actual
+  // field on each ward record). Without it the IMD-composite-ward overlay
+  // produced an empty Top/Bottom 20 panel because every ward returned null.
+  const fieldKey = resolveOvField(curOv);
   const rows = [];
   for (const [id, row] of Object.entries(pool)) {
     if (useLsoa && mapCodes && !mapCodes.has(id)) continue;
-    const v = (row.indicators || row || {})[curOv];
+    const v = (row.indicators || row || {})[fieldKey];
     if (v == null || v === '' || isNaN(parseFloat(v))) continue;
     const name = useLsoa ? ((mapNames && mapNames[id]) || row.name || row.lsoa_name || row.LSOA21NM || id)
                          : (row.name || id);

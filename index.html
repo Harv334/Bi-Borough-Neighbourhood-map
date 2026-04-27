@@ -1894,7 +1894,7 @@ function loadSchoolsLayer(rows) {
     const wsRow = p.website ? `<div class="pop-row"><span class="pop-key">Web</span><span><a href="${_esc(p.website)}" target="_blank" rel="noopener">link</a></span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#1E5BB8">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.street,p.town,p.postcode].filter(Boolean).join(', '))}</div>${phRow}${tyRow}${ageRow}${pupRow}${fsmRow}<div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · ${_esc(p.phase||'School')}`, { direction:'top', className:'marker-tip' });
-    schoolsData.push({ phase:p.phase||'', ward_code:p.ward_code||'', lat:p.lat, lng:p.lng, marker });
+    schoolsData.push({ ...p, marker });
   });
   _applySchoolsFilter();
   console.log(`Loaded ${schoolsData.length} schools`);
@@ -1929,7 +1929,7 @@ function loadCCLayer(rows) {
     marker.bindPopup(`<div class="pop-hdr" style="background:#D87C2D">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div><div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wdRow}${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · Community centre`, { direction:'top', className:'marker-tip' });
     ccCluster.addLayer(marker);
-    ccData.push({ ward_code:p.ward_code||'', lat:p.lat, lng:p.lng, marker });
+    ccData.push({ ...p, marker });
   });
   const el = document.getElementById('cc-count');
   if (el) el.textContent = ccData.length;
@@ -1955,7 +1955,7 @@ function loadLibLayer(rows) {
     marker.bindPopup(`<div class="pop-hdr" style="background:#00A0A0">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div><div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wdRow}${stRow}${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · Library`, { direction:'top', className:'marker-tip' });
     libCluster.addLayer(marker);
-    libData.push({ ward_code:p.ward_code||'', lat:p.lat, lng:p.lng, marker });
+    libData.push({ ...p, marker });
   });
   const el = document.getElementById('lib-count');
   if (el) el.textContent = libData.length;
@@ -1980,7 +1980,7 @@ function loadESOLLayer(rows) {
     const tyRow = p.type ? `<div class="pop-row"><span class="pop-key">Type</span><span>${_esc(p.type)}</span></div>` : '';
     marker.bindPopup(`<div class="pop-hdr" style="background:#B83C3C">${_esc(p.name)}</div><div class="pop-body"><div class="pop-addr">${_esc([p.address,p.postcode].filter(Boolean).join(', '))}</div>${tyRow}<div class="pop-row"><span class="pop-key">Borough</span><span>${_esc(p.borough)}</span></div>${wsRow}</div>`);
     marker.bindTooltip(`${_esc(p.name)} · ${_esc(p.type||'ESOL provider')}`, { direction:'top', className:'marker-tip' });
-    esolData.push({ type:p.type||'', lat:p.lat, lng:p.lng, marker });
+    esolData.push({ ...p, marker });
   });
   _applyESOLFilter();
   console.log(`Loaded ${esolData.length} ESOL providers`);
@@ -2535,8 +2535,12 @@ function showWard(wn) {
     { k:'census_over65_pct',       l:'65+',    v:inds.census_over65_pct,       c:'#a05a9e' },
   ]);
 
+  // Ward sidebar profile: WARD-LEVEL FIELDS ONLY. LSOA-level fields belong
+  // in the LSOA profile (clicking a single LSOA), not here. The CATS config
+  // tags every field with .g ('ward' or 'lsoa'); we filter on that.
   const cats = CATS.map(cat => {
-    const rows = cat.fields.map(f => {
+    const wardFields = cat.fields.filter(f => f.g === 'ward');
+    const rows = wardFields.map(f => {
       const val = inds[f.k];
       if (val === null || val === undefined || val === '') return '';
       const isNum = !isNaN(parseFloat(val));
@@ -2878,6 +2882,31 @@ window.generateWardReport = function(wn) {
   // ESOL — no ward_code in source CSV, spatial only
   let esolN  = _matchSpatial(typeof esolData !== 'undefined' ? esolData : []);
 
+  // ── Build comprehensive physical-locations lists for the in-ward content.
+  // These power the "Physical locations in this ward" section at the bottom.
+  // For schools / CC / libraries we use ward_code (exact attribution from
+  // source CSVs); for everything else spatial point-in-polygon.
+  const _byWardCode = (arr) => Array.isArray(arr) && wcode
+    ? arr.filter(d => d && d.ward_code === wcode) : [];
+  const _bySpatial = (arr) => {
+    if (!Array.isArray(arr) || typeof pointInWardLayer !== 'function') return [];
+    return arr.filter(d => {
+      try {
+        const lat = d.lat != null ? d.lat : (d.marker && d.marker.getLatLng().lat);
+        const lng = d.lng != null ? d.lng : (d.marker && d.marker.getLatLng().lng);
+        return lat != null && lng != null && pointInWardLayer(lat, lng, wn);
+      } catch(e) { return false; }
+    });
+  };
+  const _schools  = _byWardCode(typeof schoolsData !== 'undefined' ? schoolsData : []);
+  const _cc       = _byWardCode(typeof ccData !== 'undefined' ? ccData : []);
+  const _libs     = _byWardCode(typeof libData !== 'undefined' ? libData : []);
+  const _esol     = _bySpatial(typeof esolData !== 'undefined' ? esolData : []);
+  const _dental   = _bySpatial(typeof dentalData !== 'undefined' ? dentalData : []);
+  const _hosp     = _bySpatial(typeof HOSP !== 'undefined' ? HOSP : []);
+  const _vcse     = _bySpatial(typeof vcseData !== 'undefined' ? vcseData : []);
+  const _green    = _bySpatial(typeof GRN !== 'undefined' ? GRN : []);
+
   // Headline stats (ward-level only) + NWL reference values for context
   const popN     = _fmt(inds.census_population);
   const goodHlt  = _fmt(inds.census_good_health_pct);
@@ -3163,19 +3192,21 @@ window.generateWardReport = function(wn) {
     ? `<span class="badge core20">Core20 ward</span>`
     : '';
 
-  // GP practices named list (kept on page 2)
+  // GP / pharmacy named lists from ward_data.json (authoritative)
   const gps = (wdata && wdata.gp_list) || [];
-  const gpRows = gps.map(g => `<tr><td><strong>${_esc(g.name || '-')}</strong><br><span style="font-size:10px;color:#777">${_esc(g.addr || '')} ${_esc(g.postcode || '')}</span></td><td class="v" style="font-size:11px;color:#666">${_esc(g.tel || '')}</td></tr>`).join('');
-  const gpListSection = gpRows
-    ? `<section class="lst"><h3>GP practices in this ward (${gps.length})</h3><table class="kv">${gpRows}</table></section>`
-    : '';
-
-  // Pharmacies named list
   const phs = (wdata && wdata.pharmacy_list) || [];
-  const phRows = phs.map(p => `<tr><td><strong>${_esc(p.name || '-')}</strong></td><td class="v" style="font-size:11px;color:#666">${_esc(p.addr || '')} ${_esc(p.postcode || '')}</td></tr>`).join('');
-  const pharmacyListSection = phRows
-    ? `<section class="lst"><h3>Pharmacies in this ward (${phs.length})</h3><table class="kv">${phRows}</table></section>`
-    : '';
+
+  // _locBlock: render a "physical locations" panel with title + ordered list.
+  // items: array of records, fmt: function(record) → inner HTML for one <li>.
+  // extra: optional class (e.g. 'span-2' for double-width grid cell).
+  function _locBlock(title, items, fmt, extra) {
+    const cls = 'locblock' + (extra ? ' ' + extra : '');
+    if (!items || !items.length) {
+      return `<div class="${cls}"><h4>${_esc(title)} <span class="count">0</span></h4><div class="empty">none</div></div>`;
+    }
+    const lis = items.map(d => `<li>${fmt(d)}</li>`).join('');
+    return `<div class="${cls}"><h4>${_esc(title)} <span class="count">${items.length}</span></h4><ol>${lis}</ol></div>`;
+  }
 
   // Build IMD composite KPI with rank-in-NWL context
   const imdRank = (() => {
@@ -3196,211 +3227,213 @@ window.generateWardReport = function(wn) {
 <meta charset="utf-8">
 <title>${_esc(wdata ? wdata.name : wn)} — Ward profile</title>
 <style>
-  /* A4 portrait at 96dpi ≈ 794×1123 px. Multi-page layout with breathing
-     room: page 1 = hero + KPIs + services + demographics; page 2 = health
-     & deprivation; page 3 = crime + civic + green/blue; page 4 = lists. */
-  @page { size: A4 portrait; margin: 12mm; }
+  /* Dense single-flow layout — pack info, allow page-break wherever needed.
+     A4 print: prints to as many pages as content needs, no forced breaks. */
+  @page { size: A4 portrait; margin: 10mm; }
   * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#eceae3; color:#1a1a1a; margin:0; padding:18px; line-height:1.5; }
-  .report { width: 794px; max-width: 100%; margin: 0 auto; background:#fff; box-shadow:0 2px 14px rgba(0,0,0,.08); border-radius:6px; overflow:hidden; }
-  .page { padding: 0; }
-  .page + .page { border-top: 6px solid #eceae3; }
-  .page-title { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.12em; padding: 14px 26px 0; margin:0; font-weight:600; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background:#eceae3; color:#1a1a1a; margin:0; padding:14px; line-height:1.4; font-size:12px; }
+  .report { width: 880px; max-width: 100%; margin: 0 auto; background:#fff; box-shadow:0 2px 14px rgba(0,0,0,.08); border-radius:6px; overflow:hidden; }
   /* HERO */
-  .hero { display:flex; gap:24px; padding:22px 26px 18px; border-bottom:1px solid #eee; align-items:flex-start; }
+  .hero { display:flex; gap:18px; padding:18px 22px 14px; border-bottom:1px solid #eee; align-items:flex-start; }
   .hero-text { flex:1; min-width:0; }
-  .hero-text .kicker { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.12em; margin-bottom:4px; font-weight:600; }
-  .hero-text h1 { margin:0; font-size:32px; font-weight:700; letter-spacing:-0.015em; line-height:1.1; }
-  .hero-text .sub { color:#555; font-size:14px; margin-top:6px; }
-  .hero-text .badges { margin-top:10px; }
-  .badge { display:inline-block; margin-right:6px; padding:3px 11px; border-radius:14px; font-size:11px; font-weight:600; vertical-align:middle; }
+  .hero-text .kicker { font-size:10.5px; color:#888; text-transform:uppercase; letter-spacing:.1em; margin-bottom:3px; font-weight:600; }
+  .hero-text h1 { margin:0; font-size:28px; font-weight:700; letter-spacing:-0.015em; line-height:1.1; }
+  .hero-text .sub { color:#555; font-size:13px; margin-top:5px; }
+  .hero-text .badges { margin-top:8px; }
+  .badge { display:inline-block; margin-right:5px; padding:2px 10px; border-radius:14px; font-size:10.5px; font-weight:600; vertical-align:middle; }
   .badge.nb { ${nb ? `background:${nb.bg};color:${nb.color};` : 'background:#eee;color:#555;'} }
   .badge.core20 { background:#fde6ee; color:#8b0035; border:1px solid #f0b5cb; }
   .badge.imd { background:#1a1a1a; color:#fff; }
-  .hero-map { flex:0 0 280px; }
-  .minimap { width:280px; height:170px; border:1px solid #e6e6df; border-radius:4px; background:#f6f6f1; display:block; }
-  .minimap-cap { font-size:10px; color:#888; text-align:center; margin-top:4px; }
-  /* KPI strip — 6 cards, taller and roomier */
+  .hero-map { flex:0 0 240px; }
+  .minimap { width:240px; height:150px; border:1px solid #e6e6df; border-radius:4px; background:#f6f6f1; display:block; }
+  .minimap-cap { font-size:9.5px; color:#888; text-align:center; margin-top:3px; }
+  /* KPI strip — 6 cards, compact */
   .kpis { display:grid; grid-template-columns: repeat(6, 1fr); border-top:1px solid #eee; border-bottom:1px solid #eee; }
-  .kpi { padding:16px 10px 14px; text-align:center; border-right:1px solid #f0f0ec; }
+  .kpi { padding:11px 8px 10px; text-align:center; border-right:1px solid #f0f0ec; }
   .kpi:last-child { border-right:none; }
-  .kpi-lbl { font-size:10px; color:#666; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; font-weight:600; }
-  .kpi-val { font-size:28px; font-weight:700; color:#1a1a1a; line-height:1.05; font-variant-numeric: tabular-nums; }
+  .kpi-lbl { font-size:9.5px; color:#666; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; font-weight:600; }
+  .kpi-val { font-size:22px; font-weight:700; color:#1a1a1a; line-height:1.05; font-variant-numeric: tabular-nums; }
   .kpi-val.dim { color:#bbb; font-weight:400; }
-  .kpi-sub { font-size:10px; color:#999; margin-top:3px; }
-  .kpi-ctx { margin-top:8px; }
-  .kpi-ctx-bar { position:relative; height:5px; border-radius:3px; }
-  .kpi-ctx-tick { position:absolute; top:-2px; bottom:-2px; width:2.5px; background:#1a1a1a; border-radius:1px; }
-  .kpi-ctx-cap { font-size:9.5px; color:#666; margin-top:3px; }
-  /* SERVICES strip — 9 cards, much roomier */
-  .services-wrap { padding:0 0 4px; }
-  .services-title { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.08em; padding:12px 26px 6px; font-weight:600; }
+  .kpi-sub { font-size:9.5px; color:#999; margin-top:2px; }
+  .kpi-ctx { margin-top:5px; }
+  .kpi-ctx-bar { position:relative; height:4px; border-radius:2px; }
+  .kpi-ctx-tick { position:absolute; top:-2px; bottom:-2px; width:2px; background:#1a1a1a; border-radius:1px; }
+  .kpi-ctx-cap { font-size:9px; color:#666; margin-top:2px; }
+  /* SERVICES strip — 9 compact cards */
+  .services-wrap { padding:0; }
+  .services-title { font-size:10.5px; color:#666; text-transform:uppercase; letter-spacing:.08em; padding:9px 22px 4px; font-weight:600; }
   .services { display:grid; grid-template-columns: repeat(9, 1fr); background:#fafaf6; border-top:1px solid #eee; border-bottom:1px solid #eee; }
-  .svc { padding:14px 4px 12px; text-align:center; border-right:1px solid #f0f0ec; }
+  .svc { padding:9px 3px 8px; text-align:center; border-right:1px solid #f0f0ec; }
   .svc:last-child { border-right:none; }
-  .svc-val { font-size:22px; font-weight:700; color:#185FA5; line-height:1.1; font-variant-numeric: tabular-nums; }
+  .svc-val { font-size:18px; font-weight:700; color:#185FA5; line-height:1.1; font-variant-numeric: tabular-nums; }
   .svc-val.dim { color:#bbb; font-weight:400; }
-  .svc-lbl { font-size:10px; color:#666; margin-top:4px; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+  .svc-lbl { font-size:9.5px; color:#666; margin-top:2px; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
   /* CONTENT */
-  .content { padding: 22px 26px 24px; }
-  .section-h { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.1em; margin: 0 0 12px; font-weight:600; padding-bottom:4px; border-bottom:1px solid #e8e8e2; }
-  .row { display:flex; gap:18px; margin-bottom:20px; }
+  .content { padding: 14px 22px 16px; }
+  .section-h { font-size:10.5px; color:#666; text-transform:uppercase; letter-spacing:.1em; margin: 14px 0 8px; font-weight:600; padding-bottom:3px; border-bottom:1px solid #e8e8e2; page-break-after: avoid; }
+  .section-h:first-of-type { margin-top:0; }
+  .row { display:flex; gap:12px; margin-bottom:12px; }
   .row.row-3 > .panel { flex:1; min-width:0; }
   .row.row-2 > .panel { flex:1; min-width:0; }
-  .panel { background:#fafaf7; border:1px solid #eee; border-radius:6px; padding:14px 16px 12px; page-break-inside: avoid; }
-  .panel h3 { font-size:12.5px; margin:0 0 10px; color:#333; text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
-  .panel .note { font-size:10.5px; color:#888; margin-top:6px; }
+  .panel { background:#fafaf7; border:1px solid #eee; border-radius:5px; padding:10px 12px 8px; page-break-inside: avoid; }
+  .panel h3 { font-size:11px; margin:0 0 6px; color:#333; text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+  .panel .note { font-size:10px; color:#888; margin-top:4px; }
   /* SVG charts */
   svg.ch-stack, svg.ch-hbar, svg.ch-compare { width:100%; height:auto; display:block; }
-  svg.ch-radar { display:block; margin: 0 auto; }
-  /* lists (GP/pharmacy) */
-  .lst { padding: 14px 26px 18px; page-break-inside: avoid; }
-  .lst h3 { font-size:13px; margin:10px 0 8px; color:#333; border-bottom:1.5px solid #1a1a1a; padding-bottom:4px; letter-spacing:.02em; }
-  table.kv { width:100%; border-collapse: collapse; font-size:11.5px; }
-  table.kv td { padding:6px 0; border-bottom:1px solid #f3f3ef; vertical-align:top; }
+  svg.ch-radar { display:block; margin: 0 auto; max-width: 100%; }
+  /* PHYSICAL LOCATIONS — 3-column grid of named lists */
+  .locations { padding: 4px 22px 14px; }
+  .locations h2 { font-size:13px; margin: 14px 0 8px; color:#1a1a1a; padding-bottom:4px; border-bottom:1.5px solid #1a1a1a; letter-spacing:.04em; text-transform:uppercase; }
+  .locations-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 18px; }
+  .locblock { page-break-inside: avoid; min-width: 0; }
+  .locblock h4 { font-size:11px; margin:0 0 4px; color:#333; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+  .locblock h4 .count { background:#1a1a1a; color:#fff; border-radius:8px; padding:1px 6px; font-size:9px; margin-left:5px; vertical-align:middle; }
+  .locblock ol { margin:0; padding-left:18px; font-size:11px; color:#333; }
+  .locblock li { margin-bottom:3px; line-height:1.35; }
+  .locblock li .meta { color:#888; font-size:10px; }
+  .locblock .empty { font-size:10.5px; color:#bbb; font-style:italic; }
+  .locblock.span-2 { grid-column: span 2; }
+  /* lists (GP/pharmacy named) — full width tables */
+  .lst { padding: 4px 22px 8px; page-break-inside: avoid; }
+  .lst h3 { font-size:11.5px; margin:8px 0 4px; color:#333; border-bottom:1.5px solid #1a1a1a; padding-bottom:3px; letter-spacing:.02em; text-transform:uppercase; }
+  table.kv { width:100%; border-collapse: collapse; font-size:11px; }
+  table.kv td { padding:4px 6px 4px 0; border-bottom:1px solid #f3f3ef; vertical-align:top; }
   table.kv td.v { font-weight:500; color:#1a1a1a; text-align:right; font-variant-numeric: tabular-nums; }
-  .legend { font-size:10px; color:#888; margin-top:6px; }
+  .legend { font-size:9.5px; color:#888; margin-top:4px; }
   .legend-tick { display:inline-block; width:1px; height:9px; background:#1a1a1a; margin: 0 2px 0 0; vertical-align:middle; }
-  .footer { padding: 14px 26px 18px; background:#fafaf6; border-top:1px solid #eee; font-size:10.5px; color:#666; line-height:1.55; }
+  .footer { padding: 10px 22px 14px; background:#fafaf6; border-top:1px solid #eee; font-size:10px; color:#666; line-height:1.5; }
   .footer strong { color:#333; }
-  .actions { max-width:794px; margin: 12px auto 0; display:flex; gap:8px; justify-content:flex-end; }
-  .actions button { padding:8px 14px; border:1px solid #ddd; background:#fff; border-radius:5px; font-size:13px; cursor:pointer; color:#333; }
+  .actions { max-width:880px; margin: 10px auto 0; display:flex; gap:8px; justify-content:flex-end; }
+  .actions button { padding:6px 12px; border:1px solid #ddd; background:#fff; border-radius:5px; font-size:12px; cursor:pointer; color:#333; }
   .actions button:hover { border-color:#999; }
   @media print {
-    body { background:#fff; padding:0; }
+    body { background:#fff; padding:0; font-size:10.5px; }
     .report { box-shadow:none; border-radius:0; width:100%; }
     .actions { display:none; }
-    .panel, .hero, .kpis, .services, .lst { page-break-inside: avoid; }
-    .page { page-break-before: always; }
-    .page:first-of-type { page-break-before: auto; }
+    .panel, .hero, .kpis, .services, .locblock, .lst { page-break-inside: avoid; }
   }
 </style>
 </head><body>
 <div class="report">
 
-  <!-- ═══════════════════════ PAGE 1: Overview ═══════════════════════ -->
-  <div class="page">
-    <div class="hero">
-      <div class="hero-text">
-        <div class="kicker">NW London ward profile · ${_esc(today)}</div>
-        <h1>${_esc(wdata ? wdata.name : wn)}</h1>
-        <div class="sub">${_esc(borough)}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population ' + population : ''}${imdRank ? ' · IMD rank ' + imdRank + ' of ' + totalWards + ' NWL wards' : ''}</div>
-        <div class="badges">
-          ${nb ? `<span class="badge nb">${_esc(nb.label)}</span>` : ''}
-          ${core20Badge}
-          ${imdW != null ? `<span class="badge imd">IMD score ${imdW.toFixed(1)}</span>` : ''}
-        </div>
-      </div>
-      ${miniMapSVG ? `<div class="hero-map">${miniMapSVG}</div>` : ''}
-    </div>
-
-    <div class="kpis">
-      ${_kpi('Population',     popN  != null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
-      ${_kpi('IMD score',      imdW != null ? imdW.toFixed(1) : null,   'pop-weighted', _ctxBar(imdPct, 'lower-better'))}
-      ${_kpi('Good health',    goodHlt != null ? goodHlt.toFixed(0) + '%' : null, 'of residents', _ctxBar(goodHpct, 'higher-better'))}
-      ${_kpi('Bad health',     badHlt  != null ? badHlt.toFixed(1) + '%' : null, 'of residents', _ctxBar(badHpct, 'lower-better'))}
-      ${_kpi('Disability',     disAny  != null ? disAny.toFixed(1) + '%' : null, 'any condition', _ctxBar(disAnyPct, 'lower-better'))}
-      ${_kpi('Core20 LSOAs',   (c20L != null && totL != null) ? c20L.toFixed(0) + '/' + totL.toFixed(0) : null, 'most deprived')}
-    </div>
-
-    <div class="services-wrap">
-      <div class="services-title">Services in this ward</div>
-      <div class="services">
-        <div class="svc"><div class="svc-val ${gpN ? '' : 'dim'}">${gpN  || '—'}</div><div class="svc-lbl">GP</div></div>
-        <div class="svc"><div class="svc-val ${pharmN ? '' : 'dim'}">${pharmN || '—'}</div><div class="svc-lbl">Pharmacy</div></div>
-        <div class="svc"><div class="svc-val ${dentN ? '' : 'dim'}">${dentN  || '—'}</div><div class="svc-lbl">Dental</div></div>
-        <div class="svc"><div class="svc-val ${hospN ? '' : 'dim'}">${hospN  || '—'}</div><div class="svc-lbl">Hospital</div></div>
-        <div class="svc"><div class="svc-val ${schN ? '' : 'dim'}">${schN   || '—'}</div><div class="svc-lbl">Schools</div></div>
-        <div class="svc"><div class="svc-val ${ccN ? '' : 'dim'}">${ccN    || '—'}</div><div class="svc-lbl">Comm ctr</div></div>
-        <div class="svc"><div class="svc-val ${libN ? '' : 'dim'}">${libN   || '—'}</div><div class="svc-lbl">Library</div></div>
-        <div class="svc"><div class="svc-val ${esolN ? '' : 'dim'}">${esolN  || '—'}</div><div class="svc-lbl">ESOL</div></div>
-        <div class="svc"><div class="svc-val ${vcseN ? '' : 'dim'}">${vcseN  || '—'}</div><div class="svc-lbl">VCSE</div></div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-text">
+      <div class="kicker">NW London ward profile · ${_esc(today)}</div>
+      <h1>${_esc(wdata ? wdata.name : wn)}</h1>
+      <div class="sub">${_esc(borough)}${borough && population !== '—' ? ' · ' : ''}${population !== '—' ? 'Population ' + population : ''}${imdRank ? ' · IMD rank ' + imdRank + ' of ' + totalWards + ' NWL wards' : ''}</div>
+      <div class="badges">
+        ${nb ? `<span class="badge nb">${_esc(nb.label)}</span>` : ''}
+        ${core20Badge}
+        ${imdW != null ? `<span class="badge imd">IMD score ${imdW.toFixed(1)}</span>` : ''}
       </div>
     </div>
+    ${miniMapSVG ? `<div class="hero-map">${miniMapSVG}</div>` : ''}
+  </div>
 
-    <div class="content">
-      <div class="section-h">Demographics — who lives here</div>
-      <div class="row row-2">
-        <div class="panel">
-          <h3>Ethnicity (Census 2021)</h3>
-          ${ethStack}
-        </div>
-        <div class="panel">
-          <h3>Age (Census 2021)</h3>
-          ${ageStack}
-          ${inds.census_over85_pct != null ? `<div class="note">85+: ${parseFloat(inds.census_over85_pct).toFixed(1)}% of residents</div>` : ''}
-        </div>
+  <!-- KPI strip -->
+  <div class="kpis">
+    ${_kpi('Population',     popN  != null ? Math.round(popN).toLocaleString() : null, 'Census 2021')}
+    ${_kpi('IMD score',      imdW != null ? imdW.toFixed(1) : null,   'pop-weighted', _ctxBar(imdPct, 'lower-better'))}
+    ${_kpi('Good health',    goodHlt != null ? goodHlt.toFixed(0) + '%' : null, 'of residents', _ctxBar(goodHpct, 'higher-better'))}
+    ${_kpi('Bad health',     badHlt  != null ? badHlt.toFixed(1) + '%' : null, 'of residents', _ctxBar(badHpct, 'lower-better'))}
+    ${_kpi('Disability',     disAny  != null ? disAny.toFixed(1) + '%' : null, 'any condition', _ctxBar(disAnyPct, 'lower-better'))}
+    ${_kpi('Core20 LSOAs',   (c20L != null && totL != null) ? c20L.toFixed(0) + '/' + totL.toFixed(0) : null, 'most deprived')}
+  </div>
+
+  <!-- Services strip -->
+  <div class="services-wrap">
+    <div class="services-title">Services in this ward (counts)</div>
+    <div class="services">
+      <div class="svc"><div class="svc-val ${gpN ? '' : 'dim'}">${gpN  || '—'}</div><div class="svc-lbl">GP</div></div>
+      <div class="svc"><div class="svc-val ${pharmN ? '' : 'dim'}">${pharmN || '—'}</div><div class="svc-lbl">Pharmacy</div></div>
+      <div class="svc"><div class="svc-val ${dentN ? '' : 'dim'}">${dentN  || '—'}</div><div class="svc-lbl">Dental</div></div>
+      <div class="svc"><div class="svc-val ${hospN ? '' : 'dim'}">${hospN  || '—'}</div><div class="svc-lbl">Hospital</div></div>
+      <div class="svc"><div class="svc-val ${schN ? '' : 'dim'}">${schN   || '—'}</div><div class="svc-lbl">Schools</div></div>
+      <div class="svc"><div class="svc-val ${ccN ? '' : 'dim'}">${ccN    || '—'}</div><div class="svc-lbl">Comm ctr</div></div>
+      <div class="svc"><div class="svc-val ${libN ? '' : 'dim'}">${libN   || '—'}</div><div class="svc-lbl">Library</div></div>
+      <div class="svc"><div class="svc-val ${esolN ? '' : 'dim'}">${esolN  || '—'}</div><div class="svc-lbl">ESOL</div></div>
+      <div class="svc"><div class="svc-val ${vcseN ? '' : 'dim'}">${vcseN  || '—'}</div><div class="svc-lbl">VCSE</div></div>
+    </div>
+  </div>
+
+  <!-- All charts in flow, no forced page breaks -->
+  <div class="content">
+    <div class="section-h">Demographics — who lives here</div>
+    <div class="row row-2">
+      <div class="panel">
+        <h3>Ethnicity (Census 2021)</h3>
+        ${ethStack}
       </div>
-      <div class="row">
-        <div class="panel" style="flex:1">
-          <h3>Demographic indicators vs NWL median</h3>
-          ${compareCensus}
-          <div class="legend"><span class="legend-tick"></span> NWL median &nbsp;·&nbsp; <span style="color:#c9534a">red</span> = direction-of-concern, <span style="color:#2c8a4a">green</span> = direction-of-strength</div>
-        </div>
+      <div class="panel">
+        <h3>Age (Census 2021)</h3>
+        ${ageStack}
+        ${inds.census_over85_pct != null ? `<div class="note">85+: ${parseFloat(inds.census_over85_pct).toFixed(1)}% of residents</div>` : ''}
+      </div>
+    </div>
+    <div class="row">
+      <div class="panel" style="flex:1">
+        <h3>Demographic indicators vs NWL median</h3>
+        ${compareCensus}
+        <div class="legend"><span class="legend-tick"></span> NWL median · <span style="color:#c9534a">red</span> = concern, <span style="color:#2c8a4a">green</span> = strength</div>
+      </div>
+    </div>
+
+    <div class="section-h">Health &amp; deprivation</div>
+    <div class="row">
+      <div class="panel" style="flex:0 0 280px">
+        <h3>IMD domains — mean of ward LSOAs</h3>
+        ${radarSVG}
+        <div class="legend">Red polygon = this ward · dashed = NWL mean</div>
+      </div>
+      <div class="panel" style="flex:1">
+        <h3>Health &amp; economic indicators vs NWL median</h3>
+        ${healthBars}
+      </div>
+    </div>
+    <div class="row">
+      <div class="panel" style="flex:1">
+        <h3>Green &amp; blue space access — mean of ward LSOAs</h3>
+        ${greenSVG}
+        <div class="legend">% of LSOA UPRNs within walking distance of qualifying greenspace · Defra ANGSt / FoE (2023)</div>
+      </div>
+    </div>
+
+    ${crimeRows.length ? `<div class="section-h">Crime — last 12 months${crimeTotal != null ? ` · total ${Math.round(crimeTotal).toLocaleString()}` : ''}</div>
+    <div class="row">
+      <div class="panel" style="flex:1">
+        <h3>MPS recorded crime — Apr 2025 to Mar 2026</h3>
+        ${crimeSVG}
+        <div class="legend"><span class="legend-tick"></span> NWL median · sorted by ward count · source: Met Police via London Datastore</div>
+      </div>
+    </div>` : ''}
+
+    <div class="section-h">Civic strength &amp; community assets</div>
+    <div class="row">
+      <div class="panel" style="flex:1">
+        <h3>Civic strength — NWL percentile (higher = stronger)</h3>
+        ${civicSVG}
+        <div class="legend">Each bar = % of 168 NWL wards this ward beats · London Civic Strength Index R3 (2024)</div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════ PAGE 2: Health & deprivation ═══════════════════════ -->
-  <div class="page">
-    <div class="page-title">Health &amp; deprivation</div>
-    <div class="content">
-      <div class="row">
-        <div class="panel" style="flex:0 0 320px">
-          <h3>IMD domains — mean of ward LSOAs</h3>
-          ${radarSVG}
-          <div class="legend">Red polygon = this ward · <span class="legend-tick"></span> dashed = NWL ward-mean reference ring · each axis normalised to NWL LSOA max</div>
-        </div>
-        <div class="panel" style="flex:1">
-          <h3>Health &amp; economic indicators vs NWL median</h3>
-          ${healthBars}
-          <div class="legend"><span class="legend-tick"></span> NWL median &nbsp;·&nbsp; bar colour shows direction (red = concern, green = strength)</div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="panel" style="flex:1">
-          <h3>Green &amp; blue space access — mean of ward LSOAs</h3>
-          ${greenSVG}
-          <div class="legend">% of LSOA UPRNs within walking distance of qualifying greenspace · source: Defra ANGSt / Friends of the Earth (2023)</div>
-        </div>
-      </div>
+  <!-- ═══════════════ PHYSICAL LOCATIONS — comprehensive named lists ═══════════════ -->
+  <div class="locations">
+    <h2>Physical locations in this ward</h2>
+    <div class="locations-grid">
+      ${_locBlock('GP practices',         gps,      g => `<strong>${_esc(g.name||'')}</strong> <span class="meta">${_esc(g.addr||'')}${g.postcode?' · '+_esc(g.postcode):''}${g.tel?' · '+_esc(g.tel):''}</span>`)}
+      ${_locBlock('Pharmacies',           phs,      p => `<strong>${_esc(p.name||'')}</strong> <span class="meta">${_esc(p.addr||'')}${p.postcode?' · '+_esc(p.postcode):''}</span>`)}
+      ${_locBlock('Dental practices',     _dental,  d => `<strong>${_esc(d.name||'')}</strong> <span class="meta">${d.postcode?_esc(d.postcode):''}${d.nhs_contracted===true?' · NHS/mixed':d.nhs_contracted===false?' · Private':''}</span>`)}
+      ${_locBlock('Hospitals & clinics',  _hosp,    h => `<strong>${_esc(h.n||'')}</strong> <span class="meta">${_esc(h.a||'')}${h.t?' · '+_esc(h.t):''}${h.trust?' · '+_esc(h.trust):''}</span>`, 'span-2')}
+      ${_locBlock('Schools',              _schools, s => `<strong>${_esc(s.name||'')}</strong> <span class="meta">${s.phase?_esc(s.phase):''}${s.type?' · '+_esc(s.type):''}${s.postcode?' · '+_esc(s.postcode):''}${s.pupils?' · '+s.pupils+' pupils':''}${s.fsm_pct?' · FSM '+s.fsm_pct+'%':''}</span>`, 'span-2')}
+      ${_locBlock('Community centres',    _cc,      c => `<strong>${_esc(c.name||'')}</strong> <span class="meta">${_esc(c.address||'')}${c.postcode?' · '+_esc(c.postcode):''}</span>`)}
+      ${_locBlock('Libraries',            _libs,    l => `<strong>${_esc(l.name||'')}</strong> <span class="meta">${_esc(l.address||'')}${l.postcode?' · '+_esc(l.postcode):''}${l.status?' · '+_esc(l.status):''}</span>`)}
+      ${_locBlock('Formal ESOL providers',_esol,    e => `<strong>${_esc(e.name||'')}</strong> <span class="meta">${e.type?_esc(e.type):''}${e.postcode?' · '+_esc(e.postcode):''}</span>`)}
+      ${_locBlock('VCSE organisations',   _vcse,    v => `<strong>${_esc(v.name||'')}</strong> <span class="meta">${_esc(v.addr||'')}</span>`, 'span-2')}
+      ${_locBlock('Parks & greenspaces',  _green,   g => `<strong>${_esc(g.n||'')}</strong> <span class="meta">${_esc(g.a||'')}${g.sz?' · '+_esc(g.sz):''}</span>`)}
     </div>
   </div>
-
-  ${crimeRows.length ? `<!-- ═══════════════════════ PAGE 3: Crime ═══════════════════════ -->
-  <div class="page">
-    <div class="page-title">Crime — by category, last 12 months${crimeTotal != null ? ` · total ${Math.round(crimeTotal).toLocaleString()}` : ''}</div>
-    <div class="content">
-      <div class="row">
-        <div class="panel" style="flex:1">
-          <h3>MPS recorded crime — Apr 2025 to Mar 2026</h3>
-          ${crimeSVG}
-          <div class="legend"><span class="legend-tick"></span> NWL median for each category &nbsp;·&nbsp; sorted by this ward's count, highest first &nbsp;·&nbsp; source: Met Police via London Datastore</div>
-        </div>
-      </div>
-    </div>
-  </div>` : ''}
-
-  <!-- ═══════════════════════ PAGE 4: Civic strength ═══════════════════════ -->
-  <div class="page">
-    <div class="page-title">Civic strength &amp; community assets</div>
-    <div class="content">
-      <div class="row">
-        <div class="panel" style="flex:1">
-          <h3>Civic strength — NWL percentile (higher = stronger)</h3>
-          ${civicSVG}
-          <div class="legend">Each bar = % of 168 NWL wards this ward beats on that indicator · source: London Civic Strength Index Round 3, London Datastore (2024)</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  ${(gpListSection || pharmacyListSection) ? `<!-- ═══════════════════════ PAGE 5: Service lists ═══════════════════════ -->
-  <div class="page">
-    <div class="page-title">Service lists — GPs &amp; pharmacies in this ward</div>
-    ${gpListSection}
-    ${pharmacyListSection}
-  </div>` : ''}
 
   <div class="footer">
     <strong>Data sources:</strong> ONS Census 2021 (demographics, health, household language, travel-to-work) · MHCLG Indices of Deprivation 2019, mid-2022 population-weighted · Met Police MPS via London Datastore (crime, Apr 2025 – Mar 2026) · London Civic Strength Index Round 3, London Datastore (2024) · DESNZ LILEE (fuel poverty) · NOMIS / DWP (claimant count, working-age) · NHS Digital ODS (GP, pharmacy, dental practice registers) · DfE GIAS (schools) · GLA ESOL Planning Map (community centres, libraries, formal ESOL providers).
@@ -5263,7 +5296,10 @@ async function _downloadMapPng() {
         const finish = () => { if (!done) { done = true; resolve(); } };
         try { map.once('moveend', finish); } catch (e) { /* no-op */ }
         try {
-          map.fitBounds(scopeBounds, { padding: [24, 24], animate: false });
+          // Generous padding so no part of the scope polygon is touching the
+          // edge of the canvas — that's what was producing the "cut off" look
+          // on the eastern boroughs (Westminster/K&C/H&F).
+          map.fitBounds(scopeBounds, { padding: [60, 60], animate: false });
           movedMap = true;
         } catch (e) { finish(); return; }
         setTimeout(finish, 500);
@@ -5345,29 +5381,12 @@ async function _downloadMapPng() {
     const yScale = mapEl.clientHeight
       ? (fullCanvas.height / mapEl.clientHeight) : dpr;
 
-    // Step 4: tight-crop to the scope bbox, using the SAME container-pixel
-    // coords we projected above (no second projection pass → no stale-
-    // state race). Scale CSS-pixel coords by the measured html2canvas
-    // ratio to convert to canvas pixels, and clamp to the canvas extent.
-    let outCanvas = fullCanvas;
-    if (isFinite(bxMin) && (bxMax - bxMin) > 40 && (byMax - byMin) > 40) {
-      const padCss = 14;
-      const cx = Math.max(0, Math.round((bxMin - padCss) * xScale));
-      const cy = Math.max(0, Math.round((byMin - padCss) * yScale));
-      const cwRaw = Math.round((bxMax - bxMin + padCss * 2) * xScale);
-      const chRaw = Math.round((byMax - byMin + padCss * 2) * yScale);
-      const cw = Math.min(fullCanvas.width - cx, cwRaw);
-      const ch = Math.min(fullCanvas.height - cy, chRaw);
-      if (cw > 40 && ch > 40) {
-        outCanvas = document.createElement('canvas');
-        outCanvas.width = cw;
-        outCanvas.height = ch;
-        const cctx = outCanvas.getContext('2d');
-        cctx.fillStyle = '#ffffff';
-        cctx.fillRect(0, 0, cw, ch);
-        cctx.drawImage(fullCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
-      }
-    }
+    // No tight-crop. fitBounds() above already framed the map so the scope
+    // polygon fills the viewport with breathing room. Cropping again past
+    // the polygon bbox was reliably cutting off the eastern boroughs
+    // (Westminster, K&C, H&F) per user-reported output. The captured
+    // canvas IS the output.
+    const outCanvas = fullCanvas;
     outCanvas._nwlDpr = Math.max(xScale, yScale);
 
     // Caption pill (scope · overlay · month YYYY).
@@ -5474,11 +5493,136 @@ function _downloadOverlayCsv() {
   }
 }
 
+// ── Point-layer CSV export ─────────────────────────────────────────────
+// When the user has any point layers (VCSE / GP / dental / schools / etc.)
+// toggled on, the CSV button also emits one CSV per visible layer alongside
+// the ward/LSOA choropleth CSV. Each file is scoped to the current borough
+// focus so it matches what the user is currently looking at.
+function _downloadCsvBlob(filename, header, rows) {
+  if (!rows || !rows.length) return false;
+  const lines = [header.map(_csvEscape).join(',')]
+    .concat(rows.map(r => r.map(_csvEscape).join(',')));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  return true;
+}
+
+function _downloadPointLayersCsv() {
+  const ts = new Date().toISOString().slice(0,16).replace(/[:T-]/g,'');
+  const boroughFilter = (typeof focusedBorough !== 'undefined' && focusedBorough && focusedBorough !== 'all') ? focusedBorough : null;
+  const scopeSlug = (boroughFilter ? boroughFilter : 'nw-london')
+    .toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+
+  // Scope helper: keep only records inside the focused borough (if one is
+  // focused). For records with a borough/lad field, match by name; otherwise
+  // fall back to a spatial test using BOROUGH_GJ.
+  const inScope = (rec) => {
+    if (!boroughFilter) return true;
+    const b = rec.borough || rec.lad || rec.LAD || '';
+    if (b && b === boroughFilter) return true;
+    const lat = rec.lat, lng = rec.lng;
+    if (lat == null || lng == null) return false;
+    if (typeof ladOfLatLng === 'function') {
+      try { return ladOfLatLng(lat, lng) === boroughFilter; } catch(e) { return false; }
+    }
+    return false;
+  };
+
+  let total = 0;
+  const layers = [
+    {
+      id: 'tg', name: 'gp-practices',
+      data: typeof GPS !== 'undefined' ? GPS : null,
+      header: ['name','address','postcode','tel','website','patients','lat','lng'],
+      row: r => [r.n||r.name, r.a||r.addr, r.pc||r.postcode, r.tel||'', r.web||'', r.patients||'', r.lat, r.lng],
+    },
+    {
+      id: 'th', name: 'hospitals',
+      data: typeof HOSP !== 'undefined' ? HOSP : null,
+      header: ['name','address','type','trust','lat','lng'],
+      row: r => [r.n||r.name, r.a||r.addr, r.t||'', r.trust||'', r.lat, r.lng],
+    },
+    {
+      id: 'tph', name: 'pharmacies',
+      data: typeof pharmData !== 'undefined' ? pharmData : null,
+      header: ['name','address','postcode','lat','lng'],
+      row: r => [r.name||r.n, r.addr||r.a||'', r.postcode||r.pc||'', r.lat, r.lng],
+    },
+    {
+      id: 'td', name: 'dental-practices',
+      data: typeof dentalData !== 'undefined' ? dentalData : null,
+      header: ['name','postcode','nhs_contracted','lat','lng'],
+      row: r => [r.name, r.postcode||'', r.nhs_contracted===true?'Y':r.nhs_contracted===false?'N':'', r.lat, r.lng],
+    },
+    {
+      id: 'tv', name: 'vcse-organisations',
+      data: typeof vcseData !== 'undefined' ? vcseData : null,
+      header: ['name','address','lat','lng'],
+      row: r => [r.name, r.addr||'', r.lat, r.lng],
+    },
+    {
+      id: 'tsch', name: 'schools',
+      data: typeof schoolsData !== 'undefined' ? schoolsData : null,
+      header: ['name','urn','phase','type','gender','low_age','high_age','capacity','pupils','fsm_pct','street','town','postcode','website','borough','ward_code','lat','lng'],
+      row: r => [r.name, r.urn||'', r.phase||'', r.type||'', r.gender||'', r.low_age||'', r.high_age||'', r.capacity||'', r.pupils||'', r.fsm_pct||'', r.street||'', r.town||'', r.postcode||'', r.website||'', r.borough||'', r.ward_code||'', r.lat, r.lng],
+    },
+    {
+      id: 'tcc', name: 'community-centres',
+      data: typeof ccData !== 'undefined' ? ccData : null,
+      header: ['name','address','postcode','website','borough','ward_name','ward_code','lat','lng'],
+      row: r => [r.name, r.address||'', r.postcode||'', r.website||'', r.borough||'', r.ward_name||'', r.ward_code||'', r.lat, r.lng],
+    },
+    {
+      id: 'tlib', name: 'libraries',
+      data: typeof libData !== 'undefined' ? libData : null,
+      header: ['name','address','postcode','website','status','borough','ward_name','ward_code','lat','lng'],
+      row: r => [r.name, r.address||'', r.postcode||'', r.website||'', r.status||'', r.borough||'', r.ward_name||'', r.ward_code||'', r.lat, r.lng],
+    },
+    {
+      id: 'tesol', name: 'esol-providers',
+      data: typeof esolData !== 'undefined' ? esolData : null,
+      header: ['name','type','website','address','postcode','borough','lat','lng'],
+      row: r => [r.name, r.type||'', r.website||'', r.address||'', r.postcode||'', r.borough||'', r.lat, r.lng],
+    },
+    {
+      id: 'tgr', name: 'parks-greenspaces',
+      data: typeof GRN !== 'undefined' ? GRN : null,
+      header: ['name','address','size','lat','lng'],
+      row: r => [r.n||r.name, r.a||r.addr||'', r.sz||'', r.lat, r.lng],
+    },
+  ];
+
+  // Stagger the downloads slightly — some browsers block synchronous bursts.
+  let delay = 0;
+  layers.forEach(L => {
+    const cb = document.getElementById(L.id);
+    if (!cb || !cb.checked) return;
+    if (!Array.isArray(L.data) || !L.data.length) return;
+    const filtered = L.data.filter(inScope);
+    if (!filtered.length) return;
+    const rows = filtered.map(L.row);
+    setTimeout(() => {
+      _downloadCsvBlob(`nwl-${L.name}-${scopeSlug}-${ts}.csv`, L.header, rows);
+    }, delay);
+    delay += 350;
+    total++;
+  });
+  return total;
+}
+
 (function _wireExportButtons() {
   const pngBtn = document.getElementById('tb-png');
   const csvBtn = document.getElementById('tb-csv');
   if (pngBtn) pngBtn.addEventListener('click', _downloadMapPng);
-  if (csvBtn) csvBtn.addEventListener('click', _downloadOverlayCsv);
+  if (csvBtn) csvBtn.addEventListener('click', () => {
+    _downloadOverlayCsv();
+    // Also export every visible point layer as its own CSV.
+    try { _downloadPointLayersCsv(); } catch(e) { console.warn('point-layer CSV export failed', e); }
+  });
 })();
 
 // (Copy-link button removed — if we want shareable URLs later, wire it

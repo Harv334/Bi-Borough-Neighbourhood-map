@@ -14,7 +14,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue .git\HEAD.lock
 # mis-parsed as flags).
 $msgPath = Join-Path $env:TEMP "nwl_commit_msg.txt"
 $msg = @'
-ui+tooling: revert OSM, dim mask, fix svc counts, multi-page A4, ward .pptx generator
+ui+tooling: dense ward profile + locations + sidebar ward-only + PNG fitBounds + CSV layers
 
 Adopts the official ONS LSOA (2021) -> Electoral Ward (May 2024)
 best-fit lookup as the authoritative LSOA->ward mapping, replacing
@@ -838,6 +838,120 @@ Ward profile — redesigned as A4 at-a-glance page
 - LSOA report (generateLSOAReport) is unchanged for
   now — same redesign approach can be applied in a
   follow-up commit.
+
+Iteration round 3 — dense profile, sidebar fix, PNG, CSV
+========================================================
+
+Ward profile — revert multi-page → dense single-flow
+----------------------------------------------------
+- Per user feedback ("very crammed" reading was
+  inverted — they wanted MORE information packed
+  in, not less), reverted the 5-page A4 split.
+  Single flowing document, ~880px wide. Smaller
+  fonts (12px body, 22px KPI values, 18px service
+  values), tighter padding, no forced
+  page-break-before. @media print rules just
+  avoid breaking inside panels.
+- All chart panels still present and intact
+  (ethnicity stack, age stack, demographic-
+  vs-NWL bars, IMD radar, health/economic bars,
+  green/blue space bars, crime breakdown, civic
+  strength NWL-percentile bars).
+- NEW "Physical locations in this ward" section
+  at the bottom: 3-column grid of named lists
+  with count badges, replacing the old GP/
+  pharmacy-only tables. Renders:
+    GP practices · Pharmacies · Dental practices
+    Hospitals & clinics · Schools (with phase,
+    type, pupils, FSM%) · Community centres
+    Libraries · Formal ESOL providers · VCSE
+    organisations · Parks & greenspaces.
+  Schools / community centres / libraries via
+  ward_code (exact); everything else via spatial
+  point-in-polygon.
+- _locBlock helper renders each list as ordered,
+  bold-name + meta inline, and "none" empty
+  state. The four GLA loaders now spread `...p`
+  into their data arrays so every original CSV
+  field (URN, phase, FSM%, capacity, ward_name,
+  status, etc.) is available in the report.
+
+Ward sidebar profile — ward-level fields only
+---------------------------------------------
+- Bug: clicking a ward in the map showed LSOA-
+  level rows in the sidebar profile (e.g. green/
+  blue 15-min %, IMD domain scores) intermixed
+  with ward-level census fields. The CATS config
+  tags every field with .g; the sidebar was
+  iterating without filtering.
+- Fix: filter cat.fields with `f.g === 'ward'`
+  before rendering. LSOA-tagged rows are excluded
+  from the ward profile. The LSOA profile (open
+  by clicking a single LSOA when boundaries are
+  on) still shows them — that's the correct
+  geography.
+
+PNG export — drop tight-crop, generous fitBounds pad
+----------------------------------------------------
+- User report: PNG was "still being cut off" —
+  eastern boroughs (Westminster, K&C, H&F)
+  appeared in the dimmed (out-of-scope) zone of
+  the export.
+- Root cause: the post-capture tight-crop to the
+  scope-polygon container-pixel bbox + 14 CSS px
+  pad was tighter than the fitBounds frame in
+  some projections, slicing off chunks of the
+  polygon edges. The mask itself was correct;
+  the second crop on top was the bug.
+- Fix: dropped the tight-crop entirely. fitBounds
+  alone frames the map so the scope polygon
+  fills the viewport. Increased fitBounds
+  padding from 24px to 60px for additional
+  breathing room around the polygon edges.
+- Behaviour now: PNG download = the lat/lng-
+  bounded view of the current scope (NWL if no
+  borough focused, the focused borough
+  otherwise), framed by Leaflet's fitBounds at
+  the natural zoom for that bbox. The semi-
+  transparent white mask still dims everything
+  outside the scope polygon at 0.55 opacity.
+
+CSV export — also emit every visible point layer
+------------------------------------------------
+- Previously the CSV button produced a single
+  ward-level or LSOA-level choropleth file.
+- NEW: when point-layer toggles are on (#tg GP,
+  #th hospitals, #tph pharmacies, #td dental,
+  #tv VCSE, #tsch schools, #tcc community
+  centres, #tlib libraries, #tesol ESOL, #tgr
+  greenspaces), the CSV button additionally
+  emits one CSV per toggled-on layer alongside
+  the choropleth CSV. Each is filenamed
+  nwl-{layer}-{scope-slug}-{timestamp}.csv.
+- Each point-layer CSV is scoped to the current
+  borough focus: borough-focused → only records
+  inside that borough; "All NW London" → every
+  loaded record. Filtering uses the record's own
+  borough/lad field where present, falling back
+  to ladOfLatLng() spatial test.
+- Per-layer columns are tailored to the source
+  data:
+    schools: name, URN, phase, type, gender,
+             ages, capacity, pupils, FSM%,
+             street, town, postcode, website,
+             borough, ward_code, lat, lng
+    libraries: includes status (Open/Closed)
+    community centres: includes ward_name +
+             ward_code
+    dental: includes nhs_contracted (Y/N)
+    hospitals: includes type + trust
+    GP: includes patient list size where
+             available
+- Downloads are staggered 350ms apart to avoid
+  browser-level burst-blocking. The existing
+  ward/LSOA choropleth CSV continues to download
+  immediately as before — this addition is
+  alongside, not in place of.
 '@
 Set-Content -Path $msgPath -Value $msg -Encoding UTF8
 
